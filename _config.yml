@@ -43,3 +43,17 @@ sass:
 #   - vendor/gems/
 #   - vendor/ruby/
 
+# Collections
+collections:
+  benchmarking:
+    output: true
+    permalink: /benchmarking/:title.html
+  ipv6:
+    output: true
+    permalink: /ipv6/:title.html
+
+
+# Menu entries
+header_pages:
+  - benchmarking.md
+  - ipv6.md
