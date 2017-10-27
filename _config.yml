@@ -35,7 +35,6 @@ theme-color: {
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-materialize
 plugins:
   - jekyll-feed
 
