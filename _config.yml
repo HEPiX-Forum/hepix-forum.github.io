@@ -22,6 +22,8 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 github_username:  hepix-forum
+search_placeholder: "article title"
+unit_articles: "articles"
 
 # Build settings
 markdown: kramdown
@@ -54,7 +56,3 @@ collections:
     permalink: /ipv6/:title.html
 
 
-# Menu entries
-header_pages:
-  - benchmarking.md
-  - ipv6.md
