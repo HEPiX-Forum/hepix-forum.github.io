@@ -57,6 +57,11 @@ nav {
 
 
   // Logo
+  .logo-image {
+    height: $navbar-height;
+    width: auto;
+  }
+  
   .brand-logo {
     position: absolute;
     color: $navbar-font-color;
