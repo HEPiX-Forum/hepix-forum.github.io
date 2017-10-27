@@ -2,4 +2,4 @@
 layout: home
 ---
 
-A Site Starter Materialize Templates for Jekyll.
+This website contains information from the [HEPiX](http://hepix.org) working groups.

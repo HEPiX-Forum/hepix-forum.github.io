@@ -1,7 +1,7 @@
 ---
 title: Benchmarking WG
 menu: Benchmarking
-layout: default
+layout: page
 ---
 
 # Benchmarking WG
