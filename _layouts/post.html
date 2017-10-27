@@ -1,26 +1,30 @@
 ---
 layout: default
 ---
-<br>
-    <div class="row">
-      <div class="col s12">
-        <div id="postsContent" class="card-panel white">
-          <span>
-            {{ content }}
-          </span>
-            {% if page.comments %}
-    
-            {% include disqus.html %}
+<div class="container">
+    <div class="section">
+    <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-            {% endif %}
-        </div>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">{{ page.title | escape }}</h1>
+        <p class="post-meta">
+          <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+            {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
+            {{ page.date | date: date_format }}
+          </time>
+          {% if page.author %}
+            • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>
+          {% endif %}</p>
+      </header>
+
+      <div class="post-content" itemprop="articleBody">
+        {{ content }}
       </div>
+
+      {% if site.disqus.shortname %}
+        {% include disqus_comments.html %}
+      {% endif %}
+    </article>
     </div>
-<div class="row">
-{% if page.previous.url %}
-<a data-position="left" data-delay="50" data-tooltip="{{page.previous.title}}" href="{{page.previous.url | prepend: site.baseurl }}" class="btn-floating waves-effect waves-grey btn-flat white tooltipped"><i class="material-icons black-text">arrow_back</i></a>
-{% endif %}
-{% if page.next.url %}
-<a data-position="right" data-delay="50" data-tooltip="{{page.next.title}}" href="{{page.next.url | prepend: site.baseurl }}" class="btn-floating waves-effect waves-grey btn-flat white right tooltipped"><i class="material-icons black-text">arrow_forward</i></a>
-{% endif %}
 </div>
+<script>$('.carousel.carousel-slider').carousel({fullWidth: true});</script>

@@ -22,16 +22,6 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 github_username:  hepix-forum
-search_placeholder: "article title"
-unit_articles: "articles"
-theme-color: {
-  default-color: orange,
-  home-color: orange,
-  about-color: red,
-  archive-color: pink,
-  links-color: purple,
-  tags-color: blue
-}
 
 # Build settings
 markdown: kramdown

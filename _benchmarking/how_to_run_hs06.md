@@ -1,6 +1,6 @@
 ---
 title: How to Run HEP-SPEC06 Benchmark
-layout: default
+layout: page
 ---
 
 # How to Run HEP-SPEC06 Benchmark
