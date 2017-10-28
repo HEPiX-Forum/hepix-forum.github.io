@@ -27,6 +27,7 @@ github_username:  hepix-forum
 markdown: kramdown
 plugins:
   - jekyll-feed
+  - jekyll-redirect-from
 
 sass:
   style: compress
