@@ -46,6 +46,9 @@ sass:
 
 # Collections
 collections:
+  about:
+    output: true
+    permalink: /about/:title.html
   benchmarking:
     output: true
     permalink: /benchmarking/:title.html
