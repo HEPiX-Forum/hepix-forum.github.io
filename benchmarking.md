@@ -2,6 +2,7 @@
 title: Benchmarking WG
 menu: Benchmarking
 layout: page
+redirect_from: /benchmarks/index.html
 ---
 
 # Benchmarking WG
