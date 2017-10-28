@@ -2,6 +2,7 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
+$dropdown-content-min-width: 150px;
 $navbar-logo-image-height: 130%;
 @import "materialize/materialize";
 @import "syntax-highlighting";
