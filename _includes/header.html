@@ -1,4 +1,9 @@
+<ul id="about-menu" class="dropdown-content">
+  <li><a href="/about/how_to_contribute.html">How to Contribute</a></li>
+</ul>
+
 <nav class="light-blue lighten-1" role="navigation">
+
     <div class="nav-wrapper container">
     <a href="http://hepix.org"><img class="logo-image" src="/images/hepix-logo.png" alt="HEPiX Logo"></a>
     {% assign default_paths = site.pages | map: "path" %}
@@ -21,7 +26,8 @@
                       {% endif %}
                     {% endif %}
                 {% endfor %}
-            {% endif %}              
+            {% endif %}
+	    <li><a class="dropdown-button" href="#!" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a></li>
           </ul>
 
           <ul id="nav-mobile" class="side-nav">
