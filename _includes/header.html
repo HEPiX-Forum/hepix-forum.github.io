@@ -4,44 +4,44 @@
 
 <nav class="light-blue lighten-1" role="navigation">
 
-    <div class="nav-wrapper container">
+  <div class="nav-wrapper container">
     <a href="http://hepix.org"><img class="logo-image" src="/images/hepix-logo.png" alt="HEPiX Logo"></a>
     {% assign default_paths = site.pages | map: "path" %}
     {% assign page_paths = site.header_pages | default: default_paths %}
-
-          <ul class="right hide-on-med-and-down">
-            {% if page.url == "/" %}
-	      <li class="active"><a href="{{ "/" | relative_url }}">Home </a></li>
-	    {% else %}
-	      <li><a href="{{ "/" | relative_url }}">Home </a></li>
-	    {% endif %}
-            {% if page_paths %}
-                {% for path in page_paths %}
-                    {% assign my_page = site.pages | where: "path", path | first %}
-                    {% if my_page.menu %}
-                      {% if page.url == my_page.url %}
-		        <li class="active"><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
-		      {% else %}
-		        <li><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
-                      {% endif %}
-                    {% endif %}
-                {% endfor %}
+  
+    <ul class="right hide-on-med-and-down">
+      {% if page.url == "/" %}
+        <li class="active"><a href="{{ "/" | relative_url }}">Home </a></li>
+      {% else %}
+        <li><a href="{{ "/" | relative_url }}">Home </a></li>
+      {% endif %}
+      {% if page_paths %}
+        {% for path in page_paths %}
+          {% assign my_page = site.pages | where: "path", path | first %}
+          {% if my_page.menu %}
+            {% if page.url == my_page.url %}
+              <li class="active"><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
+            {% else %}
+  	          <li><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
             {% endif %}
-	    <li><a class="dropdown-button" href="#!" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a></li>
-          </ul>
-
-          <ul id="nav-mobile" class="side-nav">
-            <li><a href="#">Home</a></li>
-                            {% if page_paths %}
-                {% for path in page_paths %}
-                    {% assign my_page = site.pages | where: "path", path | first %}
-                    {% if my_page.menu %}
-                    <li><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
-                    {% endif %}
-                {% endfor %}
-            {% endif %} 
-          </ul>        
-
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <li><a class="dropdown-button" href="#!" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a></li>
+    </ul>
+  
+    <ul id="nav-mobile" class="side-nav">
+      <li><a href="#">Home</a></li>
+      {% if page_paths %}
+        {% for path in page_paths %}
+          {% assign my_page = site.pages | where: "path", path | first %}
+          {% if my_page.menu %}
+            <li><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
+          {% endif %}
+        {% endfor %}
+      {% endif %} 
+    </ul>        
+  
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+  </div>
 </nav>
