@@ -1,7 +1,3 @@
-<ul id="about-menu" class="dropdown-content">
-  <li><a href="/about/how_to_contribute.html">Website HowTo</a></li>
-</ul>
-
 <nav class="light-blue lighten-1" role="navigation">
 
   <div class="nav-wrapper container">
@@ -27,7 +23,12 @@
           {% endif %}
         {% endfor %}
       {% endif %}
-      <li><a class="dropdown-button" href="#!" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a></li>
+      <li>
+        <a class="dropdown-button" href="#!" data-beloworigin="true" data-alignment="right" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a>
+        <ul id="about-menu" class="dropdown-content">
+          <li><a href="/about/how_to_contribute.html">Website HowTo</a></li>
+        </ul>
+      </li>
     </ul>
   
     <ul id="nav-mobile" class="side-nav">
