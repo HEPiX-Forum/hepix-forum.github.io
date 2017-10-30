@@ -2,20 +2,33 @@
 set -e # halt script on error
 
 usage () {
-    echo "usage: $(basename $0) [--debug]"
+    echo "usage: $(basename $0) [--debug] [any htmlproofer option]"
     exit 2
 }
 
 debug_option=
+htmlproofer_opts=
 
-if [ "$1" == "--debug" ]
-then
-    debug_option="--log-level debug"
-elif [ -n "$1" ]
-then
-    echo "Unsupported option ($1)"
-    usage
-fi
+while [ -n "$(echo $1 | grep -- '^--')" ]
+do
+    case $1 in
+        --debug)
+            debug_option="--log-level debug"
+            ;;
+
+        --help)
+            usage
+            exit 1
+            ;;
+
+        *)
+            htmlproofer_opts="${htmlproofer_opts} $1"
+            ;;
+    esac
+
+    shift
+done
+
 
 url_ignore_file=$(dirname $0)/url-ignore
 if [ ! -f ${url_ignore_file} ]
@@ -44,7 +57,7 @@ echo "html-proofer url-ignore option: ${url_ignore_option}"
 
 bundle exec jekyll build
 set +e # do not halt script on error
-bundle exec htmlproofer ${url_ignore_option} ${debug_option} --check-html ./_site
+bundle exec htmlproofer ${url_ignore_option} ${debug_option} --allow-hash-href ${htmlproofer_opts} ./_site
 status=$?
 if [ ${status} -ne 0 -a -z "${debug_option}" ]
 then
