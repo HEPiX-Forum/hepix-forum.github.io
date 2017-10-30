@@ -4,4 +4,7 @@ menu: IPv6
 layout: page
 ---
 
-The HEPiX IPv6 Working Group as a dedicated [web site](http://hepix-ipv6.web.cern.ch).
+# IPv6 Working Group
+
+The HEPiX IPv6 Working Group is discussing issues with enabling dual-stack services and IPv6-only clients.
+It has a dedicated [web site](http://hepix-ipv6.web.cern.ch).
