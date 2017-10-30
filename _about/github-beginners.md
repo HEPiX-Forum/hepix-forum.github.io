@@ -27,7 +27,7 @@ At a first glance, GitHub (and Git) may look complex with their "workflows". But
 is that they allow a clear separation between your personal work and what you decide to show or export. Your personal work, unlike with tools 
 like SVN, can be versionned and you can work on different things in parallel (branches) very easily.
 
-In the HSF web site context, what is shared is what is in the project repository called, [hepix-forum.github.io](https://github.com/HEP-SF/hepix-forum.github.io). 
+In the HSF web site context, what is shared is what is in the project repository called, [hepix-forum.github.io](https://github.com/hepix-forum/hepix-forum.github.io). 
 Your personal environment is made of 2 parts:
 
 * One personal repository on GitHub, called a *fork*. It is typically created using the GitHub web interface, click on the `Fork` button when you are 
@@ -48,7 +48,7 @@ where your contribution is limited to only one file as you cannot edit several f
 of the Git clone, there workflow for pushing your changes to the project repository remains the same, using *pull request*.
 
 Sections below give more details on the main steps involved. Examples are based on the HSF web site 
-[repository](https://github.com/HEP-SF/hepix-forum.github.io). Note that there is a help available for each Git command that can be displayed with:
+[repository](https://github.com/hepix-forum/hepix-forum.github.io). Note that there is a help available for each Git command that can be displayed with:
 
 ```bash
 git help
@@ -71,7 +71,7 @@ that you enter your password...
 
 As explained in the introduction, this involves 2 steps:
 
-* Creating your personal fork: with your browser, open this web site [repository](https://github.com/HEP-SF/hepix-forum.github.io) and 
+* Creating your personal fork: with your browser, open this web site [repository](https://github.com/hepix-forum/hepix-forum.github.io) and 
 click on the `Fork` button at the top-right of page.
 * Creating your local clone of your personal fork (assuming your name is `dupont`: 
 

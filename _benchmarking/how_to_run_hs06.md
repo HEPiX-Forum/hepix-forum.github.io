@@ -43,7 +43,7 @@ The mandatory set of compiler flags is provided by the LCG Architects Forum:\
 
 ### Configuration files and script
 
-Configuration files and a run script are available as a gzipped tar archive ([spec2k6-2.24.tar.gz, MD5=a42e12acbc1ef533b3c1328b77c14b01}](/benchmarking/bench:spec2k6-2.24.tar.gz)).
+Configuration files and a run script are available as a gzipped tar archive ({% comment %} [spec2k6-2.24.tar.gz, MD5=a42e12acbc1ef533b3c1328b77c14b01}](/benchmarking/bench:spec2k6-2.24.tar.gz) {% endcomment %}).
 
 ## Run rules
 
@@ -292,7 +292,7 @@ If our production machines run Linux x86_64, we use this OS for the benchmark as
 
 The SPECcpu speed benchmark runs a single copy of the benchmark on the machine, using only a single core. The SPEC rate benchmark runs as many benchmarks as there are cores, but it calculates the results as a function of the total elapsed time. This skews the results, as a single slow core can keep the others idle until it finishes. Take a look at this graphical explanation of the difference between SPECcpu rate and multiple SPECcpu speed:
 
-[cpu_vs_rate](/benchmarking/speed_vs_rate.gif)
+{% comment %}[cpu_vs_rate](/benchmarking/speed_vs_rate.gif){% endcomment %}
 
 To overcome these problems, we decided to run multiple speed benchmarks in parallel. We launch one independent speed benchmark for each core in the system and then add up the results to come up with a total result for the system. This mimics what we do in our production environment, where we run multiple independent single-threaded applications in parallel. 
 

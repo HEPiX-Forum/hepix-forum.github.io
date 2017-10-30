@@ -47,4 +47,4 @@ Although the HS06 benchmark was initially designed to meet the requirements of H
 
 ----
 
-SPEC® is a registered trademark of the Standard Performance Evaluation Corporation (SPEC), [www.spec.org](http://www/spec.org).
+SPEC® is a registered trademark of the Standard Performance Evaluation Corporation (SPEC), [www.spec.org](http://www.spec.org).
