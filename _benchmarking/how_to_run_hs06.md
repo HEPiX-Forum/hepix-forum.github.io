@@ -4,6 +4,12 @@ layout: page
 ---
 
 # How to Run HEP-SPEC06 Benchmark
+{:.no_toc}
+
+##### Table of Contents:
+{:.no_toc}
+* auto-gen TOC:
+{:toc}
 
 
 ## Requirements
