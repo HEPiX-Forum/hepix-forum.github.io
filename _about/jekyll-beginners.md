@@ -8,6 +8,7 @@ layout: page
 {:.no_toc}
 
 ##### Table of Contents:
+{:.no_toc}
 * auto-gen TOC:
 {:toc}
 
