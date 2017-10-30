@@ -32,7 +32,7 @@
     </ul>
   
     <ul id="nav-mobile" class="side-nav">
-      <li><a href="#">Home</a></li>
+      <li><a href="{{ "/" | relative_url }}">Home</a></li>
       {% if page_paths %}
         {% for path in page_paths %}
           {% assign my_page = site.pages | where: "path", path | first %}
@@ -41,6 +41,9 @@
           {% endif %}
         {% endfor %}
       {% endif %} 
+      <li>
+        <a class="dropdown-button" href="#!" data-beloworigin="true" data-alignment="right" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a>
+      </li>
     </ul>        
   
     <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
