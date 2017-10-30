@@ -8,3 +8,14 @@ $navbar-logo-image-height: 130%;
 $navbar-dropdown-arrow-left-margin: 0;
 @import "materialize/materialize";
 @import "syntax-highlighting";
+
+// Sticky footer
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
