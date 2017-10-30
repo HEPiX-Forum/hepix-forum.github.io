@@ -4,8 +4,19 @@
 
 $dropdown-content-min-width: 150px;
 $dropdown-item-height: 30px;
+
+$h1-fontsize: 3.56rem;
+$h2-fontsize: 2.92rem;
+$h3-fontsize: 2.28rem;
+$h4-fontsize: 1.64rem;
+$h5-fontsize: 1.20rem;
+$h6-fontsize: 1rem;
+$ul-padding-left: 1em;
+$ul-list-style-type: square;
+
 $navbar-logo-image-height: 130%;
 $navbar-dropdown-arrow-left-margin: 0;
+
 @import "materialize/materialize";
 @import "syntax-highlighting";
 
@@ -18,4 +29,8 @@ body {
 
 main {
   flex: 1 0 auto;
+}
+
+h5 {
+  font-style: italic;
 }

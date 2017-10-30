@@ -4,6 +4,13 @@ layout: page
 ---
 
 # How to Contribute to The Web Site
+{:.no_toc}
+
+##### Table of Contents:
+{:.no_toc}
+* auto-gen TOC:
+{:toc}
+
 
 This website is implemented using [GitHub Pages](https://pages.github.com/) service which makes it easy to create a website associated with
 a GitHub account or project. GitHub Pages uses [Jekyll](https://help.github.com/articles/using-jekyll-with-pages/), a tool to automatically build 
