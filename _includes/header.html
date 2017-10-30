@@ -40,13 +40,19 @@
             <li><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
           {% endif %}
         {% endfor %}
-      {% endif %} 
-      {% comment %}
-      For some reason, breaks the same menu on non mobile devices...
-      <li>
-        <a class="dropdown-button" data-beloworigin="true" data-alignment="right" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a>
+      {% endif %}
+      <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+          <li>
+            <a class="collapsible-header">About<i class="material-icons right">arrow_drop_down</i></a>
+            <div class="collapsible-body">
+              <ul>
+                <li><a href="/about/how_to_contribute.html">Website HowTo</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </li>
-      {% endcomment %}
     </ul>        
   
     <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
