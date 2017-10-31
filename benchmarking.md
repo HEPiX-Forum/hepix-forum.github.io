@@ -25,8 +25,6 @@ Although the HS06 benchmark was initially designed to meet the requirements of H
   * [SL7 x86_64 (gcc-4.8.x)](/benchmarking/sl7-x86_64-gcc48.html)
   * [SL6 x86_64 (gcc-4.4.x)](/benchmarking/sl6-x86_64-gcc44.html)
 
-{% comment %}
-
 ### Other system configurations (for academic use)
 
   * [SL6 x86_64 (gcc-4.8.x)](/benchmarking/sl6-x86_64-gcc48.html)
@@ -36,10 +34,8 @@ Although the HS06 benchmark was initially designed to meet the requirements of H
 ### Retired configurations
 
   * [SL5 x86_64 (gcc-4.1.2)](/benchmarking/sl5-x86_64-gcc412.html)
-  * [SL5 x86_64 (gcc-3.4.6)](/benchmarking/sl5-x86_64-gcc346.html)
+  * [SL4 x86_64 (gcc-3.4.6)](/benchmarking/sl4-x86_64-gcc346.html)
   * [SL4 i386 (gcc-3.4.6)](/benchmarking/sl4-i386-gcc346.html)
-
-{% endcomment %}
 
 ## How to run the benchmark
 
