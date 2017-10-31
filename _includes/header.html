@@ -15,8 +15,20 @@
         {% for path in page_paths %}
           {% assign my_page = site.pages | where: "path", path | first %}
           {% if my_page.menu %}
-            {% if page.url == my_page.url %}
-              <li class="active"><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
+            {% assign my_page_collection = my_page.name | replace: '.md' '' %}
+            {% if site.[my_page_collection] %}
+              <li>
+                <a class="dropdown-button" data-beloworigin="true" data-alignment="right" data-activates="{{ my_page_collection }}-menu">{{ my_page.menu }}<i class="material-icons right">arrow_drop_down</i></a>
+                <ul id="{{ my_page_collection }}-menu" class="dropdown-content">
+                  <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
+                  <li class="divider"></li>
+                  {% for collection_page in site.[my_page_collection] %}
+                    {% if collection_page.menu %}
+                      <li><a href="{{ collection_page.url }}">{{ collection_page.menu }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </li>
             {% else %}
   	          <li><a href="{{ my_page.url | relative_url }}">{{ my_page.menu | escape }}</a></li>
             {% endif %}
