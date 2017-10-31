@@ -52,8 +52,5 @@ collections:
   benchmarking:
     output: true
     permalink: /benchmarking/:title.html
-  ipv6:
-    output: true
-    permalink: /ipv6/:title.html
 
 
