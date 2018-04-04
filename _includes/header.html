@@ -15,7 +15,7 @@
         {% for path in page_paths %}
           {% assign my_page = site.pages | where: "path", path | first %}
           {% if my_page.menu %}
-            {% assign my_page_collection = my_page.name | replace: '.md' '' %}
+            {% assign my_page_collection = my_page.menu | slugify: 'default' | replace: "-", "_" %}
             {% if site.[my_page_collection] %}
               <li>
                 <a class="dropdown-button" data-beloworigin="true" data-alignment="right" data-activates="{{ my_page_collection }}-menu">{{ my_page.menu }}<i class="material-icons right">arrow_drop_down</i></a>
@@ -50,7 +50,7 @@
         {% for path in page_paths %}
           {% assign my_page = site.pages | where: "path", path | first %}
           {% if my_page.menu %}
-            {% assign my_page_collection = my_page.name | replace: '.md' '' %}
+            {% assign my_page_collection = my_page.menu | slugify: 'default' | replace: "-", "_" %}
             {% if site.[my_page_collection] %}
               <li class="no-padding">
                 <ul class="collapsible collapsible-accordion">
