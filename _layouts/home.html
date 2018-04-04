@@ -7,7 +7,7 @@ layout: default
       <br><br>
       <h1 class="header center orange-text">{{ site.title }}</h1>
       <div class="row center">
-        <h5 class="col s12 light">{{ content }}</h5>
+        <h5 class="col s12 light">{{ content | rstrip | append: '$@$' | remove: '<p>' | remove: '</p>$@$' }}</h5>
       </div>
     </div>
   </div>
