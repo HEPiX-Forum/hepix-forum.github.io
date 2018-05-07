@@ -29,10 +29,27 @@ You **must** start by [forking](https://github.com/HEPiX-Forum/hepix-forum.githu
 our [website repository](https://github.com/hepix-forum/hepix-forum.github.io) and then, clone **your fork**
 (not the website repository) with your preferred Git client. Once you have done it, for every contribution you'd
 like to make, the workflow is:
-* create a Git branch (do not use the `master` branch for your contributions,
-avoid reusing an existing branch if you are not familiar with Git)
+
+* Get the last updates from the web site repository with:
+
+    ```bash
+    git fetch --all
+    ```
+
+* Create a development branch from the web site repository (do not use the `master` branch for your contributions,
+avoid reusing an existing branch if you are not familiar with Git) with:
+
+    ```bash
+    git checkout -b dev_branch upstream/master`
+    ```
+
 * Edit the files you want to add or modify
-* Push them to your fork
+* Push them to your fork with:
+
+    ```bash
+    git push --set-upstream origin HEAD
+    ```
+
 * Open a pull request with the GitHub web interface (GitHub should propose to it when you open either the web
 repository or your fork)
 
