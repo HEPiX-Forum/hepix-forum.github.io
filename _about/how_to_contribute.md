@@ -18,20 +18,29 @@ a website from source files (which are kept in GitHub).
 The site content is written using the easy [Markdown syntax](http://daringfireball.net/projects/markdown/syntax) (which is used by GitHub itself).
 
 A [beginner's guide](/about/jekyll-beginners.html) provides some useful hints to make using Jekyll in the HEPiX context easier.
+**It is recommended to read it if you are not familiar with Jekyll.**
 
 ## How to add and edit information
 
 For adding information to this site or modifying it, we follow the *[pull request](https://help.github.com/articles/using-pull-requests/)* 
 workflow in GitHub.
 
-Just fork our [website repository](https://github.com/hepix-forum/hepix-forum.github.io) and clone your fork, edit the
-files you want to add or modify, push them to your fork, and open a pull request.
+You **must** start by [forking](https://github.com/HEPiX-Forum/hepix-forum.github.io#fork-destination-box)
+our [website repository](https://github.com/hepix-forum/hepix-forum.github.io) and then, clone **your fork**
+(not the website repository) with your preferred Git client. Once you have done it, for every contribution you'd
+like to make, the workflow is:
+* create a Git branch (do not use the `master` branch for your contributions,
+avoid reusing an existing branch if you are not familiar with Git)
+* Edit the files you want to add or modify
+* Push them to your fork
+* Open a pull request with the GitHub web interface (GitHub should propose to it when you open either the web
+repository or your fork)
 
 If you wish (and it is recommended), you can easily set up a local instance of this web site in order to preview your submissions. 
 See the [documentation](https://help.github.com/articles/using-jekyll-with-pages/) on installing and running Jekyll.
 The website uses the master branch of the hepix-forum.github.io repository.
 
-If you are not familiar with GitHub and Git, you can read our [survival kit](/about/github-beginners.html)!
+**If you are not familiar with GitHub and Git, read our [survival kit](/about/github-beginners.html)!**
 
 ### General structure of website content files
 
