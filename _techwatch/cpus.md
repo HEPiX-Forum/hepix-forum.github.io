@@ -1,5 +1,6 @@
 ---
 title: CPUs sub-WG
+menu: _
 layout: page
 ---
 

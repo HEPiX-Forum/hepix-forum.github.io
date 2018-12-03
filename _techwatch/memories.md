@@ -1,5 +1,6 @@
 ---
 title: Memory sub-WG
+menu: _
 layout: page
 ---
 

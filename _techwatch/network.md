@@ -1,5 +1,6 @@
 ---
 title: Network sub-WG
+menu: _
 layout: page
 ---
 

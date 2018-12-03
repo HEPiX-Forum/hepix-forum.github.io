@@ -1,5 +1,6 @@
 ---
 title: Storage sub-WG
+menu: _
 layout: page
 ---
 

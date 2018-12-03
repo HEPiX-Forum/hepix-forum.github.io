@@ -1,5 +1,6 @@
 ---
 title: Market sub-WG
+menu: _
 layout: page
 ---
 
