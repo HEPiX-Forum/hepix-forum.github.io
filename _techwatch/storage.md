@@ -1,9 +1,9 @@
 ---
-title: Techwatch: Storage sub-WG
+title: Storage sub-WG
 layout: page
 ---
 
-# Techwatch WG: Storage 
+# Techwatch: {{ page.title }}
 {:.no_toc}
 
 ##### Table of Contents:
