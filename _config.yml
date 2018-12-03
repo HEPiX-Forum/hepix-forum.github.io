@@ -52,5 +52,8 @@ collections:
   benchmarking:
     output: true
     permalink: /benchmarking/:title.html
+  techwatch:
+    output: true
+    permalink: /techwatch/:title.html
 
 
