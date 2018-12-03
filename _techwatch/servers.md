@@ -1,9 +1,9 @@
 ---
-title: Techwatch: Servers sub-WG
+title: Servers sub-WG
 layout: page
 ---
 
-# Techwatch WG: Servers
+# Techwatch: {{ page.title }}
 {:.no_toc}
 
 ##### Table of Contents:

@@ -1,9 +1,9 @@
 ---
-title: Techwatch: Market sub-WG
+title: Market sub-WG
 layout: page
 ---
 
-# Techwatch WG: Market
+# Techwatch: {{ page.title }}
 {:.no_toc}
 
 ##### Table of Contents:

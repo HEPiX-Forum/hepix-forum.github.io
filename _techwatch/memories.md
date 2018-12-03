@@ -1,9 +1,9 @@
 ---
-title: Techwatch: Memory sub-WG
+title: Memory sub-WG
 layout: page
 ---
 
-# Techwatch WG: Memory 
+# Techwatch: {{ page.title }}
 {:.no_toc}
 
 ##### Table of Contents:

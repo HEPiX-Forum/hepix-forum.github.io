@@ -1,9 +1,9 @@
 ---
-title: Techwatch: Network sub-WG
+title: Network sub-WG
 layout: page
 ---
 
-# Techwatch WG: Network
+# Techwatch: {{ page.title }}
 {:.no_toc}
 
 ##### Table of Contents:
