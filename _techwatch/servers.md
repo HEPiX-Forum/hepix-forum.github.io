@@ -1,5 +1,6 @@
 ---
 title: Servers sub-WG
+menu: _
 layout: page
 ---
 
