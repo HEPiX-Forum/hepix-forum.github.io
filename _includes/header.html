@@ -23,8 +23,13 @@
                   <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
                   <li class="divider"></li>
                   {% for collection_page in site.[my_page_collection] %}
-                    {% if collection_page.menu %}
-                      <li><a href="{{ collection_page.url }}">{{ collection_page.menu }}</a></li>
+                    {% if collection_page.menu == "_" %}
+                      {% assign my_menu = collection_page.title %}
+                    {% else %}
+                      {% assign my_menu = collection_page.menu %}
+                    {% endif %}
+                    {% if my_menu %}
+                      <li><a href="{{ collection_page.url }}">{{ my_menu }}</a></li>
                     {% endif %}
                   {% endfor %}
                 </ul>

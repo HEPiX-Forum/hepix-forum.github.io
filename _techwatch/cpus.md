@@ -1,9 +1,10 @@
 ---
-title: Techwatch: CPUs sub-WG
+title: CPUs sub-WG
+menu: _
 layout: page
 ---
 
-# Techwatch WG: CPUs
+# Techwatch: {{ page.title }}
 {:.no_toc}
 
 ##### Table of Contents:
