@@ -57,3 +57,4 @@ The following are the areas within the Storage sub-WG:
 ## Resources
 
    * Bernd Panzer's Computing Technologies and Markets reports: https://twiki.cern.ch/twiki/bin/view/Main/TechMarketPresentations
+

@@ -14,6 +14,7 @@ activities, most notably the running working groups on benchmarking
 and cost modelling.
 
 
+
 ## Subgroups
 
   * [General market trends, semiconductor markets, unit sales](/techwatch/market.html)
