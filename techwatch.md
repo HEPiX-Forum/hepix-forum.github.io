@@ -2,7 +2,7 @@
 title: Technology Watch Working Group
 menu: Techwatch
 layout: page
-author: Helge Meinhard et al.
+author: Helge Meinhard, German Cancio et al.
 redirect_from: /techwatch/index.html
 ---
 
