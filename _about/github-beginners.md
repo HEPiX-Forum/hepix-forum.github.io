@@ -27,7 +27,7 @@ At a first glance, GitHub (and Git) may look complex with their "workflows". But
 is that they allow a clear separation between your personal work and what you decide to show or export. Your personal work, unlike with tools 
 like SVN, can be versionned and you can work on different things in parallel (branches) very easily.
 
-In the HSF web site context, what is shared is what is in the project repository called, [hepix-forum.github.io](https://github.com/hepix-forum/hepix-forum.github.io). 
+In the hepix-forum web site context, what is shared is what is in the project repository called, [hepix-forum.github.io](https://github.com/hepix-forum/hepix-forum.github.io). 
 Your personal environment is made of 2 parts:
 
 * One personal repository on GitHub, called a *fork*. It is typically created using the GitHub web interface, click on the `Fork` button when you are 
