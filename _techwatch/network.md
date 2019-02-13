@@ -13,8 +13,8 @@ layout: page
 {:toc}
 
 ## Working Documents ##
-*   https://twiki.cern.ch/twiki/bin/view/HEPIX/TechwatchNetwork/WebHome
+*   [Twiki](https://twiki.cern.ch/twiki/bin/view/HEPIX/TechwatchNetwork/WebHome)
    
 ## Meetings ##
-*   On Indico: https://indico.cern.ch/category/10621/
+*   [On Indico](https://indico.cern.ch/category/10621/)
 
