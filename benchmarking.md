@@ -5,7 +5,7 @@ layout: page
 redirect_from: /benchmarks/index.html
 ---
 
-# Benchmarking WG
+# {{ page.title }}
 
 HS06 is the HEP-wide benchmark for measuring CPU performance. It has been developed by the HEPiX Benchmarking Working Group in order to replace the outdated "kSI2k" metric.
 
