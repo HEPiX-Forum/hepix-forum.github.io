@@ -6,7 +6,7 @@ author: Helge Meinhard, German Cancio et al.
 redirect_from: /techwatch/index.html
 ---
 
-# Technology Watch Working Group
+# {{ page.title }}
 
 The mandate of this Working Group is to monitor the relevant
 evolutions, both in terms of technology and markets, of the computing
