@@ -2,15 +2,19 @@
 title: Technology Watch Working Group
 menu: Techwatch
 layout: page
+description: |
+  The mandate of this Working Group is to monitor the relevant
+  evolutions, both in terms of technology and markets, of the computing
+  equipments that are relevant to the HEPiX community. 
 author: Helge Meinhard, German Cancio et al.
 redirect_from: /techwatch/index.html
 ---
 
 # {{ page.title }}
 
-The mandate of this Working Group is to monitor the relevant
-evolutions, both in terms of technology and markets, of the computing
-equipment that are relevant to the HEPiX community. The group will co-exist and align with existing
+{{ page.description }}
+
+The group will co-exist and align with existing
 activities, most notably the running working groups on benchmarking
 and cost modelling.
 
