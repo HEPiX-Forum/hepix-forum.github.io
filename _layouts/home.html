@@ -16,7 +16,7 @@ layout: default
     <div style="background: #ddd">
       <div class="container wg-list">
         <section>
-            <h5>Working groups</h5>
+            <div class="list-title">Working Groups</div>
             <ul class="collection">
                 {% assign default_paths = site.pages | map: "path" %}
                 {% assign page_paths = site.header_pages | default: default_paths %}
@@ -27,9 +27,8 @@ layout: default
                         {% if site[collection_name] %}
                             <li class="collection-item avatar">
                                 <div class="wg-name">{{ collection_name | capitalize }}</div>
-                                <p>{{ my_page.title }}</p>
-                                <p></p>
-                                <p><em>{{ my_page.description }}</em></p>
+                                <div class="wg-title">{{ my_page.title }}</div>
+                                <div class="wg-description">{{ my_page.description }}</div>
                                 <a href="{{ my_page.url | relative_url }}" class="secondary-content"><i class="material-icons">navigate_next</i></a>
                             </li>
                         {% endif %}

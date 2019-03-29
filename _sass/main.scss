@@ -65,23 +65,3 @@ h1.page-title {
 p.rss-subscribe {
     margin: 0;
 }
-
-.wg-list .collection .collection-item {
-    &.avatar {
-      padding-left: 150px;
-    }
-}
-
-.wg-list .collection .collection-item.avatar>.wg-name {
-    position: absolute;
-    width: 100px;
-    height: 40px;
-    overflow: hidden;
-    left: 10px;
-    display: inline-block;
-    padding: 16px 0;
-    vertical-align: middle;
-    background: #ad1457;
-    color: #fff;
-    text-align: center;
-}

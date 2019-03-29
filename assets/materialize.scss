@@ -46,3 +46,45 @@ h5 {
   margin: 0 auto;
   display: block;
 }
+
+.wg-list .list-title {
+    padding-top: 10px;
+    font-size: $h4-fontsize;
+    text-align: center;
+    color: #29b6f6;
+}
+
+.wg-list .collection {
+    list-style-type: none;
+}
+
+.wg-list .wg-title {
+    font-weight: bold;
+}
+
+.wg-list .wg-description {
+    font-style: italic;
+}
+
+.wg-list .collection .collection-item {
+    list-style-type: inherit;
+    &.avatar {
+      padding-left: 150px;
+    }
+}
+
+.wg-list .collection .collection-item.avatar>.wg-name {
+    position: absolute;
+    width: 110px;
+    height: 100%;
+    overflow: hidden;
+    left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+    vertical-align: middle;
+    background: #ad1457;
+    color: #fff;
+    text-align: center;
+}
