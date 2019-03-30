@@ -47,6 +47,15 @@ h5 {
   display: block;
 }
 
+#wg-list {
+    padding-bottom: 30px;
+}
+
+.container .wg-list-box {
+    background: #ddd;
+    padding-bottom: 20px;
+}
+
 .wg-list .list-title {
     padding-top: 10px;
     font-size: $h4-fontsize;
