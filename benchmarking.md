@@ -35,7 +35,7 @@ is by now widely used also by other communities.
 
 ### Default system configurations
 
-  * [SL7 x86_64 (gcc-4.8.x)](/benchmarking/sl7-x86_64-gcc48.html)
+  * [SL7/CC7  x86_64 (gcc-4.8.x)](/benchmarking/sl7-x86_64-gcc48.html)
   * [SL6 x86_64 (gcc-4.4.x)](/benchmarking/sl6-x86_64-gcc44.html)
 
 ### Other system configurations (for academic use)
