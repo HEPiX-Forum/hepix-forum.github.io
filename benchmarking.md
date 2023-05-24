@@ -9,51 +9,30 @@ description: |
 redirect_from: /benchmarks/index.html
 ---
 
-# {{ page.title }}
 
 {{ page.description }}
 
-## HEP-SPEC06 (HS06)
 
-HS06 is the HEP-wide benchmark for measuring CPU performance. It has been developed by the HEPiX Benchmarking Working 
-Group in order to replace the outdated "kSI2k" metric.
+### HEPScore23 (HS23)
 
-The goal is to provide a consistent and reproducible CPU benchmark to describe experiment requirements, lab commitments,
-existing compute resources, as well as procurements of new hardware.
+HEPScore23 is progressively replacing HS06 starting April 2023. 
+The accounting migration procedure has been officially endorsed by the WLCG MB during the [December 20th, 2022 meeting](https://wlcg-docs.web.cern.ch/boards/MB/Minutes/2022/MB-Minutes-20221220-2.pdf).  
 
-HS06 is based on the all_cpp benchmark subset (bset) of the widely used, industry standard SPEC® CPU2006 benchmark suite.
-This bset matches the percentage of floating point operations which we have observed in batch jobs (~10%), and it scales 
-perfectly with the experiment codes.
+**Execution**: For instructions on how to run the HS23 benchmark, please refer to the [dedicated page](/benchmarking/how_to_run_HS23.html). 
 
-HS06 is the official CPU performance metric to be used by WLCG sites since 1 April 2009.
+**Accounting**: For instructions on how to report HS23 and or HS06 in the Accounting system, please refer to the [dedicated page](/benchmarking/accounting_migration.html). 
 
-Although the HS06 benchmark was initially designed to meet the requirements of High Energy Physics (HEP) labs, it 
-is by now widely used also by other communities.
+**Support Unit**: 
+If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://ggus.eu/?mode=ticket_submit). In that case the *Type of Issue* and the *Support Unit* to be selected is Benchmarking, as in the screenshot here:
 
 
-## Tables of HS06 results
+![image-title-here](/images/GGUS-Form.png){:class="img-responsive" : width="350"}
 
-### Default system configurations
+#### Tables of HS23 scores
 
-  * [SL7/CC7  x86_64 (gcc-4.8.x)](/benchmarking/sl7-x86_64-gcc48.html)
-  * [SL6 x86_64 (gcc-4.4.x)](/benchmarking/sl6-x86_64-gcc44.html)
+The HEPScore23 scores for the benchmarked servers are reported in this [table](/benchmarking/scores_HS23.html).
 
-### Other system configurations (for academic use)
+### Obsolete HEP-SPEC06 (HS06)
 
-  * [SL6 x86_64 (gcc-4.8.x)](/benchmarking/sl6-x86_64-gcc48.html)
-  * [SL5 x86_64 (gcc-4.4.6)](/benchmarking/sl5-x86_64-gcc446.html)
-  * [SL5 x86_64 (gcc-4.3.2)](/benchmarking/sl5-x86_64-gcc432.html)
+  * For instructions on how to run HS06, please refer to the [legacy page of HS06](/benchmarking/HS06.html). 
 
-### Retired configurations
-
-  * [SL5 x86_64 (gcc-4.1.2)](/benchmarking/sl5-x86_64-gcc412.html)
-  * [SL4 x86_64 (gcc-3.4.6)](/benchmarking/sl4-x86_64-gcc346.html)
-  * [SL4 i386 (gcc-3.4.6)](/benchmarking/sl4-i386-gcc346.html)
-
-## How to run the benchmark
-
-  * See the [dedicated page](/benchmarking/how_to_run_hs06.html)
-
-----
-
-SPEC® is a registered trademark of the Standard Performance Evaluation Corporation (SPEC), [www.spec.org](http://www.spec.org).
