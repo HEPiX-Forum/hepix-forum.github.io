@@ -1,4 +1,16 @@
 <!--  Scripts-->                                                                               
-<script src="{{ "js/jquery.min.js" | relative_url }}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>  <!--Add JQuery-->
 <script src="{{ "js/materialize.min.js" | relative_url }}"></script>
 <script src="{{ "js/init.js" | relative_url }}"></script>
+
+<!--The lines below help include JQuery DataTables into Markdown files-->
+{%- if page.datatable == true -%}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" /><!--add style sheet-->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script></script> <!--add dataTables-->	
+
+<script>
+    $(document).ready( function () {
+    $('#myTable').DataTable();
+    } );
+</script>
+{% endif %}

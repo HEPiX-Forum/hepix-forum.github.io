@@ -8,13 +8,18 @@ source "https://rubygems.org"
 #
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
-gem "jekyll", "~> 3.6.2"
+gem "jekyll", "~> 4.2.2"
 gem "jekyll-redirect-from"
 gem "html-proofer"
 
+
+# FIX failure following https://www.crosenthal.com/chrome/2022/08/07/01.html
+gem "webrick"
+gem "rexml"
+
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
 # uncomment the line below. To upgrade, run `bundle update github-pages`.
-# gem "github-pages", group: :jekyll_plugins
+#gem "github-pages", group: :jekyll_plugins
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do
