@@ -9,6 +9,7 @@ description: |
 redirect_from: /benchmarks/index.html
 ---
 
+# {{ page.title }}
 
 {{ page.description }}
 

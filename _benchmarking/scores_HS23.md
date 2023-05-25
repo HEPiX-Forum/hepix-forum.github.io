@@ -1,5 +1,5 @@
 ---
-title: "Test Table"
+title: "HS23 scores"
 layout: page
 menu: HS23 score table
 datatable: true
