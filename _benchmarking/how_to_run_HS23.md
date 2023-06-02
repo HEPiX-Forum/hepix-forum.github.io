@@ -31,34 +31,22 @@ Hardware requirements:
    * ulimit configuration (see details below)
 
 
+
 ## Run the HEP Benchmark Suite
 
-While it is possible to install HEPScore23 manually, it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. The HEP Benchmark Suite can be installed using pip and git.
+While it is possible to install HEPScore23 manually (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. The HEP Benchmark Suite can be installed using pip and git.
 
 A [bash script](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/raw/master/examples/hepscore/run_HEPscore.sh) has been developed  to streamline the installation and running process. This script provides a fully comprehensive running procedure and enables the system administrator to install the HEP Benchmark Suite and HEPScore23, run the HEP Benchmark Suite, which in turn extracts the necessary metadata from the server, executes HEPScore23 and produces a final output document. 
 
-The HEP Benchmark Suite also offers the added benefit of being able to submit the benchmark results to the WLCG Benchmark DB (based on OpenSearch/ElasticSearch). To accomplish this, a valid X509 certificate (service, robot, user) must be available, and the certificate's DN must be authorized for the publication of the results.
-To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
-
-#### DN extraction
-To extract the DN from the certificate  run:
-
-```sh
-openssl x509 -noout -in user.crt.pem -subject -nameopt RFC2253
-```
-
-which should output something similar to:
-```
-subject=CN=Name Surname,CN=123456,CN=username,OU=Users,OU=Organic Units,DC=cern,DC=ch
-```
-
 #### Script mandatory parameters
-To use the bash script, users will need to provide a few mandatory custom parameters to declare the specific WLCG site on which the benchmark is running and to publish the results. 
+To use the bash script, users will need to provide a mandatory custom parameters to declare the specific site on which the benchmark is running. 
+
 The **SITE** parameter is essential for ensuring that the results are accurately attributed to the correct site when integrated into the WLCG Benchmark DB.
+If the "SITE" parameter cannot be assigned or the user opts not to declare it, a dummy value like "dummy" or "anonymous" should be used as a placeholder. These placeholder values avoid that the script raises exceptions, and allow, in case of publication, for the integration of data into the database while indicating that the site information is intentionally omitted.
 
 To run the script, users can use the following command line. 
 ```sh
-./run_HEPscore.sh -s SITE -p -c ./cert.pem -k ./key.pem
+./run_HEPscore.sh -s SITE 
 ```
 
 By default, the script will use the current directory to create a working directory where all necessary files will be stored, including container images, benchmark outputs, and temporary workload results. The working directory can be modified using the parameter **-w target_folder**.
@@ -78,6 +66,58 @@ HEPscore Benchmark = *value*<br>
 
 Using the bash script ensures that the entire process is performed correctly, and it is recommended that users utilize it when installing and running HEPScore23.
 
+
+### Publish results (Optional)
+The HEP Benchmark Suite also offers the added benefit of being able to submit the benchmark results to the WLCG Benchmark DB (based on OpenSearch/ElasticSearch). To accomplish this, a valid X509 certificate (service, robot, user) must be available, and the certificate's DN must be authorized for the publication of the results.
+
+The command line options of the script will include the **-p** (publish) argument, as well as the mandatory certificate and key file location. 
+
+To run the script, users can use the following command line. 
+```sh
+./run_HEPscore.sh -s SITE -p -c /path/to/cert.pem -k /path/to/key.pem
+```
+
+To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
+
+#### DN extraction
+To extract the DN from the certificate  run:
+
+```sh
+openssl x509 -noout -in user.crt.pem -subject -nameopt RFC2253
+```
+
+which should output something similar to:
+```
+subject=CN=Name Surname,CN=123456,CN=username,OU=Users,OU=Organic Units,DC=cern,DC=ch
+```
+
+
+## Run HEPScore23 standalone
+
+It is recommended to use a virtual environment to install HEPScore23
+
+```sh
+python3 -m venv HS23env
+ source HS23env/bin/activate
+ pip3 install  git+https://gitlab.cern.ch/hep-benchmarks/hep-score.git@v1.5
+ ```
+ 
+* to access the help menu 
+```sh
+hepscore -h
+```
+
+* to dump the HEPScore23 configuration 
+```sh
+hepscore -p
+ ```
+
+* to run
+```sh
+hepscore -v /path/to/workdir
+ ```
+ 
+ 
 ## Troubleshooting
 ### ulimit configuration on CENTOS7 (reason and procedure)
 A workload of the HEPScore23 benchmark uses a multi-service approach for the reconstruction and starts multiple processes per core that stay idle waiting for their turn of processing. For machines with more than 100 CPU cores, this translates into more than 4096 processes, which is the default for normal (non-root) users on CentOS7. Therefore, HEPScore23 should run as root, or the user should be able to start more processes. This can be set with ulimit on CentOS7 by adding the line
