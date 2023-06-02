@@ -96,13 +96,14 @@ subject=CN=Name Surname,CN=123456,CN=username,OU=Users,OU=Organic Units,DC=cern,
 
 ## Run HEPScore23 standalone
 
-It is recommended to use a virtual environment to install HEPScore23
+If the usage of the HEP Benchmark Suite and the orchestrator [bash script](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/raw/master/examples/hepscore/run_HEPscore.sh) is not an option for you, the following instructions will allow the installation of the python package of HEPScore23.
+It is recommended to use a virtual environment to install HEPScore23.
 
 ```sh
 python3 -m venv HS23env
- source HS23env/bin/activate
- pip3 install  git+https://gitlab.cern.ch/hep-benchmarks/hep-score.git@v1.5
- ```
+source HS23env/bin/activate
+pip3 install  git+https://gitlab.cern.ch/hep-benchmarks/hep-score.git@v1.5
+```
  
 * to access the help menu 
 ```sh
