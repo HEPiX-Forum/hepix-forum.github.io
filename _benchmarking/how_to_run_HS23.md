@@ -17,7 +17,7 @@ This document provides instructions on how to execute the HEPScore23 benchmark.
 
 It is crucial that the server is fully dedicated to the benchmarking activity during the run, to ensure accurate measurements and prevent potential errors.
 
-The server must have a minimum hardware configuration and include the following packages:
+The server must have a minimum hardware configuration (see requirements below) and include the following packages:
    * Container engine Apptainer (version 1.1.6 or higher);
    * Python version 3.9 or higher;
    * python3-pip;
@@ -26,7 +26,7 @@ The server must have a minimum hardware configuration and include the following 
 The user will need pip and git to install HEPScore23 as a Python package.
 
 Hardware requirements:
-   * A disk space proportional to the number of available cores on the server (1 GB per logical core) is necessary to temporarily store the results;
+   * A disk space proportional to the number of available cores on the server (about 1 GB per logical core) is necessary to temporarily store the results;
    * The server must have at least 2GB of RAM per logical core;
    * ulimit configuration (see details below)
 
@@ -34,14 +34,14 @@ Hardware requirements:
 
 ## Run the HEP Benchmark Suite
 
-While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. In future versions of the suite, there will be the capability to configure additional measurement plugins, expanding the functionality beyond its current state. These new plugins will include options such as an energy consumption plugin or a load and memory usage plugin
+While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. In future versions of the suite, there will be the capability to configure additional measurement plugins, expanding the functionality beyond its current state. These new plugins will include options such as an energy consumption plugin or a load and memory usage plugin.
 
 The HEP Benchmark Suite can be installed using pip and git.
 
 A [bash script](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/raw/master/examples/hepscore/run_HEPscore.sh) has been developed  to streamline the installation and running process. This script provides a fully comprehensive running procedure and enables the system administrator to install the HEP Benchmark Suite and HEPScore23, run the HEP Benchmark Suite, which in turn extracts the necessary metadata from the server, executes HEPScore23 and produces a final output document. 
 
 #### Script mandatory parameters
-To use the bash script, users will need to provide a mandatory custom parameters to declare the specific site on which the benchmark is running. 
+To use the bash script, users will need to provide a mandatory custom parameter to declare the specific site on which the benchmark is running. 
 
 The **SITE** parameter is essential for ensuring that the results are accurately attributed to the correct site when integrated into the WLCG Benchmark DB.
 If the "SITE" parameter cannot be assigned or the user opts not to declare it, a dummy value like "dummy" or "anonymous" should be used as a placeholder. These placeholder values avoid that the script raises exceptions, and allow, in case of publication, for the integration of data into the database while indicating that the site information is intentionally omitted.
@@ -60,7 +60,7 @@ During the execution the script reports the stdout of the HEP Benchmark Suite. I
 =========================================================<br>
 BENCHMARK RESULTS FOR \<hostname\><br>
 =========================================================<br>
-Suite start: *start_date*<br>
+Suite start: *start_date*<br>#
 Suite end:   *end_date*<br>
 Machine CPU Model: *name*<br>
 HEPscore Benchmark = *value*<br>
