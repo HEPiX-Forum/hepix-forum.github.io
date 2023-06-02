@@ -34,7 +34,9 @@ Hardware requirements:
 
 ## Run the HEP Benchmark Suite
 
-While it is possible to install HEPScore23 manually (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. The HEP Benchmark Suite can be installed using pip and git.
+While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. In future versions of the suite, there will be the capability to configure additional measurement plugins, expanding the functionality beyond its current state. These new plugins will include options such as an energy consumption plugin or a load and memory usage plugin
+
+The HEP Benchmark Suite can be installed using pip and git.
 
 A [bash script](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/raw/master/examples/hepscore/run_HEPscore.sh) has been developed  to streamline the installation and running process. This script provides a fully comprehensive running procedure and enables the system administrator to install the HEP Benchmark Suite and HEPScore23, run the HEP Benchmark Suite, which in turn extracts the necessary metadata from the server, executes HEPScore23 and produces a final output document. 
 
