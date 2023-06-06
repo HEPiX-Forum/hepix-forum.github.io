@@ -60,7 +60,7 @@ During the execution the script reports the stdout of the HEP Benchmark Suite. I
 =========================================================<br>
 BENCHMARK RESULTS FOR \<hostname\><br>
 =========================================================<br>
-Suite start: *start_date*<br>#
+Suite start: *start_date*<br>
 Suite end:   *end_date*<br>
 Machine CPU Model: *name*<br>
 HEPscore Benchmark = *value*<br>
