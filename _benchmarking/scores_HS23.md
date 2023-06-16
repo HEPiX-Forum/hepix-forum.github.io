@@ -9,6 +9,11 @@ datatable: true
 
 <br>
 <br>
+
+Data displayed in the following table are available in csv format at https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/HS23scores.csv
+
+<br>
+<br>
   <table id="myTable" class="display">
       {% for row in table_rows %}
           {% if forloop.first %}
