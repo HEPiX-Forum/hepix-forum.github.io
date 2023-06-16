@@ -10,7 +10,7 @@ datatable: true
 <br>
 <br>
 
-Data displayed in the following table are available in csv format at https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/HS23scores.csv
+Data displayed in the following table are available in csv format in the github repository of [HEPiX-Forum](https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/HS23scores.csv)
 
 <br>
 <br>
