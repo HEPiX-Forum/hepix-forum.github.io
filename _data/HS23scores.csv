@@ -91,6 +91,7 @@ Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz,0,0-31,2,16,1,1024K,22528K,529,593.65
 Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz,1,0-63,2,16,2,1024K,22528K,115,713.517,1.44,183 GiB,0 B,CERN,71892
 Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz,1,0-63,2,16,2,1024K,22528K,78,676.305,0.979,122 GiB,128 GiB,IJCLAB,71892
 Neoverse-N1,0,0-159,2,80,1,160 MiB (160 instances),not_available,36,2712.821,0.832,965 GiB,8 GiB,CERN,71892
+Neoverse-N1,0,0-255,2,128,1,256 MiB (256 instances),not_available,1,3754.09,0.0,497 GiB,500 GiB,INFN-T1,71892
 Neoverse-N1,0,0-79,1,80,1,not_available,not_available,7,1517.407,0.234,232 GiB,4 GiB,UKI-SCOTGRID-GLASGOW,71892
 Neoverse-N1 - Ampere(R) Altra(R) Max Processor,0,0-127,1,128,1,128 MiB (128 instances),not_available,8,2099.357,0.191,496 GiB,4 GiB,CC-IN2P3,71892
 Neoverse-N1 - Ampere(R) Altra(R) Max Processor,0,0-127,1,128,1,not_available,not_available,7,2103.897,0.281,497 GiB,4 GiB,CC-IN2P3,71892
