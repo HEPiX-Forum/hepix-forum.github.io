@@ -79,7 +79,7 @@ To run the script, users can use the following command line.
 ./run_HEPscore.sh -s SITE -p -c /path/to/cert.pem -k /path/to/key.pem
 ```
 
-To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
+To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit).  For additional information please refer to the below [section](## How to open a GGUS ticket) 
 
 #### DN extraction
 To extract the DN from the certificate  run:
@@ -120,7 +120,12 @@ hepscore -p
 hepscore -v /path/to/workdir
  ```
  
- 
+## How to open a GGUS ticket
+
+If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
+In that case the *Type of Issue* and the *Support Unit* to be selected is Benchmarking, as in the screenshot here:
+![image-title-here](/images/GGUS-Form.png){:class="img-responsive" : width="350"}
+
 ## Troubleshooting
 ### ulimit configuration on CENTOS7 (reason and procedure)
 A workload of the HEPScore23 benchmark uses a multi-service approach for the reconstruction and starts multiple processes per core that stay idle waiting for their turn of processing. For machines with more than 100 CPU cores, this translates into more than 4096 processes, which is the default for normal (non-root) users on CentOS7. Therefore, HEPScore23 should run as root, or the user should be able to start more processes. This can be set with ulimit on CentOS7 by adding the line
