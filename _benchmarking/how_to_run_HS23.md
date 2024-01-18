@@ -79,7 +79,7 @@ To run the script, users can use the following command line.
 ./run_HEPscore.sh -s SITE -p -c /path/to/cert.pem -k /path/to/key.pem
 ```
 
-To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit).  For additional information please refer to the below [section](#how-to-open-a-ggus-ticket) 
+To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit).  For additional information please refer to the below [section](#how-to-open-a-ggus-ticket).
 
 #### DN extraction
 To extract the DN from the certificate  run:
