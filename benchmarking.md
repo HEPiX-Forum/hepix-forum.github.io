@@ -25,7 +25,7 @@ The accounting migration procedure has been officially endorsed by the WLCG MB d
 
 **Support Unit**: 
 If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
-More details are available in the [dedicated page](/benchmarking/how_to_run_HS23.html## How to open a GGUS ticket) about how to run HS23. 
+More details are available in the [dedicated page](/benchmarking/how_to_run_HS23.html#how-to-open-a-ggus-ticket) about how to run HS23. 
 
 #### Tables of HS23 scores
 
