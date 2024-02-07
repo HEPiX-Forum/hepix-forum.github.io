@@ -6,7 +6,7 @@ description: |
   The mandate of this Working Group is to monitor the relevant
   evolutions, both in terms of technology and markets, of the computing
   equipments that are relevant to the HEPiX community. 
-author: Helge Meinhard, German Cancio et al.
+author: Andrea Sciaba et al.
 redirect_from: /techwatch/index.html
 ---
 
@@ -14,20 +14,19 @@ redirect_from: /techwatch/index.html
 
 {{ page.description }}
 
-The group will co-exist and align with existing
-activities, most notably the running working groups on benchmarking
-and cost modelling.
+The group will co-exist and align with existing activities, most notably the running working group on benchmarking.
 
 ## Chairs
 
-The group is jointly chaired by **Helge Meinhard** (Helge dot Meinhard at cern dot ch) and **Bernd Panzer-Steindel** (Bernd Panzer-Steindel at cern dot ch).
+The group is jointly chaired by **Andrea Chierici**, **Shigeki Misawa** and **Andrea Sciaba**.
 
 ## References to earlier work
   * Bernd Panzer's **Wiki:** https://twiki.cern.ch/twiki/bin/view/Main/TechMarketPerf
-  * Helge Meinhard's **presentation** at Spring 2018 HEPiX: https://indico.cern.ch/event/676324/contributions/2964768/
+  * Helge Meinhard's **presentation** at Spring 2019 HEPiX: https://indico.cern.ch/event/765497/contributions/3348835/
 
 
 ## Subgroups
+The definition of the subgroups is being redefined. The old subgroups and their members were:
 
   * [General market trends, semiconductor markets, unit sales](/techwatch/market.html)  
     Conveners: Servesh Muralidharan, Peter Wegner
@@ -56,8 +55,6 @@ The group is jointly chaired by **Helge Meinhard** (Helge dot Meinhard at cern d
 
 Interested to get in touch? Contact the chairs (see above), or join us at one of the following events, where we expect to present:
 
-  * **Joint HSF-OSG-WLCG workshop (HOW19)** at Jefferson Lab, Newport News (Virginia), USA, from 18 to 22 March 2019: https://indico.cern.ch/e/how2019
-  * **HEPiX Spring 2019 workshop** at the San Diego Supercomputer Center (SDSC), San Diego (California), USA, from 25 to 29 March 2019: https://indico.cern.ch/e/hepix-spring2019
-  * **EGI Conference 2019** at Science Park, Amsterdam, The Netherlands, from 6 to 8 May 2019: https://indico.egi.eu/indico/event/4431/
-
+  * **HEPiX Spring 2024 workshop** at IRFU CEA, Paris, from 15 to 19 April 2024
+  
 ----
