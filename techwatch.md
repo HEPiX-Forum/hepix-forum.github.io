@@ -3,9 +3,9 @@ title: Technology Watch Working Group
 menu: Techwatch
 layout: page
 description: |
-  The mandate of this Working Group is to monitor the relevant
-  evolutions, both in terms of technology and markets, of the computing
-  equipments that are relevant to the HEPiX community. 
+  The mission of this Working Group is to monitor the relevant evolution,
+  both in terms of technology and markets, of the computing equipment
+  that is relevant to the HEPiX Community. 
 author: Andrea Sciaba et al.
 redirect_from: /techwatch/index.html
 ---
@@ -13,6 +13,15 @@ redirect_from: /techwatch/index.html
 # {{ page.title }}
 
 {{ page.description }}
+
+In particular, the Working Group has the following duties:
+   * Understand the trends and the direction of the technology markets using publicly available sources
+   * Assist in making cost predictions and optimizing investments
+   * Provide a risk assessment for technologies, also financially when possible
+   * Leverage the expertise of the HEPiX community
+   * Inform the HEPiX board about technologies that may warrant a more in-depth investigation
+
+The Working Group’s scope covers hardware that is used or can be used in data centers participating to HEP/NP-related computing activities. It does not cover technologies solely applicable to DAQ systems or software technologies unless they are essential to enable a particular hardware technology.
 
 The group will co-exist and align with existing activities, most notably the running working group on benchmarking.
 
@@ -55,6 +64,6 @@ The definition of the subgroups is being redefined. The old subgroups and their 
 
 Interested to get in touch? Contact the chairs (see above), or join us at one of the following events, where we expect to present:
 
-  * **HEPiX Spring 2024 workshop** at IRFU CEA, Paris, from 15 to 19 April 2024
+  * **HEPiX Spring 2024 workshop** at IRFU CEA, Paris, from 15 to 19 April 2024 [(website)](https://indico.cern.ch/event/1377701/)
   
 ----
