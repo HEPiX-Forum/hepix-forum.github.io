@@ -16,7 +16,7 @@ redirect_from: /techwatch/index.html
 
 In particular, the Working Group has the following duties:
    * Understand the trends and the direction of the technology markets using publicly available sources
-   * Assist in making cost predictions and optimizing investments
+   * Assist in making cost predictions and optimizing investments, taking also into account sustainability
    * Provide a risk assessment for technologies, also financially when possible
    * Leverage the expertise of the HEPiX community
    * Inform the HEPiX board about technologies that may warrant a more in-depth investigation
