@@ -37,24 +37,21 @@ The group is jointly chaired by **Andrea Chierici**, **Shigeki Misawa** and **An
 ## Subgroups
 The definition of the subgroups is being redefined. The old subgroups and their members were:
 
-  * [General market trends, semiconductor markets, unit sales](/techwatch/market.html)  
-    Conveners: Servesh Muralidharan, Peter Wegner
-    Other members: Rolf Seuster, Kai Leffhalm, Charles Leggett, Gang Chen
-  * [Server market](/techwatch/servers.html)  
-    Conveners: Michele Michelotto, Chris Hollowell  
-    Other members: Servesh Muralidharan, Peter Wegner, Mathieu Puel, Andrea Chierici, Harvey Newman
-  * [CPUs and accelerators](/techwatch/cpus.html)  
-    Conveners: Andrea Sciaba, Eric Yen  
-    Other members: Michele Michelotto, Rolf Seuster, Servesh Muralidharan, Domenico Giordano, Niko Neufeld, Charles Leggett, Peter Wegner, Mathieu Puel, Romain Wartel, Andrea Chierici, Andrea Valassi, Shigeki Misawa, Felice Pantaleo, Chris Hollowell
-  * [Memories](/techwatch/memories.html)  
-    Convener: Shigeki Misawa  
-    Other members: Servesh Muralidharan, Andrea Sciaba, Loic Tortay, Fabio Hernandez
+  * [General market trends](/techwatch/market.html)  
+    Conveners: Shigeki Misawa  
+    Other members: Xavier Espinal, Andrea Sciaba, James Walder
+  * [Server and data center infrastructure](/techwatch/servers.html)  
+    Conveners: TBD  
+    Other members: Andrea Chierici, Michele Michelotto, Eric Yen
+  * [Processing units, memory, buses and interconnects](/techwatch/cpus.html)  
+    Conveners: Andrea Chierici, Tristan Suerink  
+    Other members: Dhruva Kulkarni, Charles Leggett, Michele Michelotto, Andrea Sciaba, Andrea Valassi
   * [Storage](/techwatch/storage.html)  
-    Conveners: German Cancio, Martin Gasthuber  
-    Other members: Federico Calzolari, Peter Wienemann, Oliver Freyermuth, Julien Leduc, Vladimir Sapunenko, Kai Leffhalm, Alessandro Brunengo, Shkelzen Rudovac, Loic Tortay, Fabio Hernandez, Eric Yen, Harvey Newman, Shigeki Misawa
+    Conveners: TBD  
+    Other members: Thomas Byrne, Martin Gasthuber, Alison Packer, Vladimir Sapunenko
   * [Network](/techwatch/network.html)  
-    Conveners: Edoardo Martelli, Rolf Seuster  
-    Other members: Federico Calzolari, Fazhi Qi, Alessandro Brunengo, Harvey Newman, Tristan Suerink
+    Conveners: Harvey Newman  
+    Other members: Dhruva Kulkarni, James Walder
 
 ## Meetings
 
