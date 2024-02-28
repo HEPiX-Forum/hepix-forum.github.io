@@ -35,7 +35,7 @@ The group is jointly chaired by **Andrea Chierici**, **Shigeki Misawa** and **An
 
 
 ## Subgroups
-The definition of the subgroups is being redefined. The old subgroups and their members were:
+The definition of the subgroups and their members are:
 
   * [General market trends](/techwatch/market.html)  
     Conveners: Shigeki Misawa  
