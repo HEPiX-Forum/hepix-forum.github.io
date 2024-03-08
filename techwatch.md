@@ -41,11 +41,11 @@ The definition of the subgroups and their members are:
     Conveners: Shigeki Misawa  
     Other members: Xavier Espinal, Andrea Sciaba, James Walder
   * [Server and data center infrastructure](/techwatch/servers.html)  
-    Conveners: TBD  
+    Conveners: Tristan Suerink  
     Other members: Andrea Chierici, Michele Michelotto, Eric Yen
   * [Processing units, memory, buses and interconnects](/techwatch/cpus.html)  
-    Conveners: Andrea Chierici, Tristan Suerink  
-    Other members: Dhruva Kulkarni, Charles Leggett, Michele Michelotto, Andrea Sciaba, Andrea Valassi
+    Conveners: Andrea Chierici  
+    Other members: Erik Kooistra, Dhruva Kulkarni, Charles Leggett, Michele Michelotto, Andrea Sciaba, Andrea Valassi
   * [Storage](/techwatch/storage.html)  
     Conveners: TBD  
     Other members: Thomas Byrne, Martin Gasthuber, Alison Packer, Vladimir Sapunenko
