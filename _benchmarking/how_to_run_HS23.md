@@ -79,7 +79,9 @@ To run the script, users can use the following command line.
 ./run_HEPscore.sh -s SITE -p -c /path/to/cert.pem -k /path/to/key.pem
 ```
 
-To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit); the Type of Issue and the Support Unit to be selected is Benchmarking.
+
+To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit).  For additional information please refer to the below [section](#how-to-open-a-ggus-ticket).
+
 
 #### DN extraction
 To extract the DN from the certificate  run:
@@ -120,7 +122,12 @@ hepscore -p
 hepscore -v /path/to/workdir
  ```
  
- 
+## How to open a GGUS ticket
+
+If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
+In that case the *Type of Issue* and the *Support Unit* to be selected is Benchmarking, as in the screenshot here:
+![image-title-here](/images/GGUS-Form.png){:class="img-responsive" : width="350"}
+
 ## Troubleshooting
 ### ulimit configuration on CENTOS7 (reason and procedure)
 A workload of the HEPScore23 benchmark uses a multi-service approach for the reconstruction and starts multiple processes per core that stay idle waiting for their turn of processing. For machines with more than 100 CPU cores, this translates into more than 4096 processes, which is the default for normal (non-root) users on CentOS7. Therefore, HEPScore23 should run as root, or the user should be able to start more processes. This can be set with ulimit on CentOS7 by adding the line
@@ -132,4 +139,6 @@ echo "benchmark  soft nproc unlimited" >> /etc/security/limits.d/20-nproc.conf
 It is necessary to start a new shell session after that change before running HEPScore23.
 
 ### CVMFS (as image repository) configuration 
-Although it’s not part of the standard configuration, it is possible to get the container images for the benchmark from CVMFS instead of from the gitlab registry. Some workloads of the HEPScore23 benchmark access several files in parallel on /cvmfs, about 200 files per CPU core. For bigger machines (more than 60 cores), it is necessary to adjust the CVMFS config and set the maximal number of open files (CVMFS_NFILES in /etc/cvmfs/default.local) value to about 200 times the number of cores. The new value is active after a remount of the CVMFS repository on the machine.
+Although it’s not part of the standard configuration, it is possible to get the container images for the benchmark from CVMFS instead of from the gitlab registry. Be aware that the resulting score is reduced by about 5% using the CVMFS registry since CVMFS needs some CPU resources. 
+ 
+Some workloads of the HEPScore23 benchmark access several files in parallel on `/cvmfs`, which results in failing benchmarks on big machines (more than 60 cores). Therefore, please enable `CVMFS_CACHE_REFCOUNT = yes` in /etc/cvmfs/default.local [released in CVMFS version 2.11.0](https://cvmfs.readthedocs.io/en/stable/cpt-releasenotes.html#release-notes-for-cernvm-fs-2-11-1). Otherwise, it is necessary to adjust the CVMFS config and set the maximal number of open files (`CVMFS_NFILES` in `/etc/cvmfs/default.local`) value to about 200 times the number of cores. The new value is active after a remount of the CVMFS repository on the machine.

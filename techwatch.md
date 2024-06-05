@@ -3,10 +3,10 @@ title: Technology Watch Working Group
 menu: Techwatch
 layout: page
 description: |
-  The mandate of this Working Group is to monitor the relevant
-  evolutions, both in terms of technology and markets, of the computing
-  equipments that are relevant to the HEPiX community. 
-author: Helge Meinhard, German Cancio et al.
+  The mission of this Working Group is to monitor the relevant evolution,
+  both in terms of technology and markets, of the computing equipment
+  that is relevant to the HEPiX Community. 
+author: Andrea Sciaba et al.
 redirect_from: /techwatch/index.html
 ---
 
@@ -14,39 +14,44 @@ redirect_from: /techwatch/index.html
 
 {{ page.description }}
 
-The group will co-exist and align with existing
-activities, most notably the running working groups on benchmarking
-and cost modelling.
+In particular, the Working Group has the following duties:
+   * Understand the trends and the direction of the technology markets using publicly available sources
+   * Assist in making cost predictions and optimizing investments, taking also into account sustainability
+   * Provide a risk assessment for technologies, also financially when possible
+   * Leverage the expertise of the HEPiX community
+   * Inform the HEPiX board about technologies that may warrant a more in-depth investigation
+
+The Working Group’s scope covers hardware that is used or can be used in data centers participating to HEP/NP-related computing activities. It does not cover technologies solely applicable to DAQ systems or software technologies unless they are essential to enable a particular hardware technology.
+
+The group will co-exist and align with existing activities, most notably the running working group on benchmarking.
 
 ## Chairs
 
-The group is jointly chaired by **Helge Meinhard** (Helge dot Meinhard at cern dot ch) and **Bernd Panzer-Steindel** (Bernd Panzer-Steindel at cern dot ch).
+The group is jointly chaired by **Andrea Chierici**, **Shigeki Misawa** and **Andrea Sciaba**.
 
 ## References to earlier work
   * Bernd Panzer's **Wiki:** https://twiki.cern.ch/twiki/bin/view/Main/TechMarketPerf
-  * Helge Meinhard's **presentation** at Spring 2018 HEPiX: https://indico.cern.ch/event/676324/contributions/2964768/
+  * Helge Meinhard's **presentation** at Spring 2019 HEPiX: https://indico.cern.ch/event/765497/contributions/3348835/
 
 
 ## Subgroups
+The definition of the subgroups and their members are:
 
-  * [General market trends, semiconductor markets, unit sales](/techwatch/market.html)  
-    Conveners: Servesh Muralidharan, Peter Wegner
-    Other members: Rolf Seuster, Kai Leffhalm, Charles Leggett, Gang Chen
-  * [Server market](/techwatch/servers.html)  
-    Conveners: Michele Michelotto, Chris Hollowell  
-    Other members: Servesh Muralidharan, Peter Wegner, Mathieu Puel, Andrea Chierici, Harvey Newman
-  * [CPUs and accelerators](/techwatch/cpus.html)  
-    Conveners: Andrea Sciaba, Eric Yen  
-    Other members: Michele Michelotto, Rolf Seuster, Servesh Muralidharan, Domenico Giordano, Niko Neufeld, Charles Leggett, Peter Wegner, Mathieu Puel, Romain Wartel, Andrea Chierici, Andrea Valassi, Shigeki Misawa, Felice Pantaleo, Chris Hollowell
-  * [Memories](/techwatch/memories.html)  
-    Convener: Shigeki Misawa  
-    Other members: Servesh Muralidharan, Andrea Sciaba, Loic Tortay, Fabio Hernandez
+  * [General market trends](/techwatch/market.html)  
+    Conveners: Shigeki Misawa  
+    Other members: Xavier Espinal, Andrea Sciaba, James Walder
+  * [Server and data center infrastructure](/techwatch/servers.html)  
+    Conveners: Tristan Suerink  
+    Other members: Andrea Chierici, Michele Michelotto, Eric Yen
+  * [Processing units, memory, buses and interconnects](/techwatch/cpus.html)  
+    Conveners: Andrea Chierici  
+    Other members: Erik Kooistra, Dhruva Kulkarni, Charles Leggett, Michele Michelotto, Andrea Sciaba, Andrea Valassi
   * [Storage](/techwatch/storage.html)  
-    Conveners: German Cancio, Martin Gasthuber  
-    Other members: Federico Calzolari, Peter Wienemann, Oliver Freyermuth, Julien Leduc, Vladimir Sapunenko, Kai Leffhalm, Alessandro Brunengo, Shkelzen Rudovac, Loic Tortay, Fabio Hernandez, Eric Yen, Harvey Newman, Shigeki Misawa
+    Conveners: TBD  
+    Other members: Thomas Byrne, Martin Gasthuber, Alison Packer, Vladimir Sapunenko
   * [Network](/techwatch/network.html)  
-    Conveners: Edoardo Martelli, Rolf Seuster  
-    Other members: Federico Calzolari, Fazhi Qi, Alessandro Brunengo, Harvey Newman, Tristan Suerink
+    Conveners: Harvey Newman  
+    Other members: Dhruva Kulkarni, James Walder
 
 ## Meetings
 
@@ -56,8 +61,6 @@ The group is jointly chaired by **Helge Meinhard** (Helge dot Meinhard at cern d
 
 Interested to get in touch? Contact the chairs (see above), or join us at one of the following events, where we expect to present:
 
-  * **Joint HSF-OSG-WLCG workshop (HOW19)** at Jefferson Lab, Newport News (Virginia), USA, from 18 to 22 March 2019: https://indico.cern.ch/e/how2019
-  * **HEPiX Spring 2019 workshop** at the San Diego Supercomputer Center (SDSC), San Diego (California), USA, from 25 to 29 March 2019: https://indico.cern.ch/e/hepix-spring2019
-  * **EGI Conference 2019** at Science Park, Amsterdam, The Netherlands, from 6 to 8 May 2019: https://indico.egi.eu/indico/event/4431/
-
+  * **HEPiX Spring 2024 workshop** at IRFU CEA, Paris, from 15 to 19 April 2024 [(website)](https://indico.cern.ch/event/1377701/)
+  
 ----
