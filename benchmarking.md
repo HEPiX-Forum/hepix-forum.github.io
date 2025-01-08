@@ -35,3 +35,10 @@ The HEPScore23 scores for the benchmarked servers are reported in this [table](/
 
   * For instructions on how to run HS06, please refer to the [legacy page of HS06](/benchmarking/HS06.html). 
 
+### Mailing List and Meetings
+  * hepix-cpu-benchmark@hepixNOSPAMPLEASE.org
+     * Archive available at http://listserv.in2p3.fr
+  * [Indico meeting events](https://indico.cern.ch/category/1806/)
+  * Collection of past documents available in a [Twiki](https://twiki.cern.ch/twiki/bin/view/HEPIX/CpuBenchmark)
+
+     
