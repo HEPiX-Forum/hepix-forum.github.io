@@ -13,6 +13,8 @@ menu: How to run HS23
 
 This document provides instructions on how to execute the HEPScore23 benchmark.
 
+**Update 28 March 2025**: A new version of the Hep Benchmark Suite, **v3.0**, has been released and will be used going forward. For more details, continue to read.
+
 ## Requirements
 
 It is crucial that the server is fully dedicated to the benchmarking activity during the run, to ensure accurate measurements and prevent potential errors.
@@ -34,7 +36,10 @@ Hardware requirements:
 
 ## Run the HEP Benchmark Suite
 
-While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. In future versions of the suite, there will be the capability to configure additional measurement plugins, expanding the functionality beyond its current state. These new plugins will include options such as an energy consumption plugin or a load and memory usage plugin.
+While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. 
+
+**Starting from version 3.0, the Suite includes plugins to extend functionality, such as power consumption, system load and memory usage monitoring. More details about these plugins can be found [here](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/blob/master/hepbenchmarksuite/plugins/README.md?ref_type=heads).**
+
 
 The HEP Benchmark Suite can be installed using pip and git.
 
