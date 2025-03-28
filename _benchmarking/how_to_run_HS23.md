@@ -13,6 +13,8 @@ menu: How to run HS23
 
 This document provides instructions on how to execute the HEPScore23 benchmark.
 
+**Update 28 March 2025**: A new version of the Hep Benchmark Suite, **v3.0**, has been released and will be used going forward. For more details, continue to read.
+
 ## Requirements
 
 It is crucial that the server is fully dedicated to the benchmarking activity during the run, to ensure accurate measurements and prevent potential errors.
@@ -34,11 +36,22 @@ Hardware requirements:
 
 ## Run the HEP Benchmark Suite
 
-While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. In future versions of the suite, there will be the capability to configure additional measurement plugins, expanding the functionality beyond its current state. These new plugins will include options such as an energy consumption plugin or a load and memory usage plugin.
+While it is possible to install HEPScore23 standalone (see later), it is recommended to use the HEP Benchmark Suite alongside HEPScore23 to include in the benchmark report metadata about the server's running conditions. The metadata includes details about the server's CPU, RAM, disks, IP addresses, and other relevant information. 
+
+**Update 28 March 2025**: Starting from version 3.0, the Suite includes plugins to extend functionality, such as power consumption, system load and memory usage monitoring. More details about these plugins can be found [here](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/blob/master/hepbenchmarksuite/plugins/README.md?ref_type=heads).
+
 
 The HEP Benchmark Suite can be installed using pip and git.
 
 A [bash script](https://gitlab.cern.ch/hep-benchmarks/hep-benchmark-suite/-/raw/master/examples/hepscore/run_HEPscore.sh) has been developed  to streamline the installation and running process. This script provides a fully comprehensive running procedure and enables the system administrator to install the HEP Benchmark Suite and HEPScore23, run the HEP Benchmark Suite, which in turn extracts the necessary metadata from the server, executes HEPScore23 and produces a final output document. 
+
+**Update 28 March 2025**: The script is now updated to default to version 3.0 of the suite. It comes with default plugins (CPU frequency, system load, memory usage, memory swap, power consumption)  included
+in the data collection. To take advantage of these updates, simply re-download and run the deployment script.
+
+The script parameters can be consulted by running:
+```sh
+./run_HEPscore.sh -h 
+```
 
 #### Script mandatory parameters
 To use the bash script, users will need to provide a mandatory custom parameter to declare the specific site on which the benchmark is running. 
@@ -68,6 +81,19 @@ HEPscore Benchmark = *value*<br>
 
 Using the bash script ensures that the entire process is performed correctly, and it is recommended that users utilize it when installing and running HEPScore23.
 
+### Configuring Usage Metering Plugins
+
+To customize the time series monitoring plugins, use the **-b plugin_keys** parameter. The following keys are available:
+- f - CPU frequency
+-	l - System load
+-	m - Memory usage
+-	s - Memory swap
+-	p - Power consumption
+-	g - GPU power consumption
+-	u - GPU usage
+
+By default, the following plugins are enabled: **f,l,m,s,p**.
+To disable all plugins, use **-b none**.
 
 ### Publish results (Optional)
 The HEP Benchmark Suite also offers the added benefit of being able to submit the benchmark results to the WLCG Benchmark DB (based on OpenSearch/ElasticSearch). To accomplish this, a valid X509 certificate (service, robot, user) must be available, and the certificate's DN must be authorized for the publication of the results.
