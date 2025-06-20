@@ -152,6 +152,8 @@ hepscore -v /path/to/workdir
 
 If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://helpdesk.ggus.eu/#ticket/create). 
 In that case the *Group* to be selected is *Benchmarking* and the *Category* is *Service request* , as in the screenshot here:
+
+
 ![image-title-here](/images/GGUS-Form-new.png){:class="img-responsive" : width="350"}
 
 ## Troubleshooting
