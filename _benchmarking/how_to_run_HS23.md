@@ -106,7 +106,7 @@ To run the script, users can use the following command line.
 ```
 
 
-To declare the DN users should open a [GGUS tickets](https://ggus.eu/?mode=ticket_submit).  For additional information please refer to the below [section](#how-to-open-a-ggus-ticket).
+To declare the DN users should open a [GGUS tickets](https://helpdesk.ggus.eu/#ticket/create).  For additional information please refer to the below [section](#how-to-open-a-ggus-ticket).
 
 
 #### DN extraction
@@ -150,9 +150,9 @@ hepscore -v /path/to/workdir
  
 ## How to open a GGUS ticket
 
-If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://ggus.eu/?mode=ticket_submit). 
-In that case the *Type of Issue* and the *Support Unit* to be selected is Benchmarking, as in the screenshot here:
-![image-title-here](/images/GGUS-Form.png){:class="img-responsive" : width="350"}
+If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://helpdesk.ggus.eu/#ticket/create). 
+In that case the *Group* to be selected is *Benchmarking* and the *Category* is *Service request* , as in the screenshot here:
+![image-title-here](/images/GGUS-Form-new.png){:class="img-responsive" : width="350"}
 
 ## Troubleshooting
 ### ulimit configuration on CENTOS7 (reason and procedure)
