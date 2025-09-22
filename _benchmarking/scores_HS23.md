@@ -27,17 +27,13 @@ Accuracy depends on the server’s hardware and firmware implementation. Therefo
 Benchmark result tables include several metrics.  
 Only those that are **not immediately self-explanatory** are described below:
 
-- **`# Meas`**  
-  The number of independent benchmark measurements performed.
+- **`# Meas`**  :  The number of independent benchmark measurements performed.
 
-- **`Score/Ncores`**  
-  The performance score normalized by the number of available cores (physical or logical).  
+- **`Score/Ncores`** : The performance score normalized by the number of available cores (physical or logical).  
   
-- **`sem`** (Standard Error of the Mean)  
-  A measure of the statistical uncertainty of the score, calculated from multiple runs.
+- **`sem`** (Standard Error of the Mean) :  A measure of the statistical uncertainty of the score, calculated from multiple runs.
 
-- **`Spread`**  
-  A measure of variability across the benchmark runs, calculated as the relative difference between the 95th and 5th percentiles, normalized by the median.  
+- **`Spread`** : A measure of variability across the benchmark runs, calculated as the relative difference between the 95th and 5th percentiles, normalized by the median.  
   
 - **`electric_power_mean`** , **`electric_power_std`**:  For each measurement time series collected during the benchmark run, the **85th percentile** is determined. Mean and std are then evaluated   across all measurement series.
 
