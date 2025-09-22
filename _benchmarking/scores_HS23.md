@@ -43,7 +43,7 @@ Only those that are **not immediately self-explanatory** are described below:
  
 <br>
 <br>
-<div style="overflow-x: auto;">
+<div style="width:100%; margin-left:auto; margin-right:auto;">
   <table id="myTable" class="display">
       {% for row in table_rows %}
           {% if forloop.first %}
