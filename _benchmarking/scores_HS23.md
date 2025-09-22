@@ -43,8 +43,8 @@ Only those that are **not immediately self-explanatory** are described below:
  
 <br>
 <br>
-<div style="position:relative; left:50%; right:50%; margin-left:-50vw; margin-right:-50vw; width:100vw;">
-  <table id="myTable" class="display">
+<div style="position:relative; left:50%; margin-left:-45vw; width:90vw;">
+  <table id="myTable" class="display" style="width:100%;">
       {% for row in table_rows %}
           {% if forloop.first %}
               <thead>
