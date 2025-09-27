@@ -64,7 +64,7 @@ To run the script, users can use the following command line.
 ./run_HEPscore.sh -s SITE 
 ```
 
-By default, the script will use the current directory to create a working directory where all necessary files will be stored, including container images, benchmark outputs, and temporary workload results. The working directory can be modified using the parameter **-w target_folder**.
+By default, the script will use the current directory to create a working directory where all necessary files will be stored, including container images, benchmark outputs, and temporary workload results. The working directory can be modified using the parameter **-d target_folder**.
 
 During the execution the script reports the stdout of the HEP Benchmark Suite. If the execution completes successfully, it will print at the end information such as
 
