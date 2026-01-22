@@ -27,7 +27,195 @@
 <!--The lines below help include JQuery DataTables into Markdown files-->
 {%- if page.datatable == true -%}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" /><!--add style sheet-->
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script></script> <!--add dataTables-->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script> <!--add dataTables-->
+
+<style>
+    .datatable-container {
+        width: 100%;
+        overflow: hidden;
+    }
+    .dataTables_wrapper {
+        width: 100%;
+    }
+    .dataTables_scrollBody {
+        overflow-x: auto !important;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .dataTables_scrollHeadInner,
+    .dataTables_scrollBody {
+        width: 100% !important;
+    }
+    .dataTables_scrollHeadInner table,
+    .dataTables_scrollBody table {
+        width: max-content !important;
+        min-width: 100%;
+    }
+    table.dataTable {
+        table-layout: auto;
+    }
+    table.dataTable th,
+    table.dataTable td {
+        white-space: nowrap;
+    }
+    details.metrics-toggle {
+        margin: 12px 0 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: #f8fafc;
+    }
+    details.metrics-toggle[open] {
+        background: #ffffff;
+    }
+    details.metrics-toggle > * + * {
+        margin-top: 10px;
+    }
+    details.metrics-toggle ul {
+        margin: 8px 0 0 20px;
+    }
+    details.metrics-toggle summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: #0f172a;
+        list-style: none;
+    }
+    details.metrics-toggle summary::-webkit-details-marker {
+        display: none;
+    }
+    details.metrics-toggle summary::before {
+        content: "▸";
+        display: inline-block;
+        margin-right: 8px;
+        transition: transform 0.2s ease;
+    }
+    details.metrics-toggle[open] summary::before {
+        transform: rotate(90deg);
+    }
+    .datatable-scroll-top {
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: 14px;
+        margin: 6px 0 8px;
+    }
+    .datatable-scroll-top__inner {
+        height: 1px;
+    }
+    .datatable-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin: 8px 0;
+    }
+    .dataTables_length,
+    .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #334155;
+    }
+    .dataTables_filter {
+        margin-left: auto;
+    }
+    .dataTables_filter label,
+    .dataTables_length label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        white-space: nowrap;
+    }
+    .dataTables_filter input,
+    .dataTables_length select {
+        height: 36px;
+        padding: 6px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #ffffff;
+        font-size: 0.95rem;
+        color: #1f2937;
+    }
+    .datatable-columns {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+    }
+    .datatable-columns__header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .datatable-columns__meta {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+    .datatable-columns__title {
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .datatable-columns__actions {
+        display: flex;
+        gap: 8px;
+    }
+    .datatable-btn {
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        color: #334155;
+        border-radius: 8px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .datatable-btn:hover {
+        border-color: #94a3b8;
+    }
+    .datatable-columns__filter {
+        height: 34px;
+        padding: 6px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #ffffff;
+        font-size: 0.9rem;
+        color: #1f2937;
+    }
+    .datatable-columns__list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+        max-height: 160px;
+        overflow: auto;
+    }
+    .datatable-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        font-size: 0.85rem;
+        color: #334155;
+        white-space: nowrap;
+    }
+    .datatable-toggle.is-hidden {
+        opacity: 0.45;
+        background: #f1f5f9;
+        border-color: #cbd5f5;
+        text-decoration: line-through;
+    }
+    .datatable-toggle input {
+        accent-color: #0ea5e9;
+    }
+    table.dataTable thead th {
+        white-space: nowrap;
+    }
+</style>
 
 <script>
     $(document).ready( function () {
@@ -39,17 +227,129 @@
 
     var table = $('#myTable').DataTable({
 
-        bAutoWidth: true,
+        bAutoWidth: false,
         orderCellsTop: true,
-        fixedHeader: true,
+        fixedHeader: false,
+        scrollX: true,
+        scrollCollapse: true,
+        pagingType: 'simple_numbers',
+        dom: "<'datatable-controls'lf>rt<'datatable-footer'ip>",
         initComplete: function () {
             var api = this.api();
+            var container = $(api.table().container());
+
+            var columnPanel = $('<div class="datatable-columns"></div>');
+            columnPanel.append(
+                '<div class="datatable-columns__header">' +
+                '<div>' +
+                '<div class="datatable-columns__title">Columns</div>' +
+                '<div class="datatable-columns__meta"><span class="datatable-visible-count">0</span> visible</div>' +
+                '</div>' +
+                '<div class="datatable-columns__actions">' +
+                '<button type="button" class="datatable-btn" data-action="preset-essential">Essentials</button>' +
+                '<button type="button" class="datatable-btn" data-action="show">Show all</button>' +
+                '<button type="button" class="datatable-btn" data-action="hide">Hide all</button>' +
+                '</div>' +
+                '<input class="datatable-columns__filter" type="search" placeholder="Filter columns" />' +
+                '</div>' +
+                '<div class="datatable-columns__list"></div>'
+            );
+            container.find('.datatable-controls').after(columnPanel);
+
+            var toggleByIndex = {};
+            var defaultHidden = [
+                'hash',
+                'min_score',
+                'max_score',
+                'first_date',
+                'last_date',
+                'electric_power_std',
+                'sem',
+                'SWAP',
+                'L3 cache',
+                'L2 cache',
+            ];
+            var essentialColumns = [
+                'CPU',
+                'SMT enabled',
+                'Online CPUs',
+                '# Sockets',
+                'Cores/Socket',
+                'Threads/core',
+                'Ncores',
+                '# Meas',
+                'Score',
+                'Score/Ncores',
+                'Spread',
+                'RAM',
+                'electric_power_mean',
+                'HS23/W',
+                'Site'
+            ];
+            var updateVisibleCount = function () {
+                columnPanel.find('.datatable-visible-count').text(api.columns(':visible').count());
+            };
+            var setVisibility = function (colIdx, visible) {
+                api.column(colIdx).visible(visible, false);
+                var toggle = toggleByIndex[colIdx];
+                if (toggle) {
+                    toggle.find('input').prop('checked', visible);
+                    toggle.toggleClass('is-hidden', !visible);
+                }
+            };
+            var applyVisibilityBatch = function () {
+                api.columns.adjust().draw(false);
+                updateVisibleCount();
+            };
+            var isEssential = function (title) {
+                return essentialColumns.indexOf(title) !== -1;
+            };
+
+            columnPanel.find('[data-action="show"]').on('click', function () {
+                api.columns().every(function (idx) {
+                    setVisibility(idx, true);
+                });
+                applyVisibilityBatch();
+            });
+            columnPanel.find('[data-action="hide"]').on('click', function () {
+                api.columns().every(function (idx) {
+                    setVisibility(idx, false);
+                });
+                applyVisibilityBatch();
+            });
+            columnPanel.find('[data-action="preset-essential"]').on('click', function () {
+                api.columns().every(function (idx) {
+                    var title = $(api.column(idx).header()).text().trim();
+                    if (title !== '') {
+                        setVisibility(idx, isEssential(title));
+                    }
+                });
+                applyVisibilityBatch();
+            });
 
             // For each column
             api
                 .columns()
                 .eq(0)
                 .each(function (colIdx) {
+                    var column = api.column(colIdx);
+                    var title = $(column.header()).text().trim();
+                    if (title !== '') {
+                        var toggle = $('<label class="datatable-toggle"><input type="checkbox" checked /><span></span></label>');
+                        toggle.find('span').text(title);
+                        toggle.find('input').on('change', function () {
+                            setVisibility(colIdx, this.checked);
+                            applyVisibilityBatch();
+                        });
+                        toggleByIndex[colIdx] = toggle;
+                        if (defaultHidden.indexOf(title) !== -1) {
+                            setVisibility(colIdx, false);
+                        } else {
+                            setVisibility(colIdx, column.visible());
+                        }
+                        columnPanel.find('.datatable-columns__list').append(toggle);
+                    }
+
                     // Set the header cell to contain the input element
                     var cell = $('.filters th').eq(
                         $(api.column(colIdx).header()).index()
@@ -90,6 +390,54 @@
                                 .setSelectionRange(cursorPosition, cursorPosition);
                         });
                 });
+
+            applyVisibilityBatch();
+
+            var scoreIndex = null;
+            api.columns().every(function (idx) {
+                var title = $(api.column(idx).header()).text().trim();
+                if (title === 'Score') {
+                    scoreIndex = idx;
+                }
+            });
+            if (scoreIndex !== null) {
+                api.order([scoreIndex, 'desc']).draw();
+            }
+
+            columnPanel.find('.datatable-columns__filter').on('input', function () {
+                var query = $(this).val().toLowerCase();
+                columnPanel.find('.datatable-toggle').each(function () {
+                    var label = $(this).text().toLowerCase();
+                    $(this).toggle(label.indexOf(query) !== -1);
+                });
+            });
+
+            var scrollBody = container.find('.dataTables_scrollBody');
+            if (scrollBody.length) {
+                var topScroll = $('<div class="datatable-scroll-top"><div class="datatable-scroll-top__inner"></div></div>');
+                scrollBody.before(topScroll);
+
+                var syncScroll = function () {
+                    topScroll.scrollLeft(scrollBody.scrollLeft());
+                    topScroll.find('.datatable-scroll-top__inner').width(scrollBody.get(0).scrollWidth);
+                };
+
+                syncScroll();
+                scrollBody.on('scroll', function () {
+                    topScroll.scrollLeft(scrollBody.scrollLeft());
+                });
+                topScroll.on('scroll', function () {
+                    scrollBody.scrollLeft(topScroll.scrollLeft());
+                });
+
+                var adjustAndSync = function () {
+                    api.columns.adjust();
+                    syncScroll();
+                };
+                $(window).on('resize', adjustAndSync);
+                api.on('draw', adjustAndSync);
+                setTimeout(adjustAndSync, 0);
+            }
         },
     });
 
