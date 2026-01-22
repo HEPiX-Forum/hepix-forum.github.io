@@ -303,6 +303,47 @@
             var isEssential = function (title) {
                 return essentialColumns.indexOf(title) !== -1;
             };
+            var refreshFilters = function () {
+                var header = $(api.table().header());
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (idx) {
+                        var cell = $('tr.filters th', header).eq(idx);
+                        if (!cell.length) {
+                            return;
+                        }
+                        if (!cell.find('input').length) {
+                            cell.html('<input type="text" placeholder="filter" />');
+                        }
+
+                        var input = cell.find('input');
+                        input
+                            .off('keyup change')
+                            .on('change', function () {
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})';
+                                api
+                                    .column(idx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+                            })
+                            .on('keyup', function (e) {
+                                e.stopPropagation();
+                                var cursorPosition = this.selectionStart;
+                                $(this).trigger('change');
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            };
 
             columnPanel.find('[data-action="show"]').on('click', function () {
                 api.columns().every(function (idx) {
@@ -349,48 +390,11 @@
                         columnPanel.find('.datatable-columns__list').append(toggle);
                     }
 
-                    // Set the header cell to contain the input element
-                    var cell = $('.filters th').eq(
-                        $(api.column(colIdx).header()).index()
-                    );
-                    var title = $(cell).text();
-                    $(cell).html('<input type="text" placeholder="filter" />');
-
-                    // On every keypress in this input
-                    $(
-                        'input',
-                        $('.filters th').eq($(api.column(colIdx).header()).index())
-                    )
-                        .off('keyup change')
-                        .on('change', function (e) {
-                            // Get the search value
-                            $(this).attr('title', $(this).val());
-                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
-
-                            var cursorPosition = this.selectionStart;
-                            // Search the column for that value
-                            api
-                                .column(colIdx)
-                                .search(
-                                    this.value != ''
-                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
-                                        : '',
-                                    this.value != '',
-                                    this.value == ''
-                                )
-                                .draw();
-                        })
-                        .on('keyup', function (e) {
-                            e.stopPropagation();
-
-                            $(this).trigger('change');
-                            $(this)
-                                .focus()[0]
-                                .setSelectionRange(cursorPosition, cursorPosition);
-                        });
                 });
 
             applyVisibilityBatch();
+            refreshFilters();
+            api.on('draw.dt column-visibility.dt', refreshFilters);
 
             var scoreIndex = null;
             api.columns().every(function (idx) {
