@@ -321,17 +321,15 @@
                         input
                             .off('keyup change')
                             .on('change', function () {
-                                $(this).attr('title', $(this).val());
-                                var regexr = '({search})';
+                                var value = this.value || '';
+                                $(this).attr('title', value);
+
+                                // Map the input's header cell to the corresponding visible column.
+                                // This stays correct even when columns are hidden/shown.
+                                var visibleColumnIndex = $(this).closest('th').index();
                                 api
-                                    .column(idx)
-                                    .search(
-                                        this.value != ''
-                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
-                                            : '',
-                                        this.value != '',
-                                        this.value == ''
-                                    )
+                                    .column(visibleColumnIndex + ':visible')
+                                    .search(value, false, true)
                                     .draw();
                             })
                             .on('keyup', function (e) {
