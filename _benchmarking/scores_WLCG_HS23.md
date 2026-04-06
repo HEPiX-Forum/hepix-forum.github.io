@@ -1,7 +1,7 @@
 ---
-title: "HS23 scores from WLCG"
+title: "WLCG job slot scores"
 layout: page
-menu: HS23 scores from WLCG
+menu: WLCG job slot scores
 datatable: true
 ---
 
@@ -14,7 +14,7 @@ Data displayed in the following table are available in csv format in the github 
 
 ### About This Data
 
-The table below presents HS23 benchmark scores collected from benchmarking jobs running across the Worldwide LHC Computing Grid (WLCG) infrastructure since August 2023. These measurements represent **real-world production performance** as observed in operational computing environments.
+The table below presents HEPScore benchmark scores collected from benchmarking jobs running across the Worldwide LHC Computing Grid (WLCG) infrastructure since August 2023. These measurements represent **real-world production performance** as observed in operational computing environments.
 
 **Key characteristics:**
 - Data are aggregated by CPU model to provide statistical representation of performance across multiple sites
