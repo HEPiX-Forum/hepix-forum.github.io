@@ -147,7 +147,61 @@ hepscore -p
 ```sh
 hepscore -v /path/to/workdir
  ```
- 
+
+## Visualize your results
+
+<p style="margin: 18px 0;">
+  <a href="{{ site.baseurl }}/benchmarking/hs23_report_viewer.html"
+     class="btn-large waves-effect waves-light light-blue"
+     style="text-transform: none;">
+    Open the HS23 report viewer
+  </a>
+  &nbsp;
+  <a href="{{ site.baseurl }}/assets/hepscore-report/viewer.html"
+     target="_blank" rel="noopener"
+     class="btn waves-effect waves-light grey lighten-1"
+     style="text-transform: none;">
+    Open in a new tab
+  </a>
+</p>
+
+Once the HEP Benchmark Suite finishes, it produces a JSON report
+(typically `bmkrun_report.json` / `hepscore_result.json`) that contains the
+HEPscore total, per-workload scores, the full host and hardware inventory,
+and the plugin time series (CPU frequency, system load, memory, swap, power
+consumption). The JSON is complete but not easy to scan, so the HEPiX
+Benchmarking WG provides a browser viewer that turns it into an interactive
+dashboard.
+
+The dashboard exposes, in one page:
+
+- a **hero header** with the HEPscore total, score per core / per thread,
+  and score per watt (total score divided by Q85 of the measured power);
+- **host and hardware** key-value panels (CPU model, memory, kernel, BIOS,
+  optional GPU);
+- **one Chart.js time series per plugin metric**, with dashed lines for the
+  mean (and Q85 for power);
+- a **per-workload score table** including number of runs and average
+  duration;
+- the **run metadata** (suite version, HEPscore version, scaling,
+  repetitions, reference machine).
+
+Open the [HS23 report viewer]({{ site.baseurl }}/benchmarking/hs23_report_viewer.html),
+drop your `hepscore_result.json` onto the page (or click to choose a file)
+and the report is rendered client-side in your browser. Nothing is uploaded
+anywhere. A **Download as standalone HTML** button produces a single file
+with Chart.js inlined, which you can email or publish as-is. A **Load the
+example run** link is provided so you can see what the output looks like
+before running your own benchmark.
+
+You can also download the
+[`sample.json`]({{ site.baseurl }}/assets/hepscore-report/sample.json)
+example input and load it in the viewer before running the suite.
+
+The JSON schema expected by the tool is the one produced by HEP Benchmark
+Suite **v3.x** with HEPscore **v1.5**; fields that are not present in an
+older run are simply skipped, so partial reports still render.
+
 ## How to open a GGUS ticket
 
 If assistance is needed, the support unit of HEPscore can be reached via [GGUS tickets](https://helpdesk.ggus.eu/#ticket/create). 

@@ -14,6 +14,41 @@
 
     <link rel="icon" type="image/x-icon" href="{{ "/images/hepix-logo.png" | prepend: site.baseurl }}">
 
+    <style>
+        #benchmarking-menu {
+            overflow: visible;
+        }
+        #benchmarking-menu .benchmarking-submenu {
+            position: relative;
+        }
+        #benchmarking-menu .benchmarking-submenu-menu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            min-width: 220px;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+            z-index: 1001;
+        }
+        #benchmarking-menu .benchmarking-submenu:hover > .benchmarking-submenu-menu,
+        #benchmarking-menu .benchmarking-submenu:focus-within > .benchmarking-submenu-menu {
+            display: block;
+        }
+        #benchmarking-menu .benchmarking-submenu-menu li {
+            clear: both;
+            color: rgba(0,0,0,0.87);
+            cursor: pointer;
+            min-height: 50px;
+            line-height: 1.5rem;
+            width: 100%;
+            text-align: left;
+            text-transform: none;
+        }
+    </style>
+
     {% if jekyll.environment == 'production' and site.google_analytics %}
     {% include google-analytics.html %}
     {% endif %}

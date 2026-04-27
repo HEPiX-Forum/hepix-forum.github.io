@@ -1,0 +1,1251 @@
+{
+  "host": {
+    "hostname": "example-hepscore-host",
+    "ip": "192.0.2.10",
+    "tags": {
+      "site": "EXAMPLE-SITE"
+    },
+    "SW": {
+      "python_version": "3.12.3",
+      "platform": "Linux-6.8.0-100-generic-x86_64-with-glibc2.39",
+      "OS": {
+        "id": "ubuntu",
+        "id_like": "debian",
+        "version": {
+          "major": "24",
+          "minor": "04",
+          "build": ""
+        }
+      },
+      "kernel": {
+        "version": "6",
+        "major": "8",
+        "minor": "0",
+        "ABI": "100"
+      },
+      "singularity": "1.4.5"
+    },
+    "HW": {
+      "CPU": {
+        "Architecture": "x86_64",
+        "CPU_Model": "Example CPU Model",
+        "CPU_Family": "example",
+        "CPU_num": 20,
+        "Online_CPUs_list": "0-19",
+        "Threads_per_core": 1,
+        "Cores_per_socket": 10,
+        "Sockets": 1,
+        "Vendor_ID": "ExampleVendor",
+        "Stepping": "not_available",
+        "CPU_MHz": -1.0,
+        "CPU_Max_Speed_MHz": 3900.0,
+        "CPU_Min_Speed_MHz": 1378.0,
+        "BogoMIPS": 2000.0,
+        "L2_cache": "25 MiB (20 instances)",
+        "L3_cache": "24 MiB (2 instances)",
+        "NUMA_nodes": 1,
+        "NUMA_node0_CPUs": "0-19",
+        "Power_Policy": "performance",
+        "Power_Driver": "cppc_cpufreq",
+        "Microcode": "not_available",
+        "SMT_Enabled": "0"
+      },
+      "GPU": {
+        "nvidia0": {
+          "name": "Example GPU",
+          "memory_total": "[N/A]",
+          "memory_used": "[N/A]",
+          "clock_graphics": "208 MHz",
+          "clock_sm": "208 MHz",
+          "pci_bus": "00000000:00:00.0",
+          "power_avg": "5.00 W"
+        }
+      },
+      "BIOS": {
+        "Vendor": "Example BIOS Vendor",
+        "Version": "example-version",
+        "Release_data": "01/01/2025"
+      },
+      "SYSTEM": {
+        "Manufacturer": "Example Manufacturer",
+        "Product_Name": "Example System",
+        "Version": "example-version",
+        "Product_Serial": "not_available",
+        "Product_Asset_Tag": "not_available",
+        "isVM": false
+      },
+      "MEMORY": {
+        "Mem_Total": 127601228,
+        "Mem_Available": 123234408,
+        "Mem_Swap": 16777212
+      },
+      "STORAGE": {}
+    }
+  },
+  "suite": {
+    "version": "3.1",
+    "flags": {
+      "ncores": 20,
+      "run_mode": "singularity"
+    },
+    "benchmark_version": {
+      "hepscore": "v1.5"
+    }
+  },
+  "_id": "00000000-0000-4000-8000-000000000000",
+  "_timestamp": "2025-01-15T10:12:33Z",
+  "json_version": "3.1",
+  "_timestamp_end": "2025-01-15T11:54:29Z",
+  "plugins": {
+    "CommandExecutor": {
+      "pre": {
+        "cpu-frequency": {
+          "start_time": "2025-01-15T10:12:33.678297Z",
+          "end_time": "2025-01-15T10:13:33.696202Z",
+          "values": [
+            3354.0,
+            3354.0
+          ],
+          "statistics": {
+            "total_count": 2,
+            "valid_count": 2,
+            "min": 3354.0,
+            "q25": 3354.0,
+            "mean": 3354.0,
+            "median": 3354.0,
+            "q75": 3354.0,
+            "q85": 3354.0,
+            "q95": 3354.0,
+            "max": 3354.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "cpupower",
+            "regex": "(?P<value>\\d+.\\d+).*",
+            "unit": "MHz",
+            "aggregation": "default"
+          }
+        },
+        "load": {
+          "start_time": "2025-01-15T10:12:33.678453Z",
+          "end_time": "2025-01-15T10:13:33.696166Z",
+          "values": [
+            0.08,
+            0.03
+          ],
+          "statistics": {
+            "total_count": 2,
+            "valid_count": 2,
+            "min": 0.03,
+            "q25": 0.0425,
+            "mean": 0.055,
+            "median": 0.055,
+            "q75": 0.0675,
+            "q85": 0.0725,
+            "q95": 0.0775,
+            "max": 0.08
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "uptime",
+            "regex": "load average: (?P<value>\\d+.\\d+),",
+            "unit": "",
+            "aggregation": "default"
+          }
+        },
+        "used-memory": {
+          "start_time": "2025-01-15T10:12:33.678555Z",
+          "end_time": "2025-01-15T10:13:33.696221Z",
+          "values": [
+            4268.0,
+            4207.0
+          ],
+          "statistics": {
+            "total_count": 2,
+            "valid_count": 2,
+            "min": 4207.0,
+            "q25": 4222.25,
+            "mean": 4237.5,
+            "median": 4237.5,
+            "q75": 4252.75,
+            "q85": 4258.85,
+            "q95": 4264.95,
+            "max": 4268.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "free -m",
+            "regex": "Mem: *(\\d+) *(?P<value>\\d+).*",
+            "unit": "MiB",
+            "aggregation": "default"
+          }
+        },
+        "used-swap-memory": {
+          "start_time": "2025-01-15T10:12:33.678634Z",
+          "end_time": "2025-01-15T10:13:33.696237Z",
+          "values": [
+            0.0,
+            0.0
+          ],
+          "statistics": {
+            "total_count": 2,
+            "valid_count": 2,
+            "min": 0.0,
+            "q25": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "q75": 0.0,
+            "q85": 0.0,
+            "q95": 0.0,
+            "max": 0.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "free -m",
+            "regex": "Swap: *\\d+ *(?P<value>\\d+).*",
+            "unit": "MiB",
+            "aggregation": "default"
+          }
+        },
+        "power-consumption": {
+          "start_time": "2025-01-15T10:12:33.678654Z",
+          "end_time": "2025-01-15T10:13:33.696254Z",
+          "values": [
+            32.2,
+            24.8
+          ],
+          "statistics": {
+            "total_count": 2,
+            "valid_count": 2,
+            "min": 24.8,
+            "q25": 26.65,
+            "mean": 28.5,
+            "median": 28.5,
+            "q75": 30.35,
+            "q85": 31.09,
+            "q95": 31.83,
+            "max": 32.2
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "wget",
+            "regex": "(?P<value>\\d+.\\d+).*",
+            "unit": "W",
+            "aggregation": "default"
+          }
+        },
+        "status": "success"
+      },
+      "hepscore": {
+        "cpu-frequency": {
+          "start_time": "2025-01-15T10:13:33.788672Z",
+          "end_time": "2025-01-15T11:53:52.240280Z",
+          "values": [
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0,
+            3354.0
+          ],
+          "statistics": {
+            "total_count": 101,
+            "valid_count": 101,
+            "min": 3354.0,
+            "q25": 3354.0,
+            "mean": 3354.0,
+            "median": 3354.0,
+            "q75": 3354.0,
+            "q85": 3354.0,
+            "q95": 3354.0,
+            "max": 3354.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "cpupower",
+            "regex": "(?P<value>\\d+.\\d+).*",
+            "unit": "MHz",
+            "aggregation": "default"
+          }
+        },
+        "load": {
+          "start_time": "2025-01-15T10:13:33.788712Z",
+          "end_time": "2025-01-15T11:53:52.240242Z",
+          "values": [
+            0.03,
+            0.23,
+            11.25,
+            17.05,
+            14.64,
+            18.07,
+            16.41,
+            17.21,
+            19.12,
+            9.57,
+            5.38,
+            5.07,
+            14.69,
+            18.34,
+            19.85,
+            20.25,
+            20.5,
+            14.19,
+            8.54,
+            13.54,
+            18.08,
+            19.81,
+            20.19,
+            20.46,
+            18.92,
+            10.47,
+            9.97,
+            16.92,
+            19.66,
+            20.31,
+            20.64,
+            20.51,
+            10.85,
+            10.23,
+            16.48,
+            18.71,
+            13.37,
+            15.51,
+            18.42,
+            18.98,
+            13.3,
+            17.54,
+            19.1,
+            12.75,
+            7.08,
+            14.76,
+            18.08,
+            19.35,
+            19.6,
+            10.48,
+            14.54,
+            18.0,
+            19.27,
+            19.2,
+            11.56,
+            14.1,
+            17.83,
+            19.39,
+            19.78,
+            12.88,
+            15.05,
+            18.19,
+            19.39,
+            14.65,
+            14.05,
+            17.86,
+            19.28,
+            16.94,
+            10.65,
+            16.57,
+            18.79,
+            18.84,
+            11.7,
+            14.19,
+            18.02,
+            12.45,
+            16.68,
+            17.93,
+            11.72,
+            16.96,
+            16.74,
+            8.41,
+            8.59,
+            27.54,
+            26.8,
+            25.98,
+            29.61,
+            25.79,
+            13.82,
+            24.79,
+            27.9,
+            24.52,
+            28.91,
+            30.07,
+            20.45,
+            14.66,
+            29.03,
+            27.91,
+            29.53,
+            31.57,
+            24.24
+          ],
+          "statistics": {
+            "total_count": 101,
+            "valid_count": 101,
+            "min": 0.03,
+            "q25": 13.82,
+            "mean": 17.205742574257425,
+            "median": 17.86,
+            "q75": 19.78,
+            "q85": 20.64,
+            "q95": 28.91,
+            "max": 31.57
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "uptime",
+            "regex": "load average: (?P<value>\\d+.\\d+),",
+            "unit": "",
+            "aggregation": "default"
+          }
+        },
+        "used-memory": {
+          "start_time": "2025-01-15T10:13:33.788732Z",
+          "end_time": "2025-01-15T11:53:52.240298Z",
+          "values": [
+            4213.0,
+            4281.0,
+            14050.0,
+            31169.0,
+            14102.0,
+            16025.0,
+            6490.0,
+            14065.0,
+            31192.0,
+            4325.0,
+            11053.0,
+            17084.0,
+            29687.0,
+            30205.0,
+            30539.0,
+            30609.0,
+            30597.0,
+            4702.0,
+            9763.0,
+            29285.0,
+            29962.0,
+            30529.0,
+            30594.0,
+            30585.0,
+            25432.0,
+            12076.0,
+            27054.0,
+            29886.0,
+            30456.0,
+            30661.0,
+            30660.0,
+            30652.0,
+            4230.0,
+            8869.0,
+            9240.0,
+            9519.0,
+            6395.0,
+            8882.0,
+            9426.0,
+            8470.0,
+            8837.0,
+            9285.0,
+            9531.0,
+            4231.0,
+            9842.0,
+            25362.0,
+            25995.0,
+            26335.0,
+            26608.0,
+            7556.0,
+            25197.0,
+            25305.0,
+            26256.0,
+            26364.0,
+            5147.0,
+            25113.0,
+            25217.0,
+            26171.0,
+            26504.0,
+            4232.0,
+            14129.0,
+            18023.0,
+            18977.0,
+            10988.0,
+            12338.0,
+            16875.0,
+            18903.0,
+            11631.0,
+            8156.0,
+            15605.0,
+            18777.0,
+            14739.0,
+            4979.0,
+            25171.0,
+            29216.0,
+            8021.0,
+            26753.0,
+            21682.0,
+            14924.0,
+            28284.0,
+            19196.0,
+            4222.0,
+            16237.0,
+            34965.0,
+            31528.0,
+            37837.0,
+            26711.0,
+            32955.0,
+            11709.0,
+            34573.0,
+            28466.0,
+            30609.0,
+            32186.0,
+            42997.0,
+            26331.0,
+            26072.0,
+            32542.0,
+            40658.0,
+            33787.0,
+            32165.0,
+            26612.0
+          ],
+          "statistics": {
+            "total_count": 101,
+            "valid_count": 101,
+            "min": 4213.0,
+            "q25": 9842.0,
+            "mean": 20560.70297029703,
+            "median": 25171.0,
+            "q75": 29962.0,
+            "q85": 30652.0,
+            "q95": 33787.0,
+            "max": 42997.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "free -m",
+            "regex": "Mem: *(\\d+) *(?P<value>\\d+).*",
+            "unit": "MiB",
+            "aggregation": "default"
+          }
+        },
+        "used-swap-memory": {
+          "start_time": "2025-01-15T10:13:33.788748Z",
+          "end_time": "2025-01-15T11:53:52.240326Z",
+          "values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "statistics": {
+            "total_count": 101,
+            "valid_count": 101,
+            "min": 0.0,
+            "q25": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "q75": 0.0,
+            "q85": 0.0,
+            "q95": 0.0,
+            "max": 0.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "free -m",
+            "regex": "Swap: *\\d+ *(?P<value>\\d+).*",
+            "unit": "MiB",
+            "aggregation": "default"
+          }
+        },
+        "power-consumption": {
+          "start_time": "2025-01-15T10:13:33.788764Z",
+          "end_time": "2025-01-15T11:53:52.240343Z",
+          "values": [
+            24.8,
+            32.6,
+            135.6,
+            147.7,
+            149.7,
+            142.0,
+            66.4,
+            141.8,
+            146.2,
+            34.5,
+            66.5,
+            89.4,
+            135.9,
+            137.1,
+            135.5,
+            136.6,
+            135.4,
+            73.1,
+            75.7,
+            136.7,
+            135.0,
+            135.0,
+            135.2,
+            136.1,
+            93.4,
+            77.3,
+            135.3,
+            136.2,
+            134.7,
+            135.7,
+            135.6,
+            134.1,
+            34.7,
+            139.2,
+            140.4,
+            139.4,
+            61.4,
+            140.1,
+            140.4,
+            136.6,
+            137.4,
+            139.5,
+            141.0,
+            35.8,
+            72.5,
+            139.0,
+            139.3,
+            140.3,
+            130.8,
+            70.6,
+            140.5,
+            138.9,
+            138.8,
+            135.9,
+            77.9,
+            139.1,
+            136.1,
+            139.3,
+            139.5,
+            35.7,
+            134.0,
+            139.1,
+            140.3,
+            115.9,
+            127.7,
+            139.3,
+            140.2,
+            126.0,
+            127.3,
+            139.6,
+            140.2,
+            132.1,
+            47.4,
+            131.9,
+            137.4,
+            63.4,
+            135.6,
+            130.6,
+            133.5,
+            137.1,
+            126.3,
+            35.1,
+            120.1,
+            134.7,
+            127.2,
+            127.9,
+            134.9,
+            119.7,
+            40.2,
+            131.7,
+            137.0,
+            129.2,
+            138.6,
+            132.9,
+            92.0,
+            119.6,
+            136.1,
+            126.2,
+            133.8,
+            132.4,
+            116.6
+          ],
+          "statistics": {
+            "total_count": 101,
+            "valid_count": 101,
+            "min": 24.8,
+            "q25": 119.7,
+            "mean": 118.59108910891088,
+            "median": 135.0,
+            "q75": 138.9,
+            "q85": 139.5,
+            "q95": 141.0,
+            "max": 149.7
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "wget",
+            "regex": "(?P<value>\\d+.\\d+).*",
+            "unit": "W",
+            "aggregation": "default"
+          }
+        },
+        "status": "success"
+      },
+      "post": {
+        "cpu-frequency": {
+          "start_time": "2025-01-15T11:54:29.931156Z",
+          "end_time": "2025-01-15T11:55:29.918382Z",
+          "values": [
+            3354.0,
+            3354.0
+          ],
+          "statistics": {
+            "total_count": 2,
+            "valid_count": 2,
+            "min": 3354.0,
+            "q25": 3354.0,
+            "mean": 3354.0,
+            "median": 3354.0,
+            "q75": 3354.0,
+            "q85": 3354.0,
+            "q95": 3354.0,
+            "max": 3354.0
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "cpupower",
+            "regex": "(?P<value>\\d+.\\d+).*",
+            "unit": "MHz"
+          }
+        },
+        "load": {
+          "start_time": "2025-01-15T11:54:29.931183Z",
+          "end_time": "2025-01-15T11:55:29.918346Z",
+          "values": [
+            14.63,
+            5.4
+          ],
+          "statistics": {
+            "mean": 10.015
+          },
+          "config": {
+            "interval_mins": 1.0,
+            "command": "uptime",
+            "regex": "load average: (?P<value>\\d+.\\d+),",
+            "unit": ""
+          }
+        },
+        "used-memory": {
+          "start_time": "2025-01-15T11:54:29.931193Z",
+          "end_time": "2025-01-15T11:55:29.918401Z",
+          "values": [
+            4578.0,
+            4185.0
+          ],
+          "statistics": {
+            "mean": 4381.5
+          },
+          "config": {
+            "unit": "MiB"
+          }
+        },
+        "used-swap-memory": {
+          "start_time": "2025-01-15T11:54:29.931202Z",
+          "end_time": "2025-01-15T11:55:29.918418Z",
+          "values": [
+            0.0,
+            0.0
+          ],
+          "statistics": {
+            "mean": 0.0
+          },
+          "config": {
+            "unit": "MiB"
+          }
+        },
+        "power-consumption": {
+          "start_time": "2025-01-15T11:54:29.931211Z",
+          "end_time": "2025-01-15T11:55:29.918435Z",
+          "values": [
+            33.9,
+            25.4
+          ],
+          "statistics": {
+            "mean": 29.65
+          },
+          "config": {
+            "unit": "W"
+          }
+        },
+        "status": "success"
+      }
+    }
+  },
+  "profiles": {
+    "hepscore": {
+      "benchmarks": {
+        "atlas-gen_sherpa-ma-bmk": {
+          "weight": 1.0,
+          "version": "v2.0",
+          "args": {
+            "threads": 1,
+            "events": 200
+          },
+          "run0": {
+            "duration": 218,
+            "report": {
+              "wl-scores": {
+                "gen": 32.1203
+              }
+            }
+          },
+          "run1": {
+            "duration": 149,
+            "report": {
+              "wl-scores": {
+                "gen": 32.131
+              }
+            }
+          },
+          "run2": {
+            "duration": 148,
+            "report": {
+              "wl-scores": {
+                "gen": 32.2154
+              }
+            }
+          },
+          "app": {
+            "version": "v2.0",
+            "description": "ATLAS Event Generation based on athena version 23.0.3"
+          }
+        },
+        "atlas-reco_mt-ma-bmk": {
+          "weight": 1.0,
+          "version": "v2.0",
+          "args": {
+            "threads": 4,
+            "events": 100
+          },
+          "run0": {
+            "duration": 500,
+            "report": {
+              "wl-scores": {
+                "reco": 6.060158
+              }
+            }
+          },
+          "run1": {
+            "duration": 443,
+            "report": {
+              "wl-scores": {
+                "reco": 6.051255
+              }
+            }
+          },
+          "run2": {
+            "duration": 446,
+            "report": {
+              "wl-scores": {
+                "reco": 6.029119
+              }
+            }
+          },
+          "app": {
+            "version": "v2.0",
+            "description": "Atlas data reconstruction"
+          }
+        },
+        "cms-gen-sim-run3-ma-bmk": {
+          "weight": 1.0,
+          "version": "v1.0",
+          "run0": {
+            "duration": 243,
+            "report": {
+              "wl-scores": {
+                "gen-sim": 2.0757
+              }
+            }
+          },
+          "run1": {
+            "duration": 209,
+            "report": {
+              "wl-scores": {
+                "gen-sim": 2.0593
+              }
+            }
+          },
+          "run2": {
+            "duration": 220,
+            "report": {
+              "wl-scores": {
+                "gen-sim": 2.0732
+              }
+            }
+          },
+          "app": {
+            "version": "v1.0",
+            "description": "CMS GEN-SIM of ttbar events"
+          }
+        },
+        "cms-reco-run3-ma-bmk": {
+          "weight": 1.0,
+          "version": "v1.1",
+          "run0": {
+            "duration": 342,
+            "report": {
+              "wl-scores": {
+                "reco": 3.8486
+              }
+            }
+          },
+          "run1": {
+            "duration": 309,
+            "report": {
+              "wl-scores": {
+                "reco": 3.856
+              }
+            }
+          },
+          "run2": {
+            "duration": 310,
+            "report": {
+              "wl-scores": {
+                "reco": 3.8414
+              }
+            }
+          },
+          "app": {
+            "version": "v1.1",
+            "description": "CMS RECO of ttbar events"
+          }
+        },
+        "lhcb-sim-run3-ma-bmk": {
+          "weight": 1.0,
+          "version": "v1.0",
+          "run0": {
+            "duration": 275,
+            "report": {
+              "wl-scores": {
+                "sim": 1739.2593,
+                "gen-sim": 1498.9548,
+                "gen": 45764.0713
+              }
+            }
+          },
+          "run1": {
+            "duration": 258,
+            "report": {
+              "wl-scores": {
+                "sim": 1687.9348
+              }
+            }
+          },
+          "run2": {
+            "duration": 257,
+            "report": {
+              "wl-scores": {
+                "sim": 1653.8369
+              }
+            }
+          },
+          "app": {
+            "version": "v1.0",
+            "description": "LHCb SIM-RUN3 x86/ARM benchmark"
+          }
+        },
+        "belle2-gen-sim-reco-ma-bmk": {
+          "weight": 1.0,
+          "version": "v2.0",
+          "run0": {
+            "duration": 175,
+            "report": {
+              "wl-scores": {
+                "gen-sim-reco": 12.278987942208603
+              }
+            }
+          },
+          "run1": {
+            "duration": 170,
+            "report": {
+              "wl-scores": {
+                "gen-sim-reco": 12.083332841799919
+              }
+            }
+          },
+          "run2": {
+            "duration": 177,
+            "report": {
+              "wl-scores": {
+                "gen-sim-reco": 12.3128991454171
+              }
+            }
+          },
+          "app": {
+            "version": "v2.0",
+            "description": "belle2-gen-sim-reco"
+          }
+        },
+        "alice-digi-reco-core-run3-ma-bmk": {
+          "weight": 1.0,
+          "version": "v2.1",
+          "run0": {
+            "duration": 437,
+            "report": {
+              "wl-scores": {
+                "digi-reco": 0.5708
+              }
+            }
+          },
+          "run1": {
+            "duration": 391,
+            "report": {
+              "wl-scores": {
+                "digi-reco": 0.5558
+              }
+            }
+          },
+          "run2": {
+            "duration": 379,
+            "report": {
+              "wl-scores": {
+                "digi-reco": 0.5846
+              }
+            }
+          },
+          "app": {
+            "version": "v2.1",
+            "description": "ALICE Run3 PbPb DIGI-RECO (core)"
+          }
+        }
+      },
+      "settings": {
+        "name": "HEPscore23Beta",
+        "reference_machine": "E423521X1B04810-B Gold 6326 CPU @ 2.90GHz - 64 cores SMT ON",
+        "registry": "oras://gitlab-registry.cern.ch/hep-benchmarks/hep-workloads-sif",
+        "addarch": true,
+        "method": "geometric_mean",
+        "repetitions": 3,
+        "retries": 1,
+        "scaling": 1018,
+        "container_exec": "singularity",
+        "replay": false
+      },
+      "app_info": {
+        "config_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "hepscore_ver": "1.5.0"
+      },
+      "wl-scores": {
+        "atlas-gen_sherpa-ma-bmk": {
+          "gen": 32.131,
+          "gen_ref": 38.58
+        },
+        "atlas-reco_mt-ma-bmk": {
+          "reco": 6.051255,
+          "reco_ref": 9.062
+        },
+        "cms-gen-sim-run3-ma-bmk": {
+          "gen-sim": 2.0732,
+          "gen-sim_ref": 2.665
+        },
+        "cms-reco-run3-ma-bmk": {
+          "reco": 3.8486,
+          "reco_ref": 4.814
+        },
+        "lhcb-sim-run3-ma-bmk": {
+          "sim": 1687.9348,
+          "sim_ref": 1950
+        },
+        "belle2-gen-sim-reco-ma-bmk": {
+          "gen-sim-reco": 12.278987942208603,
+          "gen-sim-reco_ref": 15.4
+        },
+        "alice-digi-reco-core-run3-ma-bmk": {
+          "digi-reco": 0.5708,
+          "digi-reco_ref": 0.762
+        }
+      },
+      "score": 796.0658,
+      "status": "success"
+    }
+  }
+}

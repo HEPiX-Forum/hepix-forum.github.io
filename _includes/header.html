@@ -20,18 +20,33 @@
               <li>
                 <a class="dropdown-button" data-beloworigin="true" data-alignment="right" data-activates="{{ my_page_collection }}-menu">{{ my_page.menu }}<i class="material-icons right">arrow_drop_down</i></a>
                 <ul id="{{ my_page_collection }}-menu" class="dropdown-content">
-                  <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
-                  <li class="divider"></li>
-                  {% for collection_page in site.[my_page_collection] %}
-                    {% if collection_page.menu == "_" %}
-                      {% assign my_menu = collection_page.title %}
-                    {% else %}
-                      {% assign my_menu = collection_page.menu %}
-                    {% endif %}
-                    {% if my_menu %}
-                      <li><a href="{{ collection_page.url }}">{{ my_menu }}</a></li>
-                    {% endif %}
-                  {% endfor %}
+                  {% if my_page_collection == "benchmarking" %}
+                    <li><a href="{{ "/benchmarking/scores_HS23.html" | relative_url }}">HS23 score table</a></li>
+                    <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
+                    <li><a href="{{ "/benchmarking/how_to_run_HS23.html" | relative_url }}">How to run HS23</a></li>
+                    <li><a href="{{ "/benchmarking/accounting_migration.html" | relative_url }}">Accounting</a></li>
+                    <li class="divider"></li>
+                    <li class="benchmarking-submenu">
+                      <a href="#!">Others<i class="material-icons right">chevron_right</i></a>
+                      <ul class="benchmarking-submenu-menu">
+                        <li><a href="{{ "/benchmarking/scores_WLCG_HS23.html" | relative_url }}">WLCG job slot scores</a></li>
+                        <li><a href="{{ "/benchmarking/hs23_report_viewer.html" | relative_url }}">HS23 Report Viewer</a></li>
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
+                    <li class="divider"></li>
+                    {% for collection_page in site.[my_page_collection] %}
+                      {% if collection_page.menu == "_" %}
+                        {% assign my_menu = collection_page.title %}
+                      {% else %}
+                        {% assign my_menu = collection_page.menu %}
+                      {% endif %}
+                      {% if my_menu %}
+                        <li><a href="{{ collection_page.url }}">{{ my_menu }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
                 </ul>
               </li>
             {% else %}
@@ -63,13 +78,34 @@
                     <a class="collapsible-header">{{ my_page.menu }}<i class="material-icons right">arrow_drop_down</i></a>
                     <div class="collapsible-body">
                       <ul>
-                        <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
-                        <li class="divider"></li>
-                        {% for collection_page in site.[my_page_collection] %}
-                          {% if collection_page.menu %}
-                            <li><a href="{{ collection_page.url }}">{{ collection_page.menu }}</a></li>
-                          {% endif %}
-                        {% endfor %}
+                        {% if my_page_collection == "benchmarking" %}
+                          <li><a href="{{ "/benchmarking/scores_HS23.html" | relative_url }}">HS23 score table</a></li>
+                          <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
+                          <li><a href="{{ "/benchmarking/how_to_run_HS23.html" | relative_url }}">How to run HS23</a></li>
+                          <li><a href="{{ "/benchmarking/accounting_migration.html" | relative_url }}">Accounting</a></li>
+                          <li class="divider"></li>
+                          <li class="no-padding">
+                            <ul class="collapsible collapsible-accordion">
+                              <li>
+                                <a class="collapsible-header">Others<i class="material-icons right">arrow_drop_down</i></a>
+                                <div class="collapsible-body">
+                                  <ul>
+                                    <li><a href="{{ "/benchmarking/scores_WLCG_HS23.html" | relative_url }}">WLCG job slot scores</a></li>
+                                    <li><a href="{{ "/benchmarking/hs23_report_viewer.html" | relative_url }}">HS23 Report Viewer</a></li>
+                                  </ul>
+                                </div>
+                              </li>
+                            </ul>
+                          </li>
+                        {% else %}
+                          <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
+                          <li class="divider"></li>
+                          {% for collection_page in site.[my_page_collection] %}
+                            {% if collection_page.menu %}
+                              <li><a href="{{ collection_page.url }}">{{ collection_page.menu }}</a></li>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
                       </ul>
                     </div>
                   </li>

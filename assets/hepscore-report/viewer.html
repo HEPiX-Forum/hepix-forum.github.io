@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HEPscore23 report viewer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f8fa; --fg: #1a1a1a; --muted: #586069; --card: #fff;
+    --border: #e1e4e8; --accent: #0366d6;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         margin: 0; padding: 24px; background: var(--bg); color: var(--fg);
+         line-height: 1.5; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 14px; padding-bottom: 6px;
+       border-bottom: 1px solid var(--border); font-weight: 600; }
+  h3 { font-size: 14px; margin: 16px 0 8px; color: var(--muted);
+       text-transform: uppercase; letter-spacing: 0.5px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border);
+          border-radius: 8px; padding: 18px; }
+  .hero { background: linear-gradient(135deg, #0366d6 0%, #044289 100%);
+          color: #fff; padding: 24px; border-radius: 8px; margin-bottom: 16px; }
+  .hero-metric { display: flex; flex-direction: column; gap: 6px; }
+  .hero .score { font-size: 44px; font-weight: 700; line-height: 1; margin: 0; }
+  .hero .score-label { opacity: 0.85; font-size: 12px;
+                       text-transform: uppercase; letter-spacing: 1px;
+                       min-height: 16px; }
+  .hero .hero-sub { opacity: 0.8; font-size: 11px; letter-spacing: 0.3px; }
+  .hero .meta { display: flex; gap: 24px; margin-top: 20px;
+                padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.18);
+                flex-wrap: wrap; font-size: 13px; opacity: 0.9; }
+  .kv { display: grid; grid-template-columns: 160px 1fr; gap: 6px 12px;
+        font-size: 13px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { font-weight: 600; background: #f6f8fa; font-size: 12px;
+       text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  code { background: #f3f4f6; padding: 1px 6px; border-radius: 3px;
+         font-size: 12px; }
+  .chart-wrap { position: relative; height: 280px; }
+  section { margin-bottom: 24px; }
+
+  /* Drop zone */
+  .dropzone { border: 2px dashed #c8ccd1; border-radius: 10px; padding: 40px 20px;
+              text-align: center; background: #fff; transition: all .15s; cursor: pointer; }
+  .dropzone:hover, .dropzone.hover { border-color: var(--accent);
+                                     background: #f0f7ff; }
+  .dropzone p { margin: 4px 0; }
+  .dropzone .muted { color: var(--muted); font-size: 13px; }
+  .dz-btn { display: inline-block; background: var(--accent); color: #fff;
+            padding: 8px 18px; border-radius: 6px; font-weight: 600;
+            margin-top: 8px; font-size: 13px; }
+  .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .toolbar button { background: #fff; border: 1px solid var(--border);
+                    padding: 8px 14px; border-radius: 6px; font-size: 13px;
+                    cursor: pointer; font-weight: 500; }
+  .toolbar button:hover { background: #f0f7ff; border-color: var(--accent);
+                          color: var(--accent); }
+  .error { background: #ffeef0; border: 1px solid #fdb8c0;
+           color: #86181d; padding: 12px 16px; border-radius: 6px;
+           margin-bottom: 16px; font-size: 13px; }
+  .hidden { display: none !important; }
+  footer { text-align: center; color: var(--muted); font-size: 12px;
+           margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header style="margin-bottom:16px">
+  <h1>HEPscore23 report viewer</h1>
+  <div class="sub">Drop a HEPscore benchmark JSON to render an interactive summary. Everything runs in your browser — the file never leaves your machine.</div>
+</header>
+
+<div id="landing">
+  <div id="dropzone" class="dropzone">
+    <p style="font-size:32px; margin-bottom:4px">📊</p>
+    <p><strong>Drop a benchmark JSON here</strong></p>
+    <p class="muted">or click to choose a file · accepts HEP Benchmark Suite v3.x output</p>
+    <input id="fileInput" type="file" accept=".json,application/json" hidden>
+    <span class="dz-btn">Choose file…</span>
+    <p class="muted" style="margin-top:14px">
+      No file? <a href="#" id="sampleLink">Load the example run</a>.
+    </p>
+  </div>
+  <div id="error" class="error hidden"></div>
+</div>
+
+<div id="report" class="hidden">
+  <div class="toolbar">
+    <button id="btnNew">← Load another file</button>
+    <button id="btnDownload">Download as standalone HTML</button>
+  </div>
+  <div id="reportBody"></div>
+</div>
+
+<footer id="landingFooter">
+  Client-side viewer · part of the <a href="/benchmarking/how_to_run_HS23.html">HEPscore23 how-to-run</a>
+</footer>
+
+</div>
+
+<script>
+// -------------------------------------------------------------
+// Helpers
+// -------------------------------------------------------------
+function percentile(arr, p) {
+  if (!arr || !arr.length) return null;
+  const s = [...arr].sort((a, b) => a - b);
+  const k = (s.length - 1) * p;
+  const lo = Math.floor(k), hi = Math.ceil(k);
+  return lo === hi ? s[lo] : s[lo] + (s[hi] - s[lo]) * (k - lo);
+}
+function mean(arr) {
+  return arr && arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+}
+function median(arr) { return percentile(arr, 0.5); }
+function fmt(x, d) {
+  if (x === null || x === undefined || Number.isNaN(x)) return "—";
+  if (Math.abs(x) >= 1000) return x.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  return x.toFixed(d !== undefined ? d : 2);
+}
+function get(obj, path, def) {
+  let cur = obj;
+  for (const p of path) {
+    if (!cur || typeof cur !== "object" || !(p in cur)) return def;
+    cur = cur[p];
+  }
+  return cur;
+}
+function esc(s) {
+  return String(s ?? "—").replace(/[&<>"']/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// -------------------------------------------------------------
+// Parse benchmark JSON -> normalized report object
+// -------------------------------------------------------------
+const METRIC_META = {
+  "power-consumption": { title: "Power consumption", unit: "W",
+                         color: "rgb(3, 102, 214)", aggs: ["mean", "q85"] },
+  "load":              { title: "Load average",     unit: "load",
+                         color: "rgb(203, 36, 49)", aggs: ["mean"] },
+  "used-memory":       { title: "Used memory",       unit: "MiB",
+                         color: "rgb(34, 134, 58)", aggs: ["mean"] },
+  "used-swap-memory":  { title: "Used swap",         unit: "MiB",
+                         color: "rgb(176, 136, 0)", aggs: ["mean"] },
+  "cpu-frequency":     { title: "CPU frequency",    unit: "MHz",
+                         color: "rgb(111, 66, 193)", aggs: ["mean"] },
+};
+
+function parseSeries(phase, name) {
+  const raw = phase && phase[name];
+  if (!raw || !Array.isArray(raw.values)) return null;
+  return {
+    name,
+    unit: get(raw, ["config", "unit"], ""),
+    values: raw.values.map(Number).filter(v => !Number.isNaN(v)),
+    start: raw.start_time || null,
+    end:   raw.end_time   || null,
+  };
+}
+
+function parseReport(data) {
+  const host = get(data, ["host"], {}) || {};
+  const hw = get(host, ["HW"], {}) || {};
+  const sw = get(host, ["SW"], {}) || {};
+  const cpu = get(hw, ["CPU"], {}) || {};
+  const os_ = get(sw, ["OS"], {}) || {};
+  const kern = get(sw, ["kernel"], {}) || {};
+  const mem = get(hw, ["MEMORY"], {}) || {};
+  const gpus = get(hw, ["GPU"], {}) || {};
+  const profiles = get(data, ["profiles", "hepscore"], {}) || {};
+  const plugins = get(data, ["plugins"], {}) || {};
+
+  // GPU label (first entry)
+  let gpu = "—";
+  for (const k in gpus) {
+    if (gpus[k] && gpus[k].name) { gpu = gpus[k].name; break; }
+  }
+
+  // Time series (hepscore phase)
+  const phase = get(plugins, ["CommandExecutor", "hepscore"], {}) || {};
+  const series = {};
+  for (const key of Object.keys(METRIC_META)) {
+    const s = parseSeries(phase, key);
+    if (s) series[key] = s;
+  }
+
+  // Scores
+  const score = Number(get(profiles, ["score"], NaN));
+  const ncores = Number(get(data, ["suite", "flags", "ncores"],
+                             cpu.CPU_num || 1)) || 1;
+  const scorePerCore = score / ncores;
+  const power = series["power-consumption"];
+  const q85Power = power ? percentile(power.values, 0.85) : null;
+  const scorePerWatt = (q85Power && q85Power > 0) ? score / q85Power : null;
+
+  // Benchmarks
+  const benchmarks = [];
+  const bms = get(profiles, ["benchmarks"], {}) || {};
+  const wlScores = get(profiles, ["wl-scores"], {}) || {};
+  const workloadStarts = []; // { name, ts } in ISO
+  for (const [name, bm] of Object.entries(bms)) {
+    if (!bm || typeof bm !== "object") continue;
+    let bmScore = null, kind = "";
+    const myScores = wlScores[name] || {};
+    for (const [k, v] of Object.entries(myScores)) {
+      if (k.endsWith("_ref")) continue;
+      bmScore = Number(v); kind = k; break;
+    }
+    if (bmScore === null) {
+      const wls = get(bm, ["run0", "report", "wl-scores"], {}) || {};
+      for (const [k, v] of Object.entries(wls)) {
+        bmScore = Number(v); kind = k; break;
+      }
+    }
+    if (bmScore === null) continue;
+
+    const durations = [];
+    for (const k of Object.keys(bm)) {
+      if (k.startsWith("run") && bm[k] && typeof bm[k].duration === "number") {
+        durations.push(bm[k].duration);
+      }
+    }
+
+    // Optional workload start time markers (best-effort).
+    // Some suite JSON variants include ISO timestamps per workload run, e.g.
+    // benchmarks.<wl>.run0.start_time / start / begin / timestamp.
+    // If present, we use the earliest run timestamp as the workload start marker.
+    try {
+      const runKeys = Object.keys(bm).filter(k => k.startsWith("run"));
+      const isoLike = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s);
+      const tsVals = [];
+      for (const rk of runKeys) {
+        const ro = bm[rk];
+        if (!ro || typeof ro !== "object") continue;
+        const candKeys = ["start_time", "start", "begin", "timestamp", "_timestamp"];
+        for (const ck of candKeys) {
+          const v = ro[ck];
+          if (isoLike(v)) tsVals.push(v);
+        }
+        // allow nested report timestamps too
+        const rep = ro.report;
+        if (rep && typeof rep === "object") {
+          for (const ck of candKeys) {
+            const v = rep[ck];
+            if (isoLike(v)) tsVals.push(v);
+          }
+        }
+      }
+      if (tsVals.length) {
+        tsVals.sort((a, b) => new Date(a) - new Date(b));
+        workloadStarts.push({ name, ts: tsVals[0] });
+      }
+    } catch (_) { /* best-effort, ignore */ }
+
+    benchmarks.push({
+      name, kind, score: bmScore,
+      runs: durations.length,
+      avgDuration: durations.length ? mean(durations) : NaN,
+      description: get(bm, ["app", "description"], ""),
+    });
+  }
+
+  return {
+    runId: data._id || "",
+    tsStart: data._timestamp || "",
+    tsEnd: data._timestamp_end || "",
+    hostname: host.hostname || "—",
+    ip: host.ip || "—",
+    site: get(host, ["tags", "site"], "—"),
+    osLabel: `${os_.id || "?"} ${get(os_, ["version", "major"], "?")}.${get(os_, ["version", "minor"], "?")}`,
+    kernel: `${kern.version || "?"}.${kern.major || "?"}.${kern.minor || "?"}-${kern.ABI || "?"}`,
+    python: sw.python_version || "—",
+    singularity: sw.singularity || "—",
+    bios: `${get(hw, ["BIOS", "Vendor"], "?")} ${get(hw, ["BIOS", "Version"], "?")} (${get(hw, ["BIOS", "Release_data"], "?")})`,
+    isVM: !!get(hw, ["SYSTEM", "isVM"], false),
+    cpuModel: cpu.CPU_Model || "—",
+    cpuArch: cpu.Architecture || "—",
+    cpuSockets: Number(cpu.Sockets || 1),
+    cpuCores: Number(cpu.Cores_per_socket || 0),
+    cpuThreadsPerCore: Number(cpu.Threads_per_core || 1),
+    cpuTotal: Number(cpu.CPU_num || 0),
+    cpuMinMhz: Number(cpu.CPU_Min_Speed_MHz || 0),
+    cpuMaxMhz: Number(cpu.CPU_Max_Speed_MHz || 0),
+    cpuL2: cpu.L2_cache || "—",
+    cpuL3: cpu.L3_cache || "—",
+    smt: String(cpu.SMT_Enabled ?? "—"),
+    memTotalMb: Math.floor(Number(mem.Mem_Total || 0) / 1024),
+    memAvailMb: Math.floor(Number(mem.Mem_Available || 0) / 1024),
+    swapTotalMb: Math.floor(Number(mem.Mem_Swap || 0) / 1024),
+    gpu,
+    suiteVersion: String(get(data, ["suite", "version"], "—")),
+    hepscoreVersion: String(get(profiles, ["app_info", "hepscore_ver"], "—")),
+    runMode: String(get(data, ["suite", "flags", "run_mode"], "—")),
+    ncores,
+    registry: String(get(profiles, ["settings", "registry"], "—")),
+    method: String(get(profiles, ["settings", "method"], "—")),
+    scaling: Number(get(profiles, ["settings", "scaling"], 1)),
+    repetitions: Number(get(profiles, ["settings", "repetitions"], 1)),
+    referenceMachine: String(get(profiles, ["settings", "reference_machine"], "—")),
+    score, scorePerCore, scorePerWatt, q85Power,
+    series, benchmarks, workloadStarts,
+    status: String(get(profiles, ["status"], "—")),
+  };
+}
+
+// -------------------------------------------------------------
+// Render
+// -------------------------------------------------------------
+function summaryLine(s) {
+  const parts = [];
+  const m = mean(s.values), me = median(s.values);
+  if (m !== null) parts.push(`mean ${fmt(m)}`);
+  if (me !== null) parts.push(`median ${fmt(me)}`);
+  if (s.values.length) {
+    parts.push(`min ${fmt(Math.min(...s.values))}`);
+    parts.push(`max ${fmt(Math.max(...s.values))}`);
+  }
+  return parts.join(" · ");
+}
+
+function timeLabels(s) {
+  const n = s.values.length;
+  if (n <= 1 || !s.start || !s.end) return s.values.map((_, i) => String(i));
+  const t0 = new Date(s.start), t1 = new Date(s.end);
+  const step = (t1 - t0) / (n - 1);
+  return s.values.map((_, i) => {
+    const d = new Date(t0.getTime() + step * i);
+    return d.toISOString().substring(11, 16);
+  });
+}
+
+function chartSpecs(r) {
+  const specs = [];
+  const markers = (r.workloadStarts || [])
+    .map(m => ({ name: m.name, t: new Date(m.ts) }))
+    .filter(m => Number.isFinite(+m.t))
+    .sort((a, b) => a.t - b.t);
+
+  for (const [key, meta] of Object.entries(METRIC_META)) {
+    const s = r.series[key];
+    if (!s || !s.values.length) continue;
+    const agg = [];
+    if (meta.aggs.includes("mean")) {
+      const m = mean(s.values);
+      if (m !== null) agg.push({ name: "mean", value: +m.toFixed(2),
+                                 color: "rgb(203, 36, 49)", dash: [6, 4] });
+    }
+    if (meta.aggs.includes("q85")) {
+      const q = percentile(s.values, 0.85);
+      if (q !== null) agg.push({ name: "Q85", value: +q.toFixed(2),
+                                 color: "rgb(176, 136, 0)", dash: [2, 3] });
+    }
+    specs.push({
+      id: key.replace(/-/g, "_") + "_chart",
+      title: meta.title, unit: meta.unit, color: meta.color,
+      values: s.values, labels: timeLabels(s), agg,
+      summary: summaryLine(s),
+      markerIdx: (() => {
+        if (!markers.length || !s.start || !s.end) return [];
+        const t0 = new Date(s.start), t1 = new Date(s.end);
+        const span = t1 - t0;
+        if (!Number.isFinite(span) || span <= 0) return [];
+        const n = s.values.length;
+        const out = [];
+        for (const m of markers) {
+          const frac = (+m.t - +t0) / span;
+          if (frac < 0 || frac > 1) continue;
+          out.push({ idx: frac * (n - 1), name: m.name });
+        }
+        return out;
+      })(),
+    });
+  }
+  return specs;
+}
+
+function renderHTML(r) {
+  const specs = chartSpecs(r);
+  const scorePerWattHTML = r.scorePerWatt !== null
+    ? `<div class="score">${fmt(r.scorePerWatt)}</div>
+       <div class="hero-sub">${fmt(r.score)} / ${fmt(r.q85Power, 1)} W (Q85 power)</div>`
+    : `<div class="score">—</div>
+       <div class="hero-sub">power series not available</div>`;
+
+  const hero = `
+<header>
+  <h1>HEPscore23 · ${esc(r.hostname)} (${esc(r.site)}) · ${esc((r.tsStart || "").slice(0, 10))}</h1>
+  <div class="sub">Run ID <code>${esc(r.runId)}</code> · ${esc(r.tsStart)} → ${esc(r.tsEnd)}</div>
+</header>
+<div class="hero">
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
+    <div class="hero-metric">
+      <div class="score-label">HEPscore · total</div>
+      <div class="score">${fmt(r.score)}</div>
+      <div class="hero-sub">${esc(r.method)} × ${fmt(r.scaling, 0)}</div>
+    </div>
+    <div class="hero-metric">
+      <div class="score-label">Score / core</div>
+      <div class="score">${fmt(r.scorePerCore)}</div>
+      <div class="hero-sub">${fmt(r.score)} / ${r.ncores} cores</div>
+    </div>
+    <div class="hero-metric">
+      <div class="score-label">Score / W</div>
+      ${scorePerWattHTML}
+    </div>
+  </div>
+  <div class="meta">
+    <div><strong>Host:</strong> ${esc(r.hostname)} @ ${esc(r.site)}</div>
+    <div><strong>CPU:</strong> ${esc(r.cpuModel)} · ${r.cpuTotal} CPUs
+         (${r.cpuSockets}S × ${r.cpuCores}C × ${r.cpuThreadsPerCore}T)</div>
+    <div><strong>GPU:</strong> ${esc(r.gpu)}</div>
+    <div><strong>Status:</strong> ✓ ${esc(r.status)}</div>
+  </div>
+</div>`;
+
+  const hostCard = `
+<section>
+  <div class="grid grid-2">
+    <div class="card">
+      <h2>Host</h2>
+      <dl class="kv">
+        <dt>Hostname</dt><dd>${esc(r.hostname)}</dd>
+        <dt>IP</dt><dd>${esc(r.ip)}</dd>
+        <dt>Site</dt><dd>${esc(r.site)}</dd>
+        <dt>OS</dt><dd>${esc(r.osLabel)} · kernel ${esc(r.kernel)}</dd>
+        <dt>Python</dt><dd>${esc(r.python)}</dd>
+        <dt>Singularity</dt><dd>${esc(r.singularity)}</dd>
+        <dt>BIOS</dt><dd>${esc(r.bios)}</dd>
+        <dt>Virtualised</dt><dd>${r.isVM ? "Yes" : "No (bare metal)"}</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h2>Hardware</h2>
+      <dl class="kv">
+        <dt>Architecture</dt><dd>${esc(r.cpuArch)}</dd>
+        <dt>CPU</dt><dd>${esc(r.cpuModel)}</dd>
+        <dt>Topology</dt>
+        <dd>${r.cpuSockets} socket · ${r.cpuCores} cores ·
+            ${r.cpuThreadsPerCore} thread/core · ${r.cpuTotal} CPUs</dd>
+        <dt>Clock</dt>
+        <dd>${fmt(r.cpuMinMhz, 0)} – ${fmt(r.cpuMaxMhz, 0)} MHz</dd>
+        <dt>L2 / L3</dt><dd>${esc(r.cpuL2)} / ${esc(r.cpuL3)}</dd>
+        <dt>SMT</dt>
+        <dd>${["1","true","True","yes"].includes(r.smt) ? "enabled" : "disabled"}</dd>
+        <dt>Memory</dt>
+        <dd>${(r.memTotalMb/1024).toFixed(1)} GiB total,
+            ${(r.memAvailMb/1024).toFixed(1)} GiB avail.</dd>
+        <dt>Swap</dt><dd>${(r.swapTotalMb/1024).toFixed(1)} GiB</dd>
+        <dt>GPU</dt><dd>${esc(r.gpu)}</dd>
+      </dl>
+    </div>
+  </div>
+</section>`;
+
+  const telemetry = `
+<section>
+  <h2>System telemetry during HEPscore phase</h2>
+  ${specs.length === 0
+    ? `<div class="card"><em>No CommandExecutor time-series available.</em></div>`
+    : `<div class="sub" style="margin-bottom:14px">${specs[0].values.length} samples · metrics recorded by CommandExecutor</div>
+       <div class="grid grid-2">
+         ${specs.map(c => `
+           <div class="card">
+             <h3>${esc(c.title)} (${esc(c.unit)})</h3>
+             <div class="sub" style="margin-bottom:6px">${esc(c.summary)}</div>
+             <div class="chart-wrap"><canvas id="${c.id}"></canvas></div>
+           </div>`).join("")}
+       </div>`}
+</section>`;
+
+  const bench = `
+<section>
+  <h2>HEPscore workload results</h2>
+  <div class="sub" style="margin-bottom:14px">
+    ${r.benchmarks.length} benchmarks · ${r.repetitions} repetitions each
+  </div>
+  <div class="card" style="padding:0">
+  <table>
+    <thead><tr>
+      <th>Benchmark</th><th>Kind</th>
+      <th class="num">Score</th><th class="num">Runs</th>
+      <th class="num">Duration (avg)</th>
+    </tr></thead>
+    <tbody>
+      ${r.benchmarks.map(b => `
+        <tr>
+          <td><strong>${esc(b.name)}</strong>
+              <div class="sub" style="font-size:11px">${esc(b.description)}</div></td>
+          <td><code>${esc(b.kind)}</code></td>
+          <td class="num">${b.score.toFixed(4)}</td>
+          <td class="num">${b.runs}</td>
+          <td class="num">${fmt(b.avgDuration, 0)} s</td>
+        </tr>`).join("")}
+    </tbody>
+  </table>
+  </div>
+</section>`;
+
+  const meta = `
+<section>
+  <h2>Run metadata</h2>
+  <div class="grid grid-2">
+    <div class="card">
+      <dl class="kv">
+        <dt>Suite version</dt><dd>${esc(r.suiteVersion)}</dd>
+        <dt>HEPscore</dt><dd>v${esc(r.hepscoreVersion)}</dd>
+        <dt>Run mode</dt><dd>${esc(r.runMode)} (apptainer ${esc(r.singularity)})</dd>
+        <dt>Registry</dt><dd><code>${esc(r.registry)}</code></dd>
+        <dt>Method</dt><dd>${esc(r.method)} · scaling ×${fmt(r.scaling, 0)}</dd>
+        <dt>Repetitions</dt><dd>${r.repetitions}</dd>
+        <dt>Cores used</dt><dd>${r.ncores}</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <dl class="kv">
+        <dt>Reference machine</dt><dd>${esc(r.referenceMachine)}</dd>
+        <dt>Run window</dt><dd>${esc(r.tsStart)} → ${esc(r.tsEnd)}</dd>
+        <dt>Report generated</dt><dd>${new Date().toISOString().replace("T", " ").substring(0, 19)} UTC</dd>
+      </dl>
+    </div>
+  </div>
+</section>`;
+
+  return { html: hero + hostCard + telemetry + bench + meta, specs };
+}
+
+function drawCharts(specs) {
+  const workloadMarkerPlugin = {
+    id: "workloadMarkers",
+    afterDatasetsDraw(chart, args, opts) {
+      const marks = (opts && opts.marks) || [];
+      if (!marks.length) return;
+      const { ctx, chartArea, scales } = chart;
+      const xScale = scales.x;
+      if (!xScale || !chartArea) return;
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(88, 96, 105, 0.6)";
+      ctx.setLineDash([5, 4]);
+      ctx.lineWidth = 1;
+
+      // If there are many workloads, limit labels to avoid clutter.
+      const labelEvery = marks.length > 10 ? 2 : 1;
+      let labelIdx = 0;
+
+      for (const m of marks) {
+        if (!Number.isFinite(m.idx)) continue;
+        const x = xScale.getPixelForValue(m.idx);
+        if (x < chartArea.left || x > chartArea.right) continue;
+        ctx.beginPath();
+        ctx.moveTo(x, chartArea.top);
+        ctx.lineTo(x, chartArea.bottom);
+        ctx.stroke();
+
+        if (m.name && (labelIdx % labelEvery === 0)) {
+          ctx.setLineDash([]);
+          ctx.fillStyle = "rgba(88, 96, 105, 0.9)";
+          ctx.font = "10px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "top";
+          const label = String(m.name).length > 22 ? String(m.name).slice(0, 19) + "…" : String(m.name);
+          ctx.fillText(label, Math.min(x + 4, chartArea.right - 40), chartArea.top + 4);
+          ctx.setLineDash([5, 4]);
+        }
+        labelIdx++;
+      }
+      ctx.restore();
+    },
+  };
+
+  specs.forEach(cfg => {
+    const el = document.getElementById(cfg.id);
+    if (!el) return;
+    const datasets = [{
+      label: cfg.unit,
+      data: cfg.values,
+      borderColor: cfg.color,
+      backgroundColor: cfg.color.replace("rgb", "rgba").replace(")", ",0.12)"),
+      borderWidth: 1.4, pointRadius: 0, tension: 0.2, fill: true,
+    }];
+    (cfg.agg || []).forEach(a => {
+      datasets.push({
+        label: `${a.name} = ${a.value}`,
+        data: Array(cfg.values.length).fill(a.value),
+        borderColor: a.color, borderDash: a.dash,
+        borderWidth: 1.4, pointRadius: 0, fill: false,
+      });
+    });
+    new Chart(el, {
+      type: "line",
+      data: { labels: cfg.labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          x: { ticks: { maxTicksLimit: 8 } },
+          y: { beginAtZero: true, title: { display: true, text: cfg.unit } },
+        },
+        plugins: {
+          legend: { position: "top",
+                    labels: { boxWidth: 14, font: { size: 11 } } },
+          workloadMarkers: { marks: cfg.markerIdx || [] },
+        },
+      },
+      plugins: [workloadMarkerPlugin],
+    });
+  });
+}
+
+// -------------------------------------------------------------
+// UI wiring
+// -------------------------------------------------------------
+const dz = document.getElementById("dropzone");
+const fileInput = document.getElementById("fileInput");
+const landing = document.getElementById("landing");
+const landingFooter = document.getElementById("landingFooter");
+const report = document.getElementById("report");
+const reportBody = document.getElementById("reportBody");
+const errorBox = document.getElementById("error");
+let lastReport = null;
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.classList.remove("hidden");
+}
+function clearError() { errorBox.classList.add("hidden"); }
+
+function handleFile(file) {
+  clearError();
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      renderFromData(data);
+    } catch (err) {
+      showError(`Could not parse JSON: ${err.message}`);
+    }
+  };
+  reader.onerror = () => showError("Could not read the file.");
+  reader.readAsText(file);
+}
+
+function renderFromData(data) {
+  try {
+    const r = parseReport(data);
+    if (!Number.isFinite(r.score)) {
+      throw new Error("No HEPscore found in profiles.hepscore.score — is this the right JSON?");
+    }
+    const { html, specs } = renderHTML(r);
+    reportBody.innerHTML = html;
+    drawCharts(specs);
+    landing.classList.add("hidden");
+    landingFooter.classList.add("hidden");
+    report.classList.remove("hidden");
+    lastReport = { r, html, specs };
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    showError(`Failed to render: ${err.message}`);
+  }
+}
+
+dz.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => {
+  e.preventDefault(); e.stopPropagation(); dz.classList.add("hover");
+}));
+["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => {
+  e.preventDefault(); e.stopPropagation(); dz.classList.remove("hover");
+}));
+dz.addEventListener("drop", e => {
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) handleFile(f);
+});
+
+document.getElementById("btnNew").addEventListener("click", () => {
+  report.classList.add("hidden");
+  landing.classList.remove("hidden");
+  landingFooter.classList.remove("hidden");
+  reportBody.innerHTML = "";
+  fileInput.value = "";
+  clearError();
+});
+
+document.getElementById("btnDownload").addEventListener("click", () => {
+  if (!lastReport) return;
+  const chartJS = `<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>`;
+  const css = document.querySelector("style").textContent;
+  const specsJSON = JSON.stringify(lastReport.specs);
+  const chartInit = `(${drawCharts.toString()})(${specsJSON});`;
+  const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HEPscore report · ${esc(lastReport.r.hostname)}</title>${chartJS}<style>${css}</style></head><body><div class="container">${lastReport.html}</div><script>${chartInit}<\/script></body></html>`;
+  const blob = new Blob([full], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const safeName = (lastReport.r.hostname || "report").replace(/[^a-z0-9._-]+/gi, "_");
+  const tsPart = (lastReport.r.tsStart || "").replace(/[-:T]/g, "").slice(0, 15);
+  a.download = `hepscore_${safeName}_${tsPart}.html`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+});
+
+document.getElementById("sampleLink").addEventListener("click", e => {
+  e.preventDefault();
+  clearError();
+  fetch("/assets/hepscore-report/sample.json")
+    .then(r => r.ok ? r.json() : Promise.reject(new Error("sample not available")))
+    .then(renderFromData)
+    .catch(err => showError(`Could not load example: ${err.message}`));
+});
+</script>
+</body>
+</html>
