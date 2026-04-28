@@ -27,11 +27,11 @@ description: |
     Open viewer in a new tab
   </a>
   &nbsp;
-  <a href="{{ site.baseurl }}/assets/hepscore-report/sample.json"
-     download
+  <a href="{{ site.baseurl }}/assets/hepscore-report/viewer.html?sample=1"
+     target="_blank" rel="noopener"
      class="btn waves-effect waves-light grey lighten-2 grey-text text-darken-3"
      style="text-transform: none;">
-    Download the example JSON
+    Open the example run
   </a>
 </p>
 

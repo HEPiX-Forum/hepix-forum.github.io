@@ -715,14 +715,23 @@ document.getElementById("btnDownload").addEventListener("click", () => {
   document.body.removeChild(a); URL.revokeObjectURL(url);
 });
 
-document.getElementById("sampleLink").addEventListener("click", e => {
-  e.preventDefault();
+function loadSample() {
   clearError();
   fetch("/assets/hepscore-report/sample.json")
     .then(r => r.ok ? r.json() : Promise.reject(new Error("sample not available")))
     .then(renderFromData)
     .catch(err => showError(`Could not load example: ${err.message}`));
+}
+
+document.getElementById("sampleLink").addEventListener("click", e => {
+  e.preventDefault();
+  e.stopPropagation();
+  loadSample();
 });
+
+if (new URLSearchParams(window.location.search).get("sample") === "1") {
+  loadSample();
+}
 </script>
 </body>
 </html>
