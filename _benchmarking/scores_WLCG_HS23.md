@@ -5,12 +5,12 @@ menu: WLCG job slot scores
 datatable: true
 ---
 
- {% assign table_rows = site.data.HS23tableWLCG %}
+ {% assign table_rows = site.data.jobprobes_withHS23 %}
 
 <br>
 <br>
 
-Data displayed in the following table are available in csv format in the github repository of [HEPiX-Forum](https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/HS23tableWLCG.csv)
+Data displayed in the following table are available in csv format in the github repository of [HEPiX-Forum](https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/jobprobes_withHS23.csv)
 
 ### About This Data
 
