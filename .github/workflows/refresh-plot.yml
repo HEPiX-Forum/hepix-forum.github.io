@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# Auto-refresh the "Time and Energy to Solution" plot.
+#
+# This workflow regenerates images/time_energy_to_solution.png from the current
+# _data/HS23scores.csv and commits it back to master. That commit then triggers
+# GitHub's built-in "pages build and deployment", which republishes w3.hepix.org.
+# ---------------------------------------------------------------------------
+
+name: Refresh Time & Energy to Solution plot
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "_data/HS23scores.csv"
+      - "scripts/time_energy_to_solution/make_plot.py"
+  schedule:
+    - cron: "0 6 * * 1"        # every Monday at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-plot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pandas numpy scipy matplotlib
+
+      - name: Generate plot
+        run: python scripts/time_energy_to_solution/make_plot.py
+
+      - name: Commit updated plot
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- images/time_energy_to_solution.png; then
+            echo "Plot unchanged - nothing to commit."
+          else
+            git add images/time_energy_to_solution.png
+            git commit -m "Auto-refresh Time & Energy to Solution plot [skip ci]"
+            git push
+          fi
