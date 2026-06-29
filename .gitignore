@@ -1,12 +1,74 @@
-Gemfile.lock
+# Jekyll build output and cache
 _site/
 .sass-cache/
+.jekyll-cache/
+.jekyll-metadata
 
-#IDEs
+# Ruby / Bundler
+.bundle/
+vendor/bundle/
+vendor/cache/
+vendor/ruby/
+*.gem
+Gemfile.lock
+.ruby-version
+.ruby-gemset
+.rvmrc
+
+# Python (scripts/, CI helpers)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Node (if added for tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.#*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+Icon?
+
+# IDEs and editors
 .project
 .idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
 
-.DS_Store
-.bundle
-.jekyll-cache
-vendor
+# Test / coverage artifacts
+coverage/
+html-proofer-cache/

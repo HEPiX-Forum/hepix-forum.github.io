@@ -18,7 +18,7 @@
             {% assign my_page_collection = my_page.menu | slugify: 'default' | replace: "-", "_" %}
             {% if site.[my_page_collection] %}
               <li>
-                <a class="dropdown-button" data-beloworigin="true" data-alignment="right" data-activates="{{ my_page_collection }}-menu">{{ my_page.menu }}<i class="material-icons right">arrow_drop_down</i></a>
+                <a class="dropdown-button" href="#!" data-beloworigin="true" data-alignment="right" data-activates="{{ my_page_collection }}-menu">{{ my_page.menu }}<i class="material-icons right">arrow_drop_down</i></a>
                 <ul id="{{ my_page_collection }}-menu" class="dropdown-content">
                   {% if my_page_collection == "benchmarking" %}
                     <li><a href="{{ my_page.url | relative_url }}">WG Activities</a></li>
@@ -57,7 +57,7 @@
         {% endfor %}
       {% endif %}
       <li>
-        <a class="dropdown-button" data-beloworigin="true" data-alignment="right" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a>
+        <a class="dropdown-button" href="#!" data-beloworigin="true" data-alignment="right" data-activates="about-menu">About<i class="material-icons right">arrow_drop_down</i></a>
         <ul id="about-menu" class="dropdown-content">
           <li><a href="/about/how_to_contribute.html">Website HowTo</a></li>
         </ul>

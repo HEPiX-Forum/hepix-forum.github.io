@@ -177,6 +177,92 @@ main .container.page-content {
     color: $hepix-text-muted;
     max-width: 46rem;
   }
+
+  // Legacy benchmark notice (e.g. HS06 page)
+  .legacy-banner {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin: 0 0 1.75rem;
+    padding: 1.1rem 1.25rem;
+    max-width: 46rem;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 55%, #fecaca 100%);
+    border: 1px solid #fca5a5;
+    border-left: 4px solid #dc2626;
+    border-radius: $hepix-radius;
+    box-shadow: $hepix-shadow;
+
+    &__icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.12);
+      color: #dc2626;
+
+      .material-icons {
+        font-size: 1.35rem;
+      }
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__title {
+      margin: 0 0 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #991b1b;
+    }
+
+    &__message {
+      margin: 0;
+      line-height: 1.65;
+      color: #7f1d1d;
+      max-width: none;
+
+      strong {
+        color: #991b1b;
+        font-weight: 600;
+      }
+    }
+
+    &__action {
+      margin: 0.75rem 0 0;
+      max-width: none;
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #dc2626 !important;
+        border-bottom-color: rgba(220, 38, 38, 0.35) !important;
+
+        &::after {
+          content: "→";
+          transition: transform 0.15s ease;
+        }
+
+        &:hover {
+          color: #991b1b !important;
+          border-bottom-color: #dc2626 !important;
+
+          &::after {
+            transform: translateX(2px);
+          }
+        }
+      }
+    }
+  }
 }
 
 // Data-table pages (scores, etc.)
@@ -225,6 +311,12 @@ main .container.page-content {
     > h2,
     > h3 {
       font-size: 1.2rem;
+    }
+
+    .legacy-banner {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
     }
   }
 }
