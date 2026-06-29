@@ -1,0 +1,230 @@
+// Subpage content layout — prose, sections, and data-heavy pages
+
+main .container.page-content {
+  background: #ffffff;
+  border: 1px solid $hepix-border;
+  border-radius: $hepix-radius;
+  box-shadow: $hepix-shadow;
+  padding: 2rem 2.25rem 2.5rem;
+  margin-top: 1.25rem;
+  margin-bottom: 2.5rem;
+
+  // Page title
+  > h1:first-child {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: $hepix-navy;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid $hepix-border;
+  }
+
+  // Intro / description paragraph directly under the title
+  > h1:first-child + p {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: $hepix-text-muted;
+    margin-bottom: 0.5rem;
+    max-width: 46rem;
+  }
+
+  // Section headings
+  > h2,
+  > h3 {
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: $hepix-navy;
+  }
+
+  > * + h2,
+  > * + h3 {
+    padding-top: 1.5rem;
+    border-top: 1px solid $hepix-border;
+  }
+
+  > h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.65rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: $hepix-navy-mid;
+  }
+
+  // Body text
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+    color: $hepix-text;
+    max-width: 46rem;
+  }
+
+  // Labelled callout lines, e.g. **Execution**: …
+  p:has(> strong:first-child) {
+    padding: 0.7rem 1rem;
+    margin: 0.65rem 0;
+    max-width: 46rem;
+    background: $hepix-surface;
+    border-left: 3px solid $hepix-accent;
+    border-radius: 0 $hepix-radius-sm $hepix-radius-sm 0;
+
+    > strong:first-child {
+      color: $hepix-navy;
+      font-weight: 600;
+    }
+  }
+
+  // Lists
+  ul,
+  ol {
+    margin: 0.75rem 0 1.25rem;
+    padding-left: 1.35rem;
+    max-width: 46rem;
+
+    li {
+      margin-bottom: 0.45rem;
+      line-height: 1.7;
+      color: $hepix-text;
+
+      ul,
+      ol {
+        margin-top: 0.35rem;
+        margin-bottom: 0.35rem;
+      }
+    }
+  }
+
+  // Links
+  a:not(.btn):not(.btn-large):not(.btn-floating) {
+    color: $hepix-accent;
+    text-decoration: none;
+    border-bottom: 1px solid rgba($hepix-accent, 0.35);
+    transition: border-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      color: darken($hepix-accent, 8%);
+      border-bottom-color: $hepix-accent;
+    }
+  }
+
+  // Auto-generated table of contents
+  #markdown-toc {
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-radius: $hepix-radius-sm;
+    padding: 1rem 1.25rem 1.1rem;
+    margin: 1.25rem 0 2rem;
+    max-width: 28rem;
+
+    &::before {
+      content: "On this page";
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: $hepix-text-muted;
+      margin-bottom: 0.65rem;
+    }
+
+    li {
+      margin-bottom: 0.3rem;
+      line-height: 1.5;
+    }
+
+    a {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Code
+  pre,
+  code {
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+    font-size: 0.875em;
+  }
+
+  pre {
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-radius: $hepix-radius-sm;
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.25rem;
+    line-height: 1.55;
+  }
+
+  :not(pre) > code {
+    background: $hepix-surface-alt;
+    border: 1px solid $hepix-border;
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+    font-size: 0.88em;
+  }
+
+  // Blockquotes
+  blockquote {
+    margin: 1.25rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid $hepix-accent-soft;
+    background: $hepix-surface;
+    border-radius: 0 $hepix-radius-sm $hepix-radius-sm 0;
+    color: $hepix-text-muted;
+    max-width: 46rem;
+  }
+}
+
+// Data-table pages (scores, etc.)
+.page-datatable main .container.page-content {
+  padding: 1.5rem 1.25rem 2rem;
+
+  > h1:first-child {
+    font-size: 1.85rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  > br {
+    display: none;
+  }
+
+  > p {
+    max-width: none;
+  }
+
+  .datatable-container {
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-radius: $hepix-radius-sm;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+
+  details.metrics-toggle {
+    max-width: none;
+    margin: 0.75rem 0 1rem;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  main .container.page-content {
+    padding: 1.25rem 1rem 1.75rem;
+    margin-top: 0.75rem;
+    border-radius: $hepix-radius-sm;
+
+    > h1:first-child {
+      font-size: 1.65rem;
+    }
+
+    > h2,
+    > h3 {
+      font-size: 1.2rem;
+    }
+  }
+}

@@ -1,14 +1,13 @@
 ---
-title: "WLCG job slot scores"
+title: "WLCG job slots"
 layout: page
 menu: WLCG job slot scores
 datatable: true
 ---
 
- {% assign table_rows = site.data.jobprobes_withHS23 %}
+# WLCG job slots
 
-<br>
-<br>
+{% assign table_rows = site.data.jobprobes_withHS23 %}
 
 Data displayed in the following table are available in csv format in the github repository of [HEPiX-Forum](https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/jobprobes_withHS23.csv)
 

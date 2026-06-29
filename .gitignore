@@ -5,3 +5,8 @@ _site/
 #IDEs
 .project
 .idea/
+
+.DS_Store
+.bundle
+.jekyll-cache
+vendor

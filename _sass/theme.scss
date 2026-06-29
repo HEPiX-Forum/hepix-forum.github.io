@@ -1,0 +1,390 @@
+// HEPiX modern theme — colors, typography, and component polish
+
+// Palette
+$hepix-navy:        #0f172a;
+$hepix-navy-mid:    #1e293b;
+$hepix-accent:      #0284c7;
+$hepix-accent-soft: #38bdf8;
+$hepix-indigo:      #4f46e5;
+$hepix-surface:     #f8fafc;
+$hepix-surface-alt: #f1f5f9;
+$hepix-border:      #e2e8f0;
+$hepix-text:        #1e293b;
+$hepix-text-muted:  #64748b;
+$hepix-radius:      10px;
+$hepix-radius-sm:   8px;
+$hepix-shadow:      0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+$hepix-shadow-md:   0 4px 12px rgba(15, 23, 42, 0.08);
+
+// Typography
+html {
+  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: $hepix-surface;
+  color: $hepix-text;
+}
+
+// Navigation — top-level bar links only (not dropdown items)
+nav.light-blue.lighten-1 {
+  background: linear-gradient(135deg, $hepix-navy 0%, $hepix-navy-mid 100%) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.14);
+
+  .nav-wrapper > ul.right > li {
+    text-decoration: none;
+  }
+
+  .nav-wrapper > ul.right > li > a {
+    color: rgba(255, 255, 255, 0.88) !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: 0.015em;
+    padding: 0 18px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    box-shadow: none;
+  }
+
+  .nav-wrapper > ul.right > li > a:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.08);
+    opacity: 1;
+    text-decoration: none !important;
+  }
+
+  .nav-wrapper > ul.right > li.active {
+    text-decoration: none;
+
+    > a {
+      color: #ffffff !important;
+      text-decoration: none !important;
+      box-shadow: inset 0 -2px 0 $hepix-accent-soft;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .nav-wrapper > ul.right > li > a .material-icons.right {
+    font-size: 1.1rem;
+    line-height: inherit;
+    height: auto;
+    margin-left: 2px;
+    opacity: 0.75;
+    vertical-align: text-bottom;
+  }
+}
+
+// Dropdown menus
+.dropdown-content {
+  background-color: #ffffff !important;
+  border-radius: $hepix-radius-sm;
+  border: 1px solid $hepix-border;
+  box-shadow: $hepix-shadow-md;
+  overflow: visible;
+
+  li {
+    color: $hepix-text;
+
+    &:hover,
+    &.active,
+    &.selected {
+      background-color: $hepix-surface-alt !important;
+    }
+  }
+
+  li > a,
+  li > span {
+    color: $hepix-text !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    font-size: 0.9rem;
+    font-weight: 400;
+    padding: 10px 16px;
+    line-height: 1.4;
+  }
+
+  li > a:hover {
+    color: $hepix-navy !important;
+    background-color: $hepix-surface-alt !important;
+  }
+
+  li.divider {
+    background-color: $hepix-border;
+    margin: 4px 0;
+  }
+
+  li > a .material-icons.right {
+    color: $hepix-text-muted;
+    font-size: 1.1rem;
+  }
+}
+
+// Hero banner (home)
+#index-banner {
+  background: linear-gradient(180deg, #ffffff 0%, $hepix-surface 55%, #e0f2fe 100%);
+  padding-bottom: 2.5rem;
+
+  .orange-text {
+    color: $hepix-navy !important;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .home_content {
+    color: $hepix-text-muted;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.7;
+    max-width: 42rem;
+    margin: 0 auto;
+  }
+}
+
+// Working groups list
+.container .wg-list-box {
+  background: transparent;
+}
+
+#wg-list .wg-list {
+  background: #ffffff;
+  border: 1px solid $hepix-border;
+  border-radius: $hepix-radius;
+  box-shadow: $hepix-shadow;
+  padding: 0 1.25rem 1rem;
+}
+
+.wg-list .list-title {
+  color: $hepix-navy;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.wg-list .collection .collection-item.avatar > .wg-name {
+  background: linear-gradient(135deg, $hepix-indigo 0%, #6366f1 100%);
+  border-radius: $hepix-radius-sm;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.wg-list .collection .collection-item {
+  border-bottom: 1px solid $hepix-border;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: $hepix-surface-alt;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.wg-list .wg-description {
+  color: $hepix-text-muted;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+.wg-list .collection .collection-item .secondary-content i {
+  color: $hepix-accent;
+}
+
+@media only screen and (max-width: 600px) {
+  #index-banner {
+    padding-bottom: 1.5rem;
+
+    .container {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
+    h1.header {
+      font-size: 1.75rem !important;
+    }
+  }
+}
+
+// Page content — base colors handled in page-content.scss
+
+// Posts
+.post-header .post-title {
+  color: $hepix-navy !important;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.post-header .post-meta,
+.post-header time {
+  color: $hepix-text-muted !important;
+}
+
+// Footer
+footer.page-footer.orange {
+  background: linear-gradient(135deg, $hepix-navy 0%, $hepix-navy-mid 100%) !important;
+  margin-top: 2rem;
+  padding: 1.75rem 0 0;
+
+  .grey-text.text-lighten-4 {
+    color: rgba(255, 255, 255, 0.72) !important;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.88) !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    transition: color 0.15s ease, opacity 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      color: #ffffff !important;
+      text-decoration: none !important;
+    }
+  }
+
+  a.orange-text {
+    color: rgba(255, 255, 255, 0.65) !important;
+    font-weight: 400;
+
+    &:hover {
+      color: $hepix-accent-soft !important;
+    }
+  }
+
+  ul {
+    margin: 0;
+    text-align: right;
+
+    li {
+      margin-bottom: 0.65rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .icon img {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+
+  .icon svg {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+
+    path {
+      fill: rgba(255, 255, 255, 0.75);
+      transition: fill 0.15s ease;
+    }
+  }
+
+  a:hover .icon svg path {
+    fill: #ffffff;
+  }
+
+  .username {
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+  }
+}
+
+footer .footer-copyright {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55) !important;
+
+  a {
+    color: rgba(255, 255, 255, 0.65) !important;
+    text-decoration: none !important;
+    font-weight: 400;
+
+    &:hover {
+      color: $hepix-accent-soft !important;
+      text-decoration: none !important;
+    }
+  }
+}
+
+// Buttons & FAB
+.btn, .btn-large {
+  border-radius: $hepix-radius-sm;
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.btn-floating {
+  background-color: $hepix-accent !important;
+
+  &:hover {
+    background-color: darken($hepix-accent, 8%) !important;
+  }
+}
+
+// Tables (markdown pages)
+table {
+  border-collapse: collapse;
+  border-radius: $hepix-radius-sm;
+  overflow: hidden;
+  box-shadow: $hepix-shadow;
+  border: 1px solid $hepix-border;
+
+  th {
+    background-color: $hepix-navy;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.65rem 1rem;
+  }
+
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid $hepix-border;
+  }
+
+  tr:nth-child(even) td {
+    background-color: $hepix-surface-alt;
+  }
+
+  tr:hover td {
+    background-color: #e0f2fe;
+  }
+}
+
+// Collections (general)
+.collection {
+  border: 1px solid $hepix-border;
+  border-radius: $hepix-radius;
+  overflow: hidden;
+  box-shadow: $hepix-shadow;
+
+  .collection-item {
+    border-bottom: 1px solid $hepix-border;
+  }
+}
+
+// Side nav (mobile)
+.side-nav {
+  box-shadow: $hepix-shadow-md;
+
+  li > a {
+    color: $hepix-text !important;
+  }
+
+  .collapsible-header {
+    color: $hepix-text !important;
+  }
+}
+
+// Remove dated global italic on headings
+h5 {
+  font-style: normal;
+}
