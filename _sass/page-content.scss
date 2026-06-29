@@ -1,0 +1,438 @@
+// Subpage content layout — prose, sections, and data-heavy pages
+
+main .container.page-content {
+  background: #ffffff;
+  border: 1px solid $hepix-border;
+  border-radius: $hepix-radius;
+  box-shadow: $hepix-shadow;
+  padding: 2rem 2.25rem 2.5rem;
+  margin-top: 1.25rem;
+  margin-bottom: 2.5rem;
+
+  // Page title
+  > h1:first-child {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: $hepix-navy;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid $hepix-border;
+  }
+
+  // Intro / description paragraph directly under the title
+  > h1:first-child + p {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: $hepix-text-muted;
+    margin-bottom: 0.5rem;
+    max-width: 46rem;
+  }
+
+  // Section headings
+  > h2,
+  > h3 {
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: $hepix-navy;
+  }
+
+  > * + h2,
+  > * + h3 {
+    padding-top: 1.5rem;
+    border-top: 1px solid $hepix-border;
+  }
+
+  > h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.65rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: $hepix-navy-mid;
+  }
+
+  // Body text
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+    color: $hepix-text;
+    max-width: 46rem;
+  }
+
+  // Labelled callout lines, e.g. **Execution**: …
+  > p:has(> strong:first-child):not(.update-banner__message):not(.update-banner__label) {
+    padding: 0.7rem 1rem;
+    margin: 0.65rem 0;
+    max-width: 46rem;
+    background: $hepix-surface;
+    border-left: 3px solid $hepix-accent;
+    border-radius: 0 $hepix-radius-sm $hepix-radius-sm 0;
+
+    > strong:first-child {
+      color: $hepix-navy;
+      font-weight: 600;
+    }
+  }
+
+  // Lists
+  ul,
+  ol {
+    margin: 0.75rem 0 1.25rem;
+    padding-left: 1.35rem;
+    max-width: 46rem;
+
+    li {
+      margin-bottom: 0.45rem;
+      line-height: 1.7;
+      color: $hepix-text;
+
+      ul,
+      ol {
+        margin-top: 0.35rem;
+        margin-bottom: 0.35rem;
+      }
+    }
+  }
+
+  // Links
+  a:not(.btn):not(.btn-large):not(.btn-floating) {
+    color: $hepix-accent;
+    text-decoration: none;
+    border-bottom: 1px solid rgba($hepix-accent, 0.35);
+    transition: border-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      color: darken($hepix-accent, 8%);
+      border-bottom-color: $hepix-accent;
+    }
+  }
+
+  // Auto-generated table of contents (enhanced by js/page-toc.js)
+  .page-toc__panel {
+    margin: 1.5rem 0 2.5rem;
+    max-width: 30rem;
+  }
+
+  .page-toc__title {
+    margin: 0 0 0.75rem;
+    max-width: none;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $hepix-text-muted;
+  }
+
+  #markdown-toc.page-toc {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+
+    &,
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    li {
+      margin: 0;
+      list-style: none;
+    }
+
+    // Quiet guide rail; the active link lights its segment.
+    a.page-toc__link {
+      display: block;
+      padding: 0.3rem 0 0.3rem 1rem;
+      border-left: 2px solid $hepix-border;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.45;
+      color: $hepix-text-muted !important;
+      text-decoration: none;
+      transition: color 0.15s ease, border-color 0.15s ease;
+
+      &:hover {
+        color: $hepix-navy !important;
+        border-left-color: $hepix-text-muted;
+      }
+
+      &.is-active {
+        color: $hepix-accent-deep !important;
+        font-weight: 500;
+        border-left-color: $hepix-accent;
+      }
+    }
+
+    // Top-level entries read as section headings.
+    > li > a.page-toc__link {
+      font-weight: 500;
+      color: $hepix-text !important;
+
+      &.is-active {
+        color: $hepix-accent-deep !important;
+      }
+    }
+
+    // Nested levels indent under the same rail.
+    ul a.page-toc__link {
+      padding-left: 2rem;
+      font-size: 0.84rem;
+    }
+
+    ul ul a.page-toc__link {
+      padding-left: 3rem;
+    }
+  }
+
+  // Code
+  pre,
+  code {
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+    font-size: 0.875em;
+  }
+
+  pre {
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-radius: $hepix-radius-sm;
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.25rem;
+    line-height: 1.55;
+  }
+
+  :not(pre) > code {
+    background: $hepix-surface-alt;
+    border: 1px solid $hepix-border;
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+    font-size: 0.88em;
+  }
+
+  // Blockquotes
+  blockquote {
+    margin: 1.25rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid $hepix-accent-soft;
+    background: $hepix-surface;
+    border-radius: 0 $hepix-radius-sm $hepix-radius-sm 0;
+    color: $hepix-text-muted;
+    max-width: 46rem;
+  }
+
+  // Legacy benchmark notice (e.g. HS06 page)
+  .legacy-banner {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin: 0 0 1.75rem;
+    padding: 1.1rem 1.25rem;
+    max-width: 46rem;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 55%, #fecaca 100%);
+    border: 1px solid #fca5a5;
+    border-left: 4px solid #dc2626;
+    border-radius: $hepix-radius;
+    box-shadow: $hepix-shadow;
+
+    &__icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.12);
+      color: #dc2626;
+
+      .material-icons {
+        font-size: 1.35rem;
+      }
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__title {
+      margin: 0 0 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #991b1b;
+    }
+
+    &__message {
+      margin: 0;
+      line-height: 1.65;
+      color: #7f1d1d;
+      max-width: none;
+
+      strong {
+        color: #991b1b;
+        font-weight: 600;
+      }
+    }
+
+    &__action {
+      margin: 0.75rem 0 0;
+      max-width: none;
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #dc2626 !important;
+        border-bottom-color: rgba(220, 38, 38, 0.35) !important;
+
+        &::after {
+          content: "→";
+          transition: transform 0.15s ease;
+        }
+
+        &:hover {
+          color: #991b1b !important;
+          border-bottom-color: #dc2626 !important;
+
+          &::after {
+            transform: translateX(2px);
+          }
+        }
+      }
+    }
+  }
+
+  // Release / version update notice
+  .update-banner {
+    margin: 1.5rem 0 1.75rem;
+    padding: 1rem 1.15rem;
+    max-width: 46rem;
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-left: 3px solid #059669;
+    border-radius: $hepix-radius-sm;
+
+    &__label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+      margin: 0 0 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: $hepix-text-muted;
+      max-width: none;
+    }
+
+    &__badge {
+      display: inline-block;
+      padding: 0.12rem 0.45rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #047857;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 4px;
+    }
+
+    &__message {
+      margin: 0;
+      line-height: 1.7;
+      color: $hepix-text;
+      max-width: none;
+
+      strong {
+        color: $hepix-navy;
+        font-weight: 600;
+      }
+
+      a {
+        color: $hepix-accent !important;
+        border-bottom-color: rgba($hepix-accent, 0.35) !important;
+
+        &:hover {
+          color: darken($hepix-accent, 8%) !important;
+          border-bottom-color: $hepix-accent !important;
+        }
+      }
+    }
+  }
+}
+
+// Data-table pages (scores, etc.)
+.page-datatable main .container.page-content {
+  padding: 1.5rem 1.25rem 2rem;
+
+  > h1:first-child {
+    font-size: 1.85rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  > br {
+    display: none;
+  }
+
+  > p {
+    max-width: none;
+  }
+
+  .datatable-container {
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-radius: $hepix-radius-sm;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+
+  details.metrics-toggle {
+    max-width: none;
+    margin: 0.75rem 0 1rem;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  main .container.page-content {
+    padding: 1.25rem 1rem 1.75rem;
+    margin-top: 0.75rem;
+    border-radius: $hepix-radius-sm;
+
+    > h1:first-child {
+      font-size: 1.65rem;
+    }
+
+    > h2,
+    > h3 {
+      font-size: 1.2rem;
+    }
+
+    .legacy-banner {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+
+    .update-banner {
+      padding: 0.9rem 1rem;
+    }
+
+    .page-toc__panel {
+      max-width: none;
+    }
+  }
+}

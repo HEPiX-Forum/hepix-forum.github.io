@@ -1,14 +1,13 @@
 ---
-title: "HS23 scores"
+title: "HS23 score table"
 layout: page
 menu: HS23 score table
 datatable: true
 ---
 
- {% assign table_rows = site.data.HS23scores %}
+# HS23 score table
 
-<br>
-<br>
+{% assign table_rows = site.data.HS23scores %}
 
 Data displayed in the following table are available in csv format in the github repository of [HEPiX-Forum](https://github.com/HEPiX-Forum/hepix-forum.github.io/blob/master/_data/HS23scores.csv)
 

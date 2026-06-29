@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HEPscore23 report viewer</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- Chart.js is vendored locally (same-origin) so the viewer is not blocked by
+     browser tracking protection / extensions (notably Firefox) and works offline. -->
+<script src="chart.umd.min.js"></script>
 <style>
   :root {
     --bg: #f6f8fa; --fg: #1a1a1a; --muted: #586069; --card: #fff;
@@ -1022,9 +1024,23 @@ document.getElementById("btnNew").addEventListener("click", () => {
 // "Download as standalone HTML": bundle the current report markup, the page
 // CSS, Chart.js (CDN), and an inlined drawCharts() call into a single self-
 // contained .html file the user can save and share offline.
-document.getElementById("btnDownload").addEventListener("click", () => {
+document.getElementById("btnDownload").addEventListener("click", async () => {
   if (!lastReport) return;
-  const chartJS = `<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>`;
+  // Inline the vendored Chart.js so the exported file is fully self-contained
+  // (no third-party CDN request — works offline and isn't blocked by Firefox
+  // tracking protection / extensions). The `</script` guard prevents the
+  // library source from prematurely closing the inline <script> element.
+  let chartJS;
+  try {
+    const libSrc = await fetch("chart.umd.min.js").then(res => {
+      if (!res.ok) throw new Error(res.status);
+      return res.text();
+    });
+    chartJS = `<script>${libSrc.replace(/<\/script/gi, "<\\/script")}<\/script>`;
+  } catch (_) {
+    // Fall back to the CDN if the local copy can't be read for some reason.
+    chartJS = `<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>`;
+  }
   const css = document.querySelector("style").textContent;
   const specsJSON = JSON.stringify(lastReport.specs);
   const chartInit = `(${drawCharts.toString()})(${specsJSON});`;

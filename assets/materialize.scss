@@ -2,9 +2,23 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
+// Modern HEPiX palette (overrides Materialize defaults)
+$hepix-navy:        #0f172a;
+$hepix-navy-mid:    #1e293b;
+$hepix-accent:      #0284c7;
+$hepix-accent-soft: #38bdf8;
+$hepix-surface:     #f8fafc;
+$hepix-border:      #e2e8f0;
+$hepix-text:        #1e293b;
+
+$primary-color: #0f172a;
+$secondary-color: $hepix-accent;
+$link-color: #2563eb;
+$button-radius: 8px;
+$footer-bg-color: $hepix-navy;
+
 $dropdown-content-min-width: 160px;
 $dropdown-item-height: 30px;
-// Ideally the same as $navbar-font-size
 $dropdown-item-font-size: 1rem;
 
 $h1-fontsize: 3.56rem;
@@ -21,6 +35,8 @@ $navbar-dropdown-arrow-left-margin: 0;
 
 @import "materialize/materialize";
 @import "syntax-highlighting";
+@import "theme";
+@import "page-content";
 
 // Sticky footer
 body {
@@ -33,13 +49,8 @@ main {
   flex: 1 0 auto;
 }
 
-h5 {
-  font-style: italic;
-}
-
 .home_content {
-  font-style: italic;
-  font-zie: $h5-fontsize;
+  font-size: $h5-fontsize;
 }
 
 .centered-image {
@@ -48,44 +59,44 @@ h5 {
 }
 
 #wg-list {
-    padding-bottom: 30px;
+  padding-bottom: 30px;
 }
 
 .container .wg-list-box {
-    background: #ddd;
-    padding-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 .wg-list .list-title {
-    padding-top: 10px;
-    font-size: $h4-fontsize;
-    text-align: center;
-    color: #29b6f6;
+  padding-top: 1.25rem;
+  font-size: $h4-fontsize;
+  text-align: center;
 }
 
 .wg-list .collection {
-    list-style-type: none;
+  list-style-type: none;
+  border: none;
+  box-shadow: none;
 }
 
 .wg-list .wg-title {
-    font-weight: bold;
-}
-
-.wg-list .wg-description {
-    font-style: italic;
+  font-weight: 600;
+  color: $hepix-text;
 }
 
 .wg-list .collection .collection-item {
-    list-style-type: inherit;
-    &.avatar {
-      padding-left: 150px;
-    }
+  list-style-type: inherit;
 }
 
-.wg-list .collection .collection-item.avatar>.wg-name {
+@media only screen and (min-width: 601px) {
+  .wg-list .collection .collection-item.avatar {
+    padding-left: 150px;
+  }
+
+  .wg-list .collection .collection-item.avatar > .wg-name {
     position: absolute;
     width: 110px;
-    height: 100%;
+    height: calc(100% - 16px);
+    top: 8px;
     overflow: hidden;
     left: 10px;
     display: flex;
@@ -93,14 +104,68 @@ h5 {
     align-items: center;
     padding: 16px 0;
     vertical-align: middle;
-    background: #ad1457;
     color: #fff;
     text-align: center;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  #wg-list.container {
+    width: calc(100% - 1.5rem);
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    padding-bottom: 1.5rem;
+  }
+
+  #wg-list .wg-list {
+    padding: 0 1rem 0.75rem;
+  }
+
+  .wg-list .list-title {
+    padding-top: 1rem;
+    font-size: 1.25rem;
+  }
+
+  .wg-list .collection .collection-item.avatar {
+    padding: 1rem 2.25rem 1rem 1rem;
+    min-height: 0;
+  }
+
+  .wg-list .collection .collection-item.avatar > .wg-name {
+    position: static;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    margin-bottom: 0.45rem;
+    font-size: 0.7rem;
+    line-height: 1.3;
+    left: auto;
+    top: auto;
+  }
+
+  .wg-list .wg-title {
+    font-size: 1rem;
+    line-height: 1.35;
+    padding-right: 0.25rem;
+  }
+
+  .wg-list .wg-description {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    margin-top: 0.35rem;
+  }
+
+  .wg-list .collection .collection-item .secondary-content {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.5rem;
+  }
 }
 
 .page-footer {
-    padding-bottom: 0;
-    padding-top: 0;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
 .page-footer .row {
