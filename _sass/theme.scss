@@ -5,7 +5,9 @@ $hepix-navy:        #0f172a;
 $hepix-navy-mid:    #1e293b;
 $hepix-accent:      #0284c7;
 $hepix-accent-soft: #38bdf8;
-$hepix-indigo:      #4f46e5;
+$hepix-accent-deep: #0369a1;
+$hepix-accent-dark: #075985;
+$hepix-accent-gradient: linear-gradient(135deg, $hepix-accent-dark 0%, $hepix-accent-deep 100%);
 $hepix-surface:     #f8fafc;
 $hepix-surface-alt: #f1f5f9;
 $hepix-border:      #e2e8f0;
@@ -15,6 +17,7 @@ $hepix-radius:      10px;
 $hepix-radius-sm:   8px;
 $hepix-shadow:      0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
 $hepix-shadow-md:   0 4px 12px rgba(15, 23, 42, 0.08);
+$hepix-page-gradient: linear-gradient(180deg, #ffffff 0%, $hepix-surface 55%, #cbd6db 100%);
 
 // Typography
 html {
@@ -24,7 +27,9 @@ html {
 }
 
 body {
-  background-color: $hepix-surface;
+  background: $hepix-page-gradient;
+  background-attachment: fixed;
+  min-height: 100vh;
   color: $hepix-text;
 }
 
@@ -123,9 +128,9 @@ nav.light-blue.lighten-1 {
   }
 }
 
-// Hero banner (home)
+// Hero banner (home) — gradient comes from body background
 #index-banner {
-  background: linear-gradient(180deg, #ffffff 0%, $hepix-surface 55%, #e0f2fe 100%);
+  background: transparent;
   padding-bottom: 2.5rem;
 
   .orange-text {
@@ -164,7 +169,7 @@ nav.light-blue.lighten-1 {
 }
 
 .wg-list .collection .collection-item.avatar > .wg-name {
-  background: linear-gradient(135deg, $hepix-indigo 0%, #6366f1 100%);
+  background: $hepix-accent-gradient;
   border-radius: $hepix-radius-sm;
   font-weight: 600;
   font-size: 0.85rem;
@@ -344,12 +349,48 @@ table {
     background-color: $hepix-navy;
     color: #ffffff;
     font-weight: 600;
-    padding: 0.65rem 1rem;
+    text-align: left;
+    vertical-align: bottom;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+
+    // Some pages wrap header text in <p><span>…</span></p>; force it light
+    // so labels stay legible on the dark header instead of inheriting the
+    // dark body-text colour.
+    p,
+    span {
+      color: #ffffff !important;
+      font-weight: 600;
+    }
   }
 
   td {
     padding: 0.55rem 1rem;
     border-bottom: 1px solid $hepix-border;
+    vertical-align: top;
+  }
+
+  // Cells on some pages wrap their text in <p>…</p>; strip the prose
+  // paragraph margins/width so they don't inflate row height, and drop the
+  // empty placeholder cells used to build multi-row headers.
+  th p,
+  td p {
+    margin: 0;
+    max-width: none;
+    line-height: 1.3;
+  }
+
+  th p:empty,
+  th span:empty {
+    display: none;
+  }
+
+  // Second header tier (e.g. HS06 / HS23 under a grouped label) — only matches
+  // tables whose second row is still header cells, so single-header tables are
+  // untouched. A lighter navy signals the sub-level.
+  tr:nth-child(2) th {
+    background-color: $hepix-navy-mid;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   }
 
   tr:nth-child(even) td {

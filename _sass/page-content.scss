@@ -65,7 +65,7 @@ main .container.page-content {
   }
 
   // Labelled callout lines, e.g. **Execution**: …
-  p:has(> strong:first-child) {
+  > p:has(> strong:first-child):not(.update-banner__message):not(.update-banner__label) {
     padding: 0.7rem 1rem;
     margin: 0.65rem 0;
     max-width: 46rem;
@@ -112,33 +112,83 @@ main .container.page-content {
     }
   }
 
-  // Auto-generated table of contents
-  #markdown-toc {
-    background: $hepix-surface;
-    border: 1px solid $hepix-border;
-    border-radius: $hepix-radius-sm;
-    padding: 1rem 1.25rem 1.1rem;
-    margin: 1.25rem 0 2rem;
-    max-width: 28rem;
+  // Auto-generated table of contents (enhanced by js/page-toc.js)
+  .page-toc__panel {
+    margin: 1.5rem 0 2.5rem;
+    max-width: 30rem;
+  }
 
-    &::before {
-      content: "On this page";
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: $hepix-text-muted;
-      margin-bottom: 0.65rem;
+  .page-toc__title {
+    margin: 0 0 0.75rem;
+    max-width: none;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $hepix-text-muted;
+  }
+
+  #markdown-toc.page-toc {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+
+    &,
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-width: none;
     }
 
     li {
-      margin-bottom: 0.3rem;
-      line-height: 1.5;
+      margin: 0;
+      list-style: none;
     }
 
-    a {
-      font-size: 0.9rem;
+    // Quiet guide rail; the active link lights its segment.
+    a.page-toc__link {
+      display: block;
+      padding: 0.3rem 0 0.3rem 1rem;
+      border-left: 2px solid $hepix-border;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.45;
+      color: $hepix-text-muted !important;
+      text-decoration: none;
+      transition: color 0.15s ease, border-color 0.15s ease;
+
+      &:hover {
+        color: $hepix-navy !important;
+        border-left-color: $hepix-text-muted;
+      }
+
+      &.is-active {
+        color: $hepix-accent-deep !important;
+        font-weight: 500;
+        border-left-color: $hepix-accent;
+      }
+    }
+
+    // Top-level entries read as section headings.
+    > li > a.page-toc__link {
+      font-weight: 500;
+      color: $hepix-text !important;
+
+      &.is-active {
+        color: $hepix-accent-deep !important;
+      }
+    }
+
+    // Nested levels indent under the same rail.
+    ul a.page-toc__link {
+      padding-left: 2rem;
+      font-size: 0.84rem;
+    }
+
+    ul ul a.page-toc__link {
+      padding-left: 3rem;
     }
   }
 
@@ -263,6 +313,64 @@ main .container.page-content {
       }
     }
   }
+
+  // Release / version update notice
+  .update-banner {
+    margin: 1.5rem 0 1.75rem;
+    padding: 1rem 1.15rem;
+    max-width: 46rem;
+    background: $hepix-surface;
+    border: 1px solid $hepix-border;
+    border-left: 3px solid #059669;
+    border-radius: $hepix-radius-sm;
+
+    &__label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+      margin: 0 0 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: $hepix-text-muted;
+      max-width: none;
+    }
+
+    &__badge {
+      display: inline-block;
+      padding: 0.12rem 0.45rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #047857;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 4px;
+    }
+
+    &__message {
+      margin: 0;
+      line-height: 1.7;
+      color: $hepix-text;
+      max-width: none;
+
+      strong {
+        color: $hepix-navy;
+        font-weight: 600;
+      }
+
+      a {
+        color: $hepix-accent !important;
+        border-bottom-color: rgba($hepix-accent, 0.35) !important;
+
+        &:hover {
+          color: darken($hepix-accent, 8%) !important;
+          border-bottom-color: $hepix-accent !important;
+        }
+      }
+    }
+  }
 }
 
 // Data-table pages (scores, etc.)
@@ -317,6 +425,14 @@ main .container.page-content {
       flex-direction: column;
       gap: 0.75rem;
       padding: 1rem;
+    }
+
+    .update-banner {
+      padding: 0.9rem 1rem;
+    }
+
+    .page-toc__panel {
+      max-width: none;
     }
   }
 }
