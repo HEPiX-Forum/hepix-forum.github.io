@@ -47,6 +47,11 @@
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   code { background: #f3f4f6; padding: 1px 6px; border-radius: 3px;
          font-size: 12px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600;
+           text-transform: uppercase; letter-spacing: 0.4px;
+           background: #e6edf7; color: #0b4aa2; border: 1px solid #c9d7ef;
+           padding: 2px 8px; border-radius: 999px; margin-left: 8px;
+           vertical-align: middle; }
   .chart-wrap { position: relative; height: 280px; }
   section { margin-bottom: 24px; }
 
@@ -111,9 +116,45 @@
 </div>
 
 <script>
+// =============================================================
+// HEP Benchmark Suite report viewer
 // -------------------------------------------------------------
-// Helpers
+// A single-file, client-side viewer for the JSON produced by the
+// HEP Benchmark Suite (v3.x). Everything runs in the browser; the
+// dropped file is never uploaded.
+//
+// Pipeline (top to bottom in this file):
+//   1. Helpers           — small pure utilities (stats, formatting, escaping).
+//   2. parseReport(data) — turns the raw suite JSON into a flat, render-ready
+//                          object `r` (scores, host/HW info, telemetry series).
+//   3. renderHTML(r)     — builds the report HTML string + chart specs.
+//   4. drawCharts(specs) — renders the telemetry line charts with Chart.js.
+//   5. UI wiring         — drag & drop, sample loading, standalone export.
+//
+// Relevant shape of the suite JSON:
+//   {
+//     "_id", "_timestamp", "_timestamp_end",     // run identity / window
+//     "host": { "HW": {...}, "SW": {...}, ... },  // static machine inventory
+//     "suite": { "version", "flags": {...} },
+//     "profiles": {                               // one benchmark "profile"
+//       "<benchmark>": { "value"|"score", "unit", "benchmarks": {...} }
+//     },
+//     "plugins": {                                // dynamic time-series data
+//       "CommandExecutor": {
+//         "<phase>": { "<metric>": { values:[...], config:{unit}, ... } }
+//       }
+//     }
+//   }
+// The viewer is benchmark-agnostic: it auto-detects the profile and plots
+// every time-series metric it finds, so new benchmarks/plugins work without
+// code changes.
+// =============================================================
+
 // -------------------------------------------------------------
+// Helpers — small pure utilities used throughout.
+// -------------------------------------------------------------
+
+// Linear-interpolated percentile (p in [0,1]); null for empty input.
 function percentile(arr, p) {
   if (!arr || !arr.length) return null;
   const s = [...arr].sort((a, b) => a - b);
@@ -125,11 +166,17 @@ function mean(arr) {
   return arr && arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
 }
 function median(arr) { return percentile(arr, 0.5); }
+
+// Human-friendly number formatting: "—" for missing values, thousands
+// separators for large numbers, otherwise `d` decimals (default 2).
 function fmt(x, d) {
   if (x === null || x === undefined || Number.isNaN(x)) return "—";
   if (Math.abs(x) >= 1000) return x.toLocaleString(undefined, { maximumFractionDigits: 0 });
   return x.toFixed(d !== undefined ? d : 2);
 }
+
+// Safe nested lookup: get(obj, ["a","b"], def) returns obj.a.b or `def`
+// if any step is missing. Avoids long `obj && obj.a && obj.a.b` chains.
 function get(obj, path, def) {
   let cur = obj;
   for (const p of path) {
@@ -138,6 +185,8 @@ function get(obj, path, def) {
   }
   return cur;
 }
+
+// Escape a value for safe insertion into HTML (report is built as strings).
 function esc(s) {
   return String(s ?? "—").replace(/[&<>"']/g,
     c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -146,6 +195,10 @@ function esc(s) {
 // -------------------------------------------------------------
 // Parse benchmark JSON -> normalized report object
 // -------------------------------------------------------------
+
+// Presentation hints for the well-known suite metrics: nice title, unit,
+// line color, and which aggregate reference lines to overlay on the chart
+// ("mean" and/or "q85"). Unknown metrics fall back to auto-generated meta.
 const METRIC_META = {
   "power-consumption": { title: "Power consumption", unit: "W",
                          color: "rgb(3, 102, 214)", aggs: ["mean", "q85"] },
@@ -158,20 +211,219 @@ const METRIC_META = {
   "cpu-frequency":     { title: "CPU frequency",    unit: "MHz",
                          color: "rgb(111, 66, 193)", aggs: ["mean"] },
 };
+// Preferred display order for known metrics; anything else sorts after them.
+const METRIC_ORDER = [
+  "power-consumption", "cpu-frequency", "load", "used-memory", "used-swap-memory",
+];
+// Colors cycled through for auto-discovered (unknown) metrics, e.g. GPU series.
+const METRIC_PALETTE = [
+  "rgb(3, 102, 214)", "rgb(203, 36, 49)", "rgb(34, 134, 58)", "rgb(176, 136, 0)",
+  "rgb(111, 66, 193)", "rgb(227, 98, 9)", "rgb(3, 102, 214)", "rgb(115, 92, 15)",
+  "rgb(0, 134, 138)", "rgb(130, 80, 223)", "rgb(207, 34, 46)", "rgb(52, 105, 162)",
+];
+// Plugin keys that are not benchmark phases (control/metadata, not metrics).
+const PHASE_SKIP = new Set(["pre", "post", "status"]);
 
+// A metric entry is any object carrying a numeric `values` array (a time series).
+function isMetricEntry(obj) {
+  return obj && typeof obj === "object" && Array.isArray(obj.values);
+}
+
+// List the metric names directly inside a container object (one phase / plugin).
+function discoverMetricKeys(phase) {
+  if (!phase || typeof phase !== "object") return [];
+  return Object.keys(phase).filter(k => !PHASE_SKIP.has(k) && isMetricEntry(phase[k]));
+}
+
+// True if `obj` directly holds one or more metric series.
+function isMetricContainer(obj) {
+  return discoverMetricKeys(obj).length > 0;
+}
+
+// Turn a raw metric key into a readable chart title, e.g.
+// "gpu-power-consumption-0" -> "GPU Power Consumption (GPU 0)".
+function metricTitle(name) {
+  return name
+    .replace(/-(\d+)$/, " (GPU $1)")
+    .replace(/-/g, " ")
+    .replace(/\bgpu\b/gi, "GPU")
+    .replace(/\bcpu\b/gi, "CPU")
+    .replace(/\bgr\b/gi, "graphics")
+    .replace(/\bsm\b/gi, "SM")
+    .replace(/\bmem\b/gi, "memory")
+    .replace(/\babs\b/gi, "used")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Resolve presentation meta for a metric: use the curated entry if known
+// (returned as a copy, since callers may tweak the title), otherwise derive
+// title/unit/color and add a Q85 line for anything power-related.
+function metricMetaFor(name, series, index) {
+  const known = METRIC_META[name];
+  if (known) return { ...known };
+  return {
+    title: metricTitle(name),
+    unit: series.unit || "",
+    color: METRIC_PALETTE[index % METRIC_PALETTE.length],
+    aggs: /power/i.test(name) ? ["mean", "q85"] : ["mean"],
+  };
+}
+
+// Order metrics for display: known metrics first (by METRIC_ORDER), then
+// non-GPU before GPU, with GPU series grouped by type and numbered by device.
+function sortMetricKeys(keys) {
+  const orderIndex = new Map(METRIC_ORDER.map((k, i) => [k, i]));
+  return [...keys].sort((a, b) => {
+    const ai = orderIndex.has(a) ? orderIndex.get(a) : 1000;
+    const bi = orderIndex.has(b) ? orderIndex.get(b) : 1000;
+    if (ai !== bi) return ai - bi;
+    const ag = a.startsWith("gpu-"), bg = b.startsWith("gpu-");
+    if (ag !== bg) return ag ? 1 : -1;
+    if (ag && bg) {
+      const prefix = s => s.replace(/-\d+$/, "");
+      const pa = prefix(a), pb = prefix(b);
+      if (pa !== pb) return pa.localeCompare(pb);
+      const na = Number((a.match(/-(\d+)$/) || [])[1] || 0);
+      const nb = Number((b.match(/-(\d+)$/) || [])[1] || 0);
+      return na - nb;
+    }
+    return a.localeCompare(b);
+  });
+}
+
+// Build a DOM-safe canvas id from a metric key (may contain ":" / "-").
+function chartIdFor(key) {
+  return "chart_" + key.replace(/[^a-zA-Z0-9_]/g, "_");
+}
+
+// Extract one metric time series into a normalized shape. Drops null/invalid
+// samples (e.g. an IPMI reading that returned nothing); returns null if the
+// series ends up empty so the caller can skip it entirely.
 function parseSeries(phase, name) {
   const raw = phase && phase[name];
   if (!raw || !Array.isArray(raw.values)) return null;
+  const values = raw.values
+    .map(v => (v === null || v === undefined ? NaN : Number(v)))
+    .filter(v => !Number.isNaN(v));
+  if (!values.length) return null;
   return {
     name,
     unit: get(raw, ["config", "unit"], ""),
-    values: raw.values.map(Number).filter(v => !Number.isNaN(v)),
+    values,
     start: raw.start_time || null,
     end:   raw.end_time   || null,
   };
 }
 
+// Pick which benchmark "profile" this report is about and extract its headline
+// score. HEPscore is the canonical case (score under `.score`); other suite
+// benchmarks (DB12, containerized apps, ...) expose `.value`/`.unit`, sometimes
+// nested one level deeper (e.g. profiles.docker_img.DockerImg.value).
+function selectProfile(profiles) {
+  if (profiles && profiles.hepscore) {
+    return { key: "hepscore", label: "HEPscore23", obj: profiles.hepscore,
+             score: get(profiles, ["hepscore", "score"], NaN),
+             unit: "HS06", status: get(profiles, ["hepscore", "status"], "—") };
+  }
+  const keys = profiles ? Object.keys(profiles) : [];
+  if (!keys.length) return { key: "", label: "Benchmark", obj: {}, score: NaN, unit: "", status: "—" };
+  const key = keys[0];
+  const obj = profiles[key] || {};
+  let label = key;
+  let score = get(obj, ["value"], NaN);
+  let unit = get(obj, ["unit"], "");
+  let status = get(obj, ["status"], "—");
+  if (!Number.isFinite(Number(score))) {
+    const innerKeys = Object.keys(obj).filter(k => obj[k] && typeof obj[k] === "object");
+    if (innerKeys.length) {
+      const innerKey = innerKeys[0];
+      const inner = obj[innerKey] || {};
+      label = key === "docker_img" ? innerKey : key;
+      score = get(inner, ["value"], NaN);
+      unit = get(inner, ["unit"], "");
+      status = get(inner, ["status"], status);
+    }
+  }
+  return { key, label, obj, score, unit, status };
+}
+
+// Case-insensitive key comparison (suite uses e.g. "DB12" vs "db12").
+function keysMatch(a, b) {
+  return String(a || "").toLowerCase() === String(b || "").toLowerCase();
+}
+
+// Find the metric container(s) inside a single plugin and which phase each
+// came from. Returns [{ plugin, phase, data }, ...]. Two plugin layouts:
+//   - Phased (like CommandExecutor): metrics live under phase keys; we prefer
+//     the phase matching the benchmark profile, then "hepscore", else take all
+//     (skipping the brief "pre"/"post" snapshots).
+//   - Flat: metrics sit directly at the plugin root (phase = "").
+function metricContainersInPlugin(pluginData, profileKey, pluginName) {
+  if (!pluginData || typeof pluginData !== "object") return [];
+
+  const phases = Object.keys(pluginData).filter(k =>
+    !PHASE_SKIP.has(k) && isMetricContainer(pluginData[k])
+  );
+  if (phases.length) {
+    const matched = profileKey && phases.find(k => keysMatch(k, profileKey));
+    const chosen = matched ? [matched]
+      : phases.includes("hepscore") ? ["hepscore"]
+      : phases;
+    return chosen.map(phase => ({ plugin: pluginName, phase, data: pluginData[phase] }));
+  }
+
+  if (isMetricContainer(pluginData)) {
+    return [{ plugin: pluginName, phase: "", data: pluginData }];
+  }
+  return [];
+}
+
+// Gather every telemetry series across all plugins into three parallel
+// structures keyed by a unique metric key:
+//   series     — { key: {values, unit, start, end} }
+//   metricMeta — { key: {title, unit, color, aggs} }
+//   metricKeys — ordered list of keys (drives chart order)
+// On name collisions across plugins the key is prefixed ("Plugin:metric"), and
+// titles get a "Plugin (phase): " prefix so the source stays clear.
+function collectAllMetrics(plugins, profileKey) {
+  const series = {};
+  const metricMeta = {};
+  const metricKeys = [];
+  const seen = new Set();
+  let idx = 0;
+
+  for (const pluginName of Object.keys(plugins || {})) {
+    const containers = metricContainersInPlugin(plugins[pluginName], profileKey, pluginName);
+    for (const { plugin, phase, data } of containers) {
+      for (const key of sortMetricKeys(discoverMetricKeys(data))) {
+        const s = parseSeries(data, key);
+        if (!s) continue;
+
+        const fullKey = seen.has(key) ? `${plugin}:${key}` : key;
+        seen.add(key);
+
+        series[fullKey] = s;
+        const meta = metricMetaFor(key, s, idx);
+        const fromOtherPlugin = pluginName !== "CommandExecutor";
+        const needsLabel = fromOtherPlugin || fullKey !== key || (phase && !keysMatch(phase, profileKey));
+        if (needsLabel) {
+          const label = phase ? `${plugin} (${phase})` : plugin;
+          meta.title = `${label}: ${meta.title}`;
+        }
+        metricMeta[fullKey] = meta;
+        metricKeys.push(fullKey);
+        idx++;
+      }
+    }
+  }
+  return { series, metricMeta, metricKeys };
+}
+
+// Main entry point: convert the raw suite JSON into a flat object that the
+// render functions can consume directly. Every field is defaulted so that
+// partial/older reports still render (missing values just show as "—").
 function parseReport(data) {
+  // Pull the major sub-trees up front; `get` returns {} when a branch is absent.
   const host = get(data, ["host"], {}) || {};
   const hw = get(host, ["HW"], {}) || {};
   const sw = get(host, ["SW"], {}) || {};
@@ -180,8 +432,13 @@ function parseReport(data) {
   const kern = get(sw, ["kernel"], {}) || {};
   const mem = get(hw, ["MEMORY"], {}) || {};
   const gpus = get(hw, ["GPU"], {}) || {};
-  const profiles = get(data, ["profiles", "hepscore"], {}) || {};
+  const profiles = get(data, ["profiles"], {}) || {};
   const plugins = get(data, ["plugins"], {}) || {};
+  const profileInfo = selectProfile(profiles);
+  const profileKey = profileInfo.key;
+  const profileLabel = profileInfo.label;
+  const profileObj = profileInfo.obj || {};
+  const scoreUnit = profileInfo.unit || "";
 
   // GPU label (first entry)
   let gpu = "—";
@@ -189,90 +446,94 @@ function parseReport(data) {
     if (gpus[k] && gpus[k].name) { gpu = gpus[k].name; break; }
   }
 
-  // Time series (hepscore phase)
-  const phase = get(plugins, ["CommandExecutor", "hepscore"], {}) || {};
-  const series = {};
-  for (const key of Object.keys(METRIC_META)) {
-    const s = parseSeries(phase, key);
-    if (s) series[key] = s;
-  }
+  // Time series from all suite plugins (CommandExecutor and others)
+  const { series, metricMeta, metricKeys } = collectAllMetrics(plugins, profileKey);
 
-  // Scores
-  const score = Number(get(profiles, ["score"], NaN));
+  // Headline score plus two derived efficiency metrics. Score/W uses the Q85
+  // (85th percentile) of the power series as a representative load power.
+  const score = Number(profileInfo.score);
   const ncores = Number(get(data, ["suite", "flags", "ncores"],
                              cpu.CPU_num || 1)) || 1;
-  const scorePerCore = score / ncores;
+  const scorePerCore = Number.isFinite(score) ? score / ncores : null;
   const power = series["power-consumption"];
   const q85Power = power ? percentile(power.values, 0.85) : null;
-  const scorePerWatt = (q85Power && q85Power > 0) ? score / q85Power : null;
+  const scorePerWatt = (Number.isFinite(score) && q85Power && q85Power > 0) ? score / q85Power : null;
 
-  // Benchmarks
+  // Per-workload breakdown (HEPscore reports list sub-benchmarks; flat
+  // benchmarks like DB12 have none, leaving this array empty).
   const benchmarks = [];
-  const bms = get(profiles, ["benchmarks"], {}) || {};
-  const wlScores = get(profiles, ["wl-scores"], {}) || {};
+  const bms = get(profileObj, ["benchmarks"], {}) || {};
+  const wlScores = get(profileObj, ["wl-scores"], {}) || {};
   const workloadStarts = []; // { name, ts } in ISO
-  for (const [name, bm] of Object.entries(bms)) {
-    if (!bm || typeof bm !== "object") continue;
-    let bmScore = null, kind = "";
-    const myScores = wlScores[name] || {};
-    for (const [k, v] of Object.entries(myScores)) {
-      if (k.endsWith("_ref")) continue;
-      bmScore = Number(v); kind = k; break;
-    }
-    if (bmScore === null) {
-      const wls = get(bm, ["run0", "report", "wl-scores"], {}) || {};
-      for (const [k, v] of Object.entries(wls)) {
+  if (bms && typeof bms === "object") {
+    for (const [name, bm] of Object.entries(bms)) {
+      if (!bm || typeof bm !== "object") continue;
+      // The workload score may live in the top-level wl-scores map or nested
+      // in the first run's report; "*_ref" entries are reference values, skip.
+      let bmScore = null, kind = "";
+      const myScores = wlScores[name] || {};
+      for (const [k, v] of Object.entries(myScores)) {
+        if (k.endsWith("_ref")) continue;
         bmScore = Number(v); kind = k; break;
       }
-    }
-    if (bmScore === null) continue;
-
-    const durations = [];
-    for (const k of Object.keys(bm)) {
-      if (k.startsWith("run") && bm[k] && typeof bm[k].duration === "number") {
-        durations.push(bm[k].duration);
-      }
-    }
-
-    // Optional workload start time markers (best-effort).
-    // Some suite JSON variants include ISO timestamps per workload run, e.g.
-    // benchmarks.<wl>.run0.start_time / start / begin / timestamp.
-    // If present, we use the earliest run timestamp as the workload start marker.
-    try {
-      const runKeys = Object.keys(bm).filter(k => k.startsWith("run"));
-      const isoLike = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s);
-      const tsVals = [];
-      for (const rk of runKeys) {
-        const ro = bm[rk];
-        if (!ro || typeof ro !== "object") continue;
-        const candKeys = ["start_time", "start", "begin", "timestamp", "_timestamp"];
-        for (const ck of candKeys) {
-          const v = ro[ck];
-          if (isoLike(v)) tsVals.push(v);
+      if (bmScore === null) {
+        const wls = get(bm, ["run0", "report", "wl-scores"], {}) || {};
+        for (const [k, v] of Object.entries(wls)) {
+          bmScore = Number(v); kind = k; break;
         }
-        // allow nested report timestamps too
-        const rep = ro.report;
-        if (rep && typeof rep === "object") {
+      }
+      if (bmScore === null) continue;
+
+      // Average duration across all "runN" entries that report one.
+      const durations = [];
+      for (const k of Object.keys(bm)) {
+        if (k.startsWith("run") && bm[k] && typeof bm[k].duration === "number") {
+          durations.push(bm[k].duration);
+        }
+      }
+
+      // Optional workload start time markers (best-effort).
+      // Some suite JSON variants include ISO timestamps per workload run, e.g.
+      // benchmarks.<wl>.run0.start_time / start / begin / timestamp.
+      // If present, we use the earliest run timestamp as the workload start marker.
+      try {
+        const runKeys = Object.keys(bm).filter(k => k.startsWith("run"));
+        const isoLike = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s);
+        const tsVals = [];
+        for (const rk of runKeys) {
+          const ro = bm[rk];
+          if (!ro || typeof ro !== "object") continue;
+          const candKeys = ["start_time", "start", "begin", "timestamp", "_timestamp"];
           for (const ck of candKeys) {
-            const v = rep[ck];
+            const v = ro[ck];
             if (isoLike(v)) tsVals.push(v);
           }
+          // allow nested report timestamps too
+          const rep = ro.report;
+          if (rep && typeof rep === "object") {
+            for (const ck of candKeys) {
+              const v = rep[ck];
+              if (isoLike(v)) tsVals.push(v);
+            }
+          }
         }
-      }
-      if (tsVals.length) {
-        tsVals.sort((a, b) => new Date(a) - new Date(b));
-        workloadStarts.push({ name, ts: tsVals[0] });
-      }
-    } catch (_) { /* best-effort, ignore */ }
+        if (tsVals.length) {
+          tsVals.sort((a, b) => new Date(a) - new Date(b));
+          workloadStarts.push({ name, ts: tsVals[0] });
+        }
+      } catch (_) { /* best-effort, ignore */ }
 
-    benchmarks.push({
-      name, kind, score: bmScore,
-      runs: durations.length,
-      avgDuration: durations.length ? mean(durations) : NaN,
-      description: get(bm, ["app", "description"], ""),
-    });
+      benchmarks.push({
+        name, kind, score: bmScore,
+        runs: durations.length,
+        avgDuration: durations.length ? mean(durations) : NaN,
+        description: get(bm, ["app", "description"], ""),
+      });
+    }
   }
 
+  // Flat, render-ready view model. Telemetry (series/metricMeta/metricKeys)
+  // and benchmarks are already normalized above; the rest is host/HW/run meta.
   return {
     runId: data._id || "",
     tsStart: data._timestamp || "",
@@ -302,23 +563,28 @@ function parseReport(data) {
     swapTotalMb: Math.floor(Number(mem.Mem_Swap || 0) / 1024),
     gpu,
     suiteVersion: String(get(data, ["suite", "version"], "—")),
-    hepscoreVersion: String(get(profiles, ["app_info", "hepscore_ver"], "—")),
+    profileKey,
+    profileLabel,
+    scoreUnit,
+    hepscoreVersion: String(get(profileObj, ["app_info", "hepscore_ver"], "—")),
     runMode: String(get(data, ["suite", "flags", "run_mode"], "—")),
     ncores,
-    registry: String(get(profiles, ["settings", "registry"], "—")),
-    method: String(get(profiles, ["settings", "method"], "—")),
-    scaling: Number(get(profiles, ["settings", "scaling"], 1)),
-    repetitions: Number(get(profiles, ["settings", "repetitions"], 1)),
-    referenceMachine: String(get(profiles, ["settings", "reference_machine"], "—")),
+    registry: String(get(profileObj, ["settings", "registry"], "—")),
+    method: String(get(profileObj, ["settings", "method"], "—")),
+    scaling: Number(get(profileObj, ["settings", "scaling"], 1)),
+    repetitions: Number(get(profileObj, ["settings", "repetitions"], 1)),
+    referenceMachine: String(get(profileObj, ["settings", "reference_machine"], "—")),
     score, scorePerCore, scorePerWatt, q85Power,
-    series, benchmarks, workloadStarts,
-    status: String(get(profiles, ["status"], "—")),
+    series, metricMeta, metricKeys, benchmarks, workloadStarts,
+    status: String(profileInfo.status || "—"),
   };
 }
 
 // -------------------------------------------------------------
-// Render
+// Render — turn the report object into HTML + chart specifications.
 // -------------------------------------------------------------
+
+// One-line "mean · median · min · max" summary shown under each chart title.
 function summaryLine(s) {
   const parts = [];
   const m = mean(s.values), me = median(s.values);
@@ -331,6 +597,9 @@ function summaryLine(s) {
   return parts.join(" · ");
 }
 
+// X-axis labels for a series. Samples are evenly spaced between the series'
+// start and end timestamps, so we render "HH:MM" labels; if timestamps are
+// missing we fall back to plain sample indices.
 function timeLabels(s) {
   const n = s.values.length;
   if (n <= 1 || !s.start || !s.end) return s.values.map((_, i) => String(i));
@@ -342,32 +611,40 @@ function timeLabels(s) {
   });
 }
 
+// Build the per-chart configuration consumed by drawCharts(). For each metric
+// we compute its line data, labels, overlay aggregate lines (mean/Q85), a text
+// summary, and the x-positions of any workload-start markers.
 function chartSpecs(r) {
   const specs = [];
+  // Workload start times, parsed and sorted, used to draw vertical markers.
   const markers = (r.workloadStarts || [])
     .map(m => ({ name: m.name, t: new Date(m.ts) }))
     .filter(m => Number.isFinite(+m.t))
     .sort((a, b) => a.t - b.t);
 
-  for (const [key, meta] of Object.entries(METRIC_META)) {
+  for (const key of r.metricKeys) {
     const s = r.series[key];
-    if (!s || !s.values.length) continue;
+    const meta = r.metricMeta[key];
+    // Horizontal reference lines overlaid on the series (per metric meta).
     const agg = [];
-    if (meta.aggs.includes("mean")) {
+    if ((meta.aggs || []).includes("mean")) {
       const m = mean(s.values);
       if (m !== null) agg.push({ name: "mean", value: +m.toFixed(2),
                                  color: "rgb(203, 36, 49)", dash: [6, 4] });
     }
-    if (meta.aggs.includes("q85")) {
+    if ((meta.aggs || []).includes("q85")) {
       const q = percentile(s.values, 0.85);
       if (q !== null) agg.push({ name: "Q85", value: +q.toFixed(2),
                                  color: "rgb(176, 136, 0)", dash: [2, 3] });
     }
+    const unit = meta.unit || s.unit || "";
     specs.push({
-      id: key.replace(/-/g, "_") + "_chart",
-      title: meta.title, unit: meta.unit, color: meta.color,
+      id: chartIdFor(key),
+      title: meta.title, unit, color: meta.color,
       values: s.values, labels: timeLabels(s), agg,
       summary: summaryLine(s),
+      // Map each workload start time onto a fractional sample index along this
+      // series' time span, so the marker lines up with the right point.
       markerIdx: (() => {
         if (!markers.length || !s.start || !s.end) return [];
         const t0 = new Date(s.start), t1 = new Date(s.end);
@@ -387,6 +664,10 @@ function chartSpecs(r) {
   return specs;
 }
 
+// Assemble the full report markup from the view model. Returns the HTML string
+// plus the chart specs (which drawCharts needs once the HTML is in the DOM).
+// The report is composed of five sections: hero, host/HW, telemetry, workload
+// results, and run metadata.
 function renderHTML(r) {
   const specs = chartSpecs(r);
   const scorePerWattHTML = r.scorePerWatt !== null
@@ -394,18 +675,25 @@ function renderHTML(r) {
        <div class="hero-sub">${fmt(r.score)} / ${fmt(r.q85Power, 1)} W (Q85 power)</div>`
     : `<div class="score">—</div>
        <div class="hero-sub">power series not available</div>`;
+  const scoreUnit = r.scoreUnit ? ` ${esc(r.scoreUnit)}` : "";
+  const scoreLabel = r.profileLabel || "Benchmark";
+  const heroMethod = r.method !== "—" ? esc(r.method) : "scaling";
+  const heroScaling = Number.isFinite(r.scaling) ? `× ${fmt(r.scaling, 0)}` : "";
 
+  // Hero banner: title with benchmark-type badge and the three headline scores.
   const hero = `
 <header>
-  <h1>HEPscore23 · ${esc(r.hostname)} (${esc(r.site)}) · ${esc((r.tsStart || "").slice(0, 10))}</h1>
+  <h1>${esc(scoreLabel)} · ${esc(r.hostname)} (${esc(r.site)}) · ${esc((r.tsStart || "").slice(0, 10))}
+    <span class="badge">Benchmark type: ${esc(scoreLabel)}</span>
+  </h1>
   <div class="sub">Run ID <code>${esc(r.runId)}</code> · ${esc(r.tsStart)} → ${esc(r.tsEnd)}</div>
 </header>
 <div class="hero">
   <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
     <div class="hero-metric">
-      <div class="score-label">HEPscore · total</div>
-      <div class="score">${fmt(r.score)}</div>
-      <div class="hero-sub">${esc(r.method)} × ${fmt(r.scaling, 0)}</div>
+      <div class="score-label">${esc(scoreLabel)} · total</div>
+      <div class="score">${fmt(r.score)}${scoreUnit}</div>
+      <div class="hero-sub">${heroMethod} ${heroScaling}</div>
     </div>
     <div class="hero-metric">
       <div class="score-label">Score / core</div>
@@ -426,6 +714,7 @@ function renderHTML(r) {
   </div>
 </div>`;
 
+  // Static inventory: host identity/software on the left, hardware on the right.
   const hostCard = `
 <section>
   <div class="grid grid-2">
@@ -465,12 +754,13 @@ function renderHTML(r) {
   </div>
 </section>`;
 
+  // Telemetry: one chart card per discovered metric (empty-state if none).
   const telemetry = `
 <section>
-  <h2>System telemetry during HEPscore phase</h2>
+  <h2>System telemetry during ${esc(scoreLabel)} phase</h2>
   ${specs.length === 0
-    ? `<div class="card"><em>No CommandExecutor time-series available.</em></div>`
-    : `<div class="sub" style="margin-bottom:14px">${specs[0].values.length} samples · metrics recorded by CommandExecutor</div>
+    ? `<div class="card"><em>No plugin time-series available in this report.</em></div>`
+    : `<div class="sub" style="margin-bottom:14px">${specs.length} metrics · ${specs[0].values.length} samples each (first series) · recorded by suite plugins</div>
        <div class="grid grid-2">
          ${specs.map(c => `
            <div class="card">
@@ -481,9 +771,12 @@ function renderHTML(r) {
        </div>`}
 </section>`;
 
-  const bench = `
+  // Workload results table; benchmarks without a per-workload breakdown (e.g.
+  // DB12) show a short empty-state card instead.
+  const bench = r.benchmarks.length
+    ? `
 <section>
-  <h2>HEPscore workload results</h2>
+  <h2>${esc(scoreLabel)} workload results</h2>
   <div class="sub" style="margin-bottom:14px">
     ${r.benchmarks.length} benchmarks · ${r.repetitions} repetitions each
   </div>
@@ -507,7 +800,28 @@ function renderHTML(r) {
     </tbody>
   </table>
   </div>
+</section>`
+    : `
+<section>
+  <h2>${esc(scoreLabel)} results</h2>
+  <div class="card"><em>No per-workload breakdown found in this report.</em></div>
 </section>`;
+
+  // Run metadata: build the left column row-by-row so optional fields (registry,
+  // method, HEPscore version, ...) are omitted entirely when absent.
+  const metaRowsLeft = [
+    ["Suite version", esc(r.suiteVersion)],
+    ["Benchmark", `${esc(scoreLabel)}${scoreUnit ? " (" + scoreUnit + ")" : ""}`],
+  ];
+  if (r.profileKey === "hepscore") {
+    metaRowsLeft.push(["HEPscore", `v${esc(r.hepscoreVersion)}`]);
+  }
+  metaRowsLeft.push(["Run mode", `${esc(r.runMode)} (apptainer ${esc(r.singularity)})`]);
+  if (r.registry !== "—") metaRowsLeft.push(["Registry", `<code>${esc(r.registry)}</code>`]);
+  if (r.method !== "—") metaRowsLeft.push(["Method", `${esc(r.method)} · scaling ×${fmt(r.scaling, 0)}`]);
+  if (Number.isFinite(r.repetitions)) metaRowsLeft.push(["Repetitions", `${r.repetitions}`]);
+  metaRowsLeft.push(["Cores used", `${r.ncores}`]);
+  if (r.referenceMachine !== "—") metaRowsLeft.push(["Reference machine", esc(r.referenceMachine)]);
 
   const meta = `
 <section>
@@ -515,18 +829,11 @@ function renderHTML(r) {
   <div class="grid grid-2">
     <div class="card">
       <dl class="kv">
-        <dt>Suite version</dt><dd>${esc(r.suiteVersion)}</dd>
-        <dt>HEPscore</dt><dd>v${esc(r.hepscoreVersion)}</dd>
-        <dt>Run mode</dt><dd>${esc(r.runMode)} (apptainer ${esc(r.singularity)})</dd>
-        <dt>Registry</dt><dd><code>${esc(r.registry)}</code></dd>
-        <dt>Method</dt><dd>${esc(r.method)} · scaling ×${fmt(r.scaling, 0)}</dd>
-        <dt>Repetitions</dt><dd>${r.repetitions}</dd>
-        <dt>Cores used</dt><dd>${r.ncores}</dd>
+        ${metaRowsLeft.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}
       </dl>
     </div>
     <div class="card">
       <dl class="kv">
-        <dt>Reference machine</dt><dd>${esc(r.referenceMachine)}</dd>
         <dt>Run window</dt><dd>${esc(r.tsStart)} → ${esc(r.tsEnd)}</dd>
         <dt>Report generated</dt><dd>${new Date().toISOString().replace("T", " ").substring(0, 19)} UTC</dd>
       </dl>
@@ -537,7 +844,13 @@ function renderHTML(r) {
   return { html: hero + hostCard + telemetry + bench + meta, specs };
 }
 
+// Render the telemetry charts into the canvases created by renderHTML.
+// Defined as a standalone, dependency-free function on purpose: the "Download
+// as standalone HTML" button serializes it with `.toString()` and re-runs it
+// in the exported file, so it must not reference any outer-scope variables.
 function drawCharts(specs) {
+  // Chart.js plugin that draws dashed vertical lines (with labels) at each
+  // workload start position supplied via the chart's `workloadMarkers` options.
   const workloadMarkerPlugin = {
     id: "workloadMarkers",
     afterDatasetsDraw(chart, args, opts) {
@@ -581,6 +894,8 @@ function drawCharts(specs) {
     },
   };
 
+  // One Chart.js line chart per spec: the metric series plus any aggregate
+  // reference lines (mean/Q85) as flat dashed datasets.
   specs.forEach(cfg => {
     const el = document.getElementById(cfg.id);
     if (!el) return;
@@ -621,7 +936,7 @@ function drawCharts(specs) {
 }
 
 // -------------------------------------------------------------
-// UI wiring
+// UI wiring — drag & drop, error display, and report lifecycle.
 // -------------------------------------------------------------
 const dz = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
@@ -630,6 +945,8 @@ const landingFooter = document.getElementById("landingFooter");
 const report = document.getElementById("report");
 const reportBody = document.getElementById("reportBody");
 const errorBox = document.getElementById("error");
+// Holds the last successfully rendered report so the Download button can
+// re-serialize it into a standalone HTML file.
 let lastReport = null;
 
 function showError(msg) {
@@ -638,6 +955,7 @@ function showError(msg) {
 }
 function clearError() { errorBox.classList.add("hidden"); }
 
+// Read a dropped/selected File as text and hand the parsed JSON to the renderer.
 function handleFile(file) {
   clearError();
   if (!file) return;
@@ -654,11 +972,13 @@ function handleFile(file) {
   reader.readAsText(file);
 }
 
+// Parse + render a report object: swaps the landing page for the report view,
+// draws the charts, and surfaces any failure as an inline error message.
 function renderFromData(data) {
   try {
     const r = parseReport(data);
     if (!Number.isFinite(r.score)) {
-      throw new Error("No HEPscore found in profiles.hepscore.score — is this the right JSON?");
+      throw new Error("No benchmark score found in profiles.* — is this the right JSON?");
     }
     const { html, specs } = renderHTML(r);
     reportBody.innerHTML = html;
@@ -673,6 +993,7 @@ function renderFromData(data) {
   }
 }
 
+// Drop zone: click to open the file picker, plus drag-over highlighting.
 dz.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", e => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
@@ -688,6 +1009,7 @@ dz.addEventListener("drop", e => {
   if (f) handleFile(f);
 });
 
+// "Load another file": reset back to the landing/drop-zone state.
 document.getElementById("btnNew").addEventListener("click", () => {
   report.classList.add("hidden");
   landing.classList.remove("hidden");
@@ -697,6 +1019,9 @@ document.getElementById("btnNew").addEventListener("click", () => {
   clearError();
 });
 
+// "Download as standalone HTML": bundle the current report markup, the page
+// CSS, Chart.js (CDN), and an inlined drawCharts() call into a single self-
+// contained .html file the user can save and share offline.
 document.getElementById("btnDownload").addEventListener("click", () => {
   if (!lastReport) return;
   const chartJS = `<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>`;
@@ -715,6 +1040,7 @@ document.getElementById("btnDownload").addEventListener("click", () => {
   document.body.removeChild(a); URL.revokeObjectURL(url);
 });
 
+// Load the bundled example report (via the link or ?sample=1 in the URL).
 function loadSample() {
   clearError();
   fetch("/assets/hepscore-report/sample.json")
@@ -729,6 +1055,7 @@ document.getElementById("sampleLink").addEventListener("click", e => {
   loadSample();
 });
 
+// Allow deep-linking straight to the example, e.g. viewer.html?sample=1
 if (new URLSearchParams(window.location.search).get("sample") === "1") {
   loadSample();
 }
