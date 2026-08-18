@@ -114,6 +114,55 @@
   text-align: center;
 }
 
+// Collapsible static reference plot
+details.tes-reference {
+  margin: 1rem 0 1.5rem;
+  border: 1px solid $hepix-border;
+  border-radius: $hepix-radius-sm;
+  background: $hepix-surface;
+  padding: 0.35rem 0.75rem;
+
+  &[open] {
+    background: #ffffff;
+    padding-bottom: 0.75rem;
+  }
+
+  > *:not(summary) {
+    margin-top: 0.75rem;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem 0.25rem;
+    font-weight: 600;
+    color: $hepix-navy;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "\25B8"; // right-pointing triangle
+      display: inline-block;
+      color: $hepix-accent;
+      font-size: 0.9em;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      color: $hepix-accent;
+    }
+  }
+
+  &[open] > summary::before {
+    transform: rotate(90deg);
+  }
+}
+
 @media only screen and (max-width: 600px) {
   .tes-controls {
     flex-direction: column;
@@ -125,6 +174,8 @@
   }
 
   .tes-plot__canvas {
-    min-height: 460px;
+    // Taller on mobile: the legend sits below the plot, so the square
+    // plotting area needs extra vertical room to stay readable.
+    min-height: 620px;
   }
 }

@@ -44,8 +44,8 @@ to zoom, pan, autoscale or download a PNG.
 
 {% include time-energy-plot.html %}
 
-<details class="metrics-toggle">
-<summary>Reference plot presented at HEPiX Spring 2026 (Lisbon)</summary>
+<details class="tes-reference">
+<summary>Show static reference plot (HEPiX Spring 2026, Lisbon)</summary>
 
 <p>Static version of this analysis, as presented at the HEPiX Spring 2026
 workshop in Lisbon.</p>
@@ -64,31 +64,17 @@ Units (PDUs); accuracy depends on the server's hardware and firmware.  -->
 
 ## How the metrics are defined
 
-The two metrics are built from a few measured quantities:
+The two metrics are built from a few measured quantities: the number of events
+to process (T<sub>Nevt</sub>), throughput (Th, events/second), electric power
+(W, Watts) and the HEPScore23 (a throughput proxy). Because throughput is
+proportional to HEPScore23, the relative expressions simplify to the HS23 ratios
+shown below.
 
-| Symbol | Meaning |
-|--------|---------|
-| T<sub>Nevt</sub> | Total number of events to process |
-| Th | Throughput (events / second) |
-| W | Electric power (Watts) |
-| HS23 | HEPScore23 (throughput proxy) |
+| Comparison | Time to solution | Energy to solution |
+|---|---|---|
+| **Absolute** (server 0) | T<sub>Nevt</sub> / Th<sub>0</sub> | T<sub>Nevt</sub> &middot; W<sub>0</sub> / Th<sub>0</sub> |
+| **Relative to reference** (_j_ vs. 0) | &asymp; 1 / HS23<sub>j</sub> | &asymp; (W<sub>j</sub> / W<sub>0</sub>) &middot; (1 / HS23<sub>j</sub>) |
+| **Server-to-server** (_j_ vs. _i_) | HS23<sub>i</sub> / HS23<sub>j</sub> | (W<sub>j</sub> / W<sub>i</sub>) &middot; (HS23<sub>i</sub> / HS23<sub>j</sub>) |
 
-**1. Absolute metrics (for a base server 0)**
-
-> Time to solution: &nbsp; TtS<sub>0</sub> = T<sub>Nevt</sub> / Th<sub>0</sub>
->
-> Energy to solution: &nbsp; EtS<sub>0</sub> = T<sub>Nevt</sub> &middot; W<sub>0</sub> / Th<sub>0</sub>
-
-**2. Relative to a reference (server _j_ vs. server 0)**
-
-Because throughput is proportional to the HEPScore23, the ratios simplify to:
-
-> Relative time to solution: &nbsp; rTtS<sub>j</sub> = TtS<sub>j</sub> / TtS<sub>0</sub> &asymp; 1 / HS23<sub>j</sub>
->
-> Relative energy to solution: &nbsp; rEtS<sub>j</sub> = EtS<sub>j</sub> / EtS<sub>0</sub> &asymp; (W<sub>j</sub> / W<sub>0</sub>) &middot; (1 / HS23<sub>j</sub>)
-
-**3. Server-to-server (server _j_ vs. server _i_)**
-
-> Relative time to solution: &nbsp; rTtS<sub>ji</sub> = HS23<sub>i</sub> / HS23<sub>j</sub>
->
-> Relative energy to solution: &nbsp; rEtS<sub>ji</sub> = (W<sub>j</sub> / W<sub>i</sub>) &middot; (HS23<sub>i</sub> / HS23<sub>j</sub>)
+On the plot above, each point uses the *relative to reference* row, with the
+reference being the fastest power-reporting configuration in the dataset.

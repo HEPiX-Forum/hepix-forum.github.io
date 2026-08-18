@@ -256,31 +256,58 @@
     return traces;
   };
 
+  var isMobile = function () {
+    return window.matchMedia('(max-width: 600px)').matches;
+  };
+
   var layout = function () {
     var scale = controls.scale.value;
+    var mobile = isMobile();
+    var axisTitleFont = { size: mobile ? 12 : 14 };
+    var tickFont = { size: mobile ? 10 : 12 };
+
+    var legend = mobile
+      ? {
+          title: { text: '' },
+          orientation: 'h',
+          x: 0,
+          xanchor: 'left',
+          y: -0.22,
+          yanchor: 'top',
+          font: { size: 10 },
+          itemwidth: 30
+        }
+      : {
+          title: { text: 'Legend' },
+          orientation: 'v',
+          x: 1.02,
+          y: 1,
+          font: { size: 11 }
+        };
+
     return {
-      margin: { l: 70, r: 20, t: 20, b: 60 },
+      margin: mobile
+        ? { l: 52, r: 12, t: 10, b: 48 }
+        : { l: 70, r: 20, t: 20, b: 60 },
       hovermode: 'closest',
       hoverlabel: { align: 'left', bgcolor: '#ffffff', bordercolor: '#e2e8f0' },
       xaxis: {
-        title: { text: 'Time to solution (relative)' },
+        title: { text: 'Time to solution (relative)', font: axisTitleFont },
         type: scale === 'log' ? 'log' : 'linear',
         gridcolor: '#e2e8f0',
-        zeroline: false
+        zeroline: false,
+        tickfont: tickFont,
+        automargin: true
       },
       yaxis: {
-        title: { text: 'Energy to solution (relative)' },
+        title: { text: 'Energy to solution (relative)', font: axisTitleFont },
         type: scale === 'log' ? 'log' : 'linear',
         gridcolor: '#e2e8f0',
-        zeroline: false
+        zeroline: false,
+        tickfont: tickFont,
+        automargin: true
       },
-      legend: {
-        title: { text: 'Legend' },
-        orientation: 'v',
-        x: 1.02,
-        y: 1,
-        font: { size: 11 }
-      },
+      legend: legend,
       font: { family: 'Inter, sans-serif', color: '#1e293b' },
       paper_bgcolor: '#ffffff',
       plot_bgcolor: '#ffffff'
@@ -325,6 +352,23 @@
     controls.fit.checked = true;
     render();
   });
+
+  var wasMobile = isMobile();
+  var mq = window.matchMedia('(max-width: 600px)');
+  var onBreakpoint = function () {
+    var nowMobile = isMobile();
+    if (nowMobile !== wasMobile) {
+      wasMobile = nowMobile;
+      if (rendered) {
+        Plotly.relayout(canvas, layout());
+      }
+    }
+  };
+  if (mq.addEventListener) {
+    mq.addEventListener('change', onBreakpoint);
+  } else if (mq.addListener) {
+    mq.addListener(onBreakpoint);
+  }
 
   render();
 })();
