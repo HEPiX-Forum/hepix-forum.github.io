@@ -1,0 +1,87 @@
+<div class="tes-plot" id="tes-plot-root">
+  <div class="tes-controls" role="group" aria-label="Plot controls">
+    <label class="tes-control">
+      <span class="tes-control__label">Colour by</span>
+      <select id="tes-colorby" class="tes-select">
+        <option value="model">CPU model</option>
+        <option value="site">Site</option>
+        <option value="vendor">Vendor</option>
+        <option value="smt">SMT</option>
+      </select>
+    </label>
+
+    <label class="tes-control">
+      <span class="tes-control__label">Site</span>
+      <select id="tes-site" class="tes-select" multiple size="1" aria-label="Filter by site"></select>
+    </label>
+
+    <label class="tes-control">
+      <span class="tes-control__label">SMT</span>
+      <select id="tes-smt" class="tes-select">
+        <option value="all">All</option>
+        <option value="on">Enabled</option>
+        <option value="off">Disabled</option>
+      </select>
+    </label>
+
+    <label class="tes-control">
+      <span class="tes-control__label">Axis scale</span>
+      <select id="tes-scale" class="tes-select">
+        <option value="log">Log-log</option>
+        <option value="linear">Linear</option>
+      </select>
+    </label>
+
+    <label class="tes-control tes-control--search">
+      <span class="tes-control__label">CPU search</span>
+      <input id="tes-search" class="tes-input" type="search" placeholder="e.g. EPYC 9654" />
+    </label>
+
+    <label class="tes-control tes-control--checkbox">
+      <input id="tes-fit" type="checkbox" checked />
+      <span class="tes-control__label">Power-law fit</span>
+    </label>
+
+    <button type="button" id="tes-reset" class="tes-btn">Reset</button>
+  </div>
+
+  <div id="tes-plot" class="tes-plot__canvas" role="img"
+       aria-label="Interactive scatter plot of relative energy to solution versus relative time to solution"></div>
+
+  <p class="tes-plot__meta"><span id="tes-count">0</span> configurations shown</p>
+
+  <noscript>
+    <p>This interactive plot requires JavaScript. A static version is available in the reference section below.</p>
+  </noscript>
+</div>
+
+<script id="tes-data" type="application/json">
+[
+{% assign tes_rows = site.data.HS23scores | where_exp: "row", "row.relative_energy_to_solution" -%}
+{% for row in tes_rows -%}
+  {
+    "cpu": {{ row.CPU | jsonify }},
+    "site": {{ row.Site | jsonify }},
+    "smt": {{ row["SMT enabled"] | jsonify }},
+    "sockets": {{ row["# Sockets"] | jsonify }},
+    "cores_per_socket": {{ row["Cores/Socket"] | jsonify }},
+    "threads_per_core": {{ row["Threads/core"] | jsonify }},
+    "ncores": {{ row.Ncores | jsonify }},
+    "ram": {{ row.RAM | jsonify }},
+    "power_policy": {{ row["Power Policy"] | jsonify }},
+    "meas": {{ row["# Meas"] | jsonify }},
+    "score": {{ row.Score | jsonify }},
+    "score_per_ncores": {{ row["Score/Ncores"] | jsonify }},
+    "spread": {{ row.Spread | jsonify }},
+    "power_mean": {{ row.electric_power_mean | jsonify }},
+    "power_std": {{ row.electric_power_std | jsonify }},
+    "hs23_per_w": {{ row["HS23/W"] | jsonify }},
+    "w_per_hs23": {{ row["W/HS23"] | jsonify }},
+    "x": {{ row.relative_time_to_solution | jsonify }},
+    "y": {{ row.relative_energy_to_solution | jsonify }},
+    "first_date": {{ row.first_date | jsonify }},
+    "last_date": {{ row.last_date | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor -%}
+]
+</script>

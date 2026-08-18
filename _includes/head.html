@@ -71,6 +71,11 @@
 <script src="{{ "js/materialize.min.js" | relative_url }}"></script>
 <script src="{{ "js/init.js" | relative_url }}"></script>
 
+<!--Plotly for the interactive Time & Energy to Solution plot-->
+{%- if page.plotly == true -%}
+<script src="{{ "js/plotly-basic.min.js" | relative_url }}"></script>
+{%- endif -%}
+
 <!--The lines below help include JQuery DataTables into Markdown files-->
 {%- if page.datatable == true -%}
 <link rel="stylesheet" href="{{ "/css/jquery.dataTables.css" | relative_url }}" />
