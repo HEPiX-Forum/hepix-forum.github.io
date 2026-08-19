@@ -119,6 +119,10 @@
     .map(function (r) { return r.site; })
     .filter(function (v, i, a) { return v && a.indexOf(v) === i; })
     .sort();
+  var allSitesOpt = document.createElement('option');
+  allSitesOpt.value = '';
+  allSitesOpt.textContent = 'All sites';
+  controls.site.appendChild(allSitesOpt);
   sites.forEach(function (s) {
     var opt = document.createElement('option');
     opt.value = s;
@@ -134,16 +138,16 @@
   };
 
   var fmt = function (v) {
-    return v === null || v === undefined || v === '' ? '&ndash;' : esc(v);
+    return v === null || v === undefined || v === '' ? '\u2013' : esc(v);
   };
 
   var hoverFor = function (r) {
-    var power = r.powerMean === null ? '&ndash;' :
-      esc(r.powerMean) + (r.powerStd !== null ? ' &plusmn; ' + esc(r.powerStd) : '') + ' W';
+    var power = r.powerMean === null ? '\u2013' :
+      esc(r.powerMean) + (r.powerStd !== null ? ' \u00b1 ' + esc(r.powerStd) : '') + ' W';
     return [
       '<b>' + esc(r.cpu) + '</b>',
       'Site: ' + fmt(r.site) + '   |   SMT: ' + (r.smtOn ? 'enabled' : 'disabled'),
-      'Layout: ' + fmt(r.sockets) + ' socket(s) &times; ' + fmt(r.coresPerSocket) +
+      'Layout: ' + fmt(r.sockets) + ' socket(s) \u00d7 ' + fmt(r.coresPerSocket) +
         ' cores, ' + fmt(r.threadsPerCore) + ' thr/core (' + fmt(r.ncores) + ' cores)',
       'RAM: ' + fmt(r.ram) + '   |   Power policy: ' + fmt(r.powerPolicy),
       'HS23 score: ' + fmt(r.score) + '   |   Power: ' + power,
@@ -151,19 +155,17 @@
       'Rel. time to solution: ' + fmt(r.x),
       'Rel. energy to solution: ' + fmt(r.y),
       'Measurements: ' + fmt(r.meas),
-      'Measured: ' + fmt(r.firstDate) + ' &rarr; ' + fmt(r.lastDate)
+      'Measured: ' + fmt(r.firstDate) + ' \u2192 ' + fmt(r.lastDate)
     ].join('<br>') + '<extra></extra>';
   };
 
   var currentFilter = function () {
-    var selectedSites = Array.prototype.slice
-      .call(controls.site.selectedOptions)
-      .map(function (o) { return o.value; });
+    var selectedSite = controls.site.value;
     var smtMode = controls.smt.value;
     var query = (controls.search.value || '').trim().toLowerCase();
 
     return rows.filter(function (r) {
-      if (selectedSites.length && selectedSites.indexOf(r.site) === -1) return false;
+      if (selectedSite && r.site !== selectedSite) return false;
       if (smtMode === 'on' && !r.smtOn) return false;
       if (smtMode === 'off' && r.smtOn) return false;
       if (query && r.cpu.toLowerCase().indexOf(query) === -1) return false;
@@ -290,7 +292,12 @@
         ? { l: 52, r: 12, t: 10, b: 48 }
         : { l: 70, r: 20, t: 20, b: 60 },
       hovermode: 'closest',
-      hoverlabel: { align: 'left', bgcolor: '#ffffff', bordercolor: '#e2e8f0' },
+      hoverlabel: {
+        align: 'left',
+        bgcolor: '#ffffff',
+        bordercolor: '#e2e8f0',
+        font: { color: '#1e293b', size: 12, family: 'Inter, sans-serif' }
+      },
       xaxis: {
         title: { text: 'Time to solution (relative)', font: axisTitleFont },
         type: scale === 'log' ? 'log' : 'linear',
@@ -345,7 +352,7 @@
   controls.search.addEventListener('input', render);
   controls.reset.addEventListener('click', function () {
     controls.colorby.value = 'model';
-    Array.prototype.forEach.call(controls.site.options, function (o) { o.selected = false; });
+    controls.site.value = '';
     controls.smt.value = 'all';
     controls.scale.value = 'log';
     controls.search.value = '';
