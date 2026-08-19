@@ -54,28 +54,41 @@
   }
 }
 
+// Reset any Materialize form styling so both inputs and selects render as
+// identical, consistently-sized controls across Chrome and Firefox.
 .tes-select,
 .tes-input {
+  box-sizing: border-box;
+  display: block;
+  width: auto;
   height: 38px;
+  margin: 0;
   padding: 6px 10px;
   border: 1px solid #d1d5db;
   border-radius: $hepix-radius-sm;
   background: #ffffff;
   font-size: 0.9rem;
+  line-height: 1.4;
   color: $hepix-text;
-  display: block;
+  box-shadow: none;
 }
 
-.tes-select[multiple] {
-  height: auto;
-  min-height: 38px;
-  max-height: 110px;
+// High-specificity override: Materialize's normalize sets
+// `input[type="search"] { box-sizing: content-box; -webkit-appearance: textfield; }`
+// which would otherwise add padding/border on top of our fixed height (making
+// the field taller than the other controls) and restore the native look.
+input.tes-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 38px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .tes-select:focus,
 .tes-input:focus {
   outline: none;
-  border-color: $hepix-accent;
+  border: 1px solid $hepix-accent;
   box-shadow: 0 0 0 2px rgba($hepix-accent, 0.18);
 }
 
@@ -170,6 +183,10 @@ details.tes-reference {
   }
 
   .tes-control {
+    width: 100%;
+  }
+
+  .tes-select {
     width: 100%;
   }
 
