@@ -362,7 +362,7 @@
     controls.smt.value = 'all';
     controls.scale.value = 'log';
     controls.search.value = '';
-    controls.fit.checked = true;
+    controls.fit.checked = false;
     render();
   });
 

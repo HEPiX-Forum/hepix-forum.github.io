@@ -52,6 +52,10 @@
       accent-color: $hepix-accent;
     }
   }
+
+  &[hidden] {
+    display: none !important;
+  }
 }
 
 // Reset any Materialize form styling so both inputs and selects render as
