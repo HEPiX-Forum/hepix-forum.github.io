@@ -64,6 +64,17 @@
                                      background: #f0f7ff; }
   .dropzone p { margin: 4px 0; }
   .dropzone .muted { color: var(--muted); font-size: 13px; }
+  .drop-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) {
+    .drop-row { grid-template-columns: 1fr; }
+  }
+  .hero .cmp-line { font-size: 22px; font-weight: 700; line-height: 1.25; }
+  .hero .cmp-tag { display: inline-block; min-width: 1.4em; font-size: 12px;
+                   font-weight: 600; opacity: 0.75; margin-right: 6px; }
+  .hero .up { color: #b7f0c2; }
+  .hero .down { color: #ffc9c9; }
+  td.up { color: #22863a; font-weight: 600; }
+  td.down { color: #cb2431; font-weight: 600; }
   .dz-btn { display: inline-block; background: var(--accent); color: #fff;
             padding: 8px 18px; border-radius: 6px; font-weight: 600;
             margin-top: 8px; font-size: 13px; }
@@ -77,6 +88,12 @@
            color: #86181d; padding: 12px 16px; border-radius: 6px;
            margin-bottom: 16px; font-size: 13px; }
   .hidden { display: none !important; }
+  .paste-card { margin-top: 16px; }
+  .paste-card h2 { border-bottom: none; padding-bottom: 0; margin-bottom: 8px; }
+  textarea.json-paste { width: 100%; min-height: 140px; resize: vertical;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px; line-height: 1.45; border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 12px; background: #fff; color: var(--fg); }
   footer { text-align: center; color: var(--muted); font-size: 12px;
            margin-top: 24px; }
 </style>
@@ -86,27 +103,61 @@
 
 <header style="margin-bottom:16px">
   <h1>HEPscore23 report viewer</h1>
-  <div class="sub">Drop a HEPscore benchmark JSON to render an interactive summary. Everything runs in your browser — the file never leaves your machine.</div>
+  <div class="sub">Drop or paste a HEPscore benchmark JSON — suite output or an OpenSearch hit — to render an interactive summary. Add a second JSON to compare two runs. Everything runs in your browser; nothing is uploaded.</div>
 </header>
 
+<div id="error" class="error hidden"></div>
+
 <div id="landing">
-  <div id="dropzone" class="dropzone">
-    <p style="font-size:32px; margin-bottom:4px">📊</p>
-    <p><strong>Drop a benchmark JSON here</strong></p>
-    <p class="muted">or click to choose a file · accepts HEP Benchmark Suite v3.x output</p>
-    <input id="fileInput" type="file" accept=".json,application/json" hidden>
-    <span class="dz-btn">Choose file…</span>
-    <p class="muted" style="margin-top:14px">
-      No file? <a href="#" id="sampleLink">Load the example run</a>.
-    </p>
+  <div class="drop-row">
+    <div id="dropzone" class="dropzone">
+      <p style="font-size:32px; margin-bottom:4px">📊</p>
+      <p><strong>Drop a benchmark JSON here</strong></p>
+      <p class="muted">or click to choose a file · suite JSON or an OpenSearch hit</p>
+      <input id="fileInput" type="file" accept=".json,application/json" multiple hidden>
+      <span class="dz-btn">Choose file…</span>
+      <p class="muted" id="slotAName"></p>
+      <p class="muted" style="margin-top:14px">
+        No file? <a href="#" id="sampleLink">Load the example run</a>.
+      </p>
+    </div>
+    <div id="dropzoneB" class="dropzone">
+      <p style="font-size:32px; margin-bottom:4px">⚖️</p>
+      <p><strong>Add a second JSON to compare</strong></p>
+      <p class="muted">optional · same formats as the first file</p>
+      <input id="fileInputB" type="file" accept=".json,application/json" multiple hidden>
+      <span class="dz-btn">Choose file…</span>
+      <p class="muted" id="slotBName"></p>
+    </div>
   </div>
-  <div id="error" class="error hidden"></div>
+  <div class="card paste-card">
+    <h2>Or paste JSON</h2>
+    <p class="sub" style="margin:0 0 8px">Suite output or an OpenSearch hit. Nothing is uploaded.</p>
+    <textarea id="pasteInput" class="json-paste" spellcheck="false"
+      placeholder="Paste a benchmark JSON here…"></textarea>
+    <div class="toolbar" style="margin:10px 0 0">
+      <button type="button" id="btnPasteA">Load as first run</button>
+      <button type="button" id="btnPasteB">Load as comparison</button>
+    </div>
+  </div>
 </div>
 
 <div id="report" class="hidden">
   <div class="toolbar">
     <button id="btnNew">← Load another file</button>
+    <button id="btnCompare">Compare with another JSON</button>
+    <button id="btnPasteToggle" type="button">Paste JSON</button>
     <button id="btnDownload">Download as standalone HTML</button>
+    <input id="fileInputCompare" type="file" accept=".json,application/json" hidden>
+  </div>
+  <div id="pasteReport" class="card hidden" style="margin-bottom:16px">
+    <h2>Paste JSON</h2>
+    <textarea id="pasteReportInput" class="json-paste" spellcheck="false"
+      placeholder="Paste a benchmark JSON here…"></textarea>
+    <div class="toolbar" style="margin:10px 0 0">
+      <button type="button" id="btnPasteReportA">Replace first run</button>
+      <button type="button" id="btnPasteReportB">Use as comparison</button>
+    </div>
   </div>
   <div id="reportBody"></div>
 </div>
@@ -122,16 +173,19 @@
 // HEP Benchmark Suite report viewer
 // -------------------------------------------------------------
 // A single-file, client-side viewer for the JSON produced by the
-// HEP Benchmark Suite (v3.x). Everything runs in the browser; the
-// dropped file is never uploaded.
+// HEP Benchmark Suite (v3.x), or the same document wrapped as an OpenSearch
+// hit (`_source.message`) or search response (`hits.hits[0]`). Everything
+// runs in the browser; dropped files are never uploaded.
 //
 // Pipeline (top to bottom in this file):
 //   1. Helpers           — small pure utilities (stats, formatting, escaping).
-//   2. parseReport(data) — turns the raw suite JSON into a flat, render-ready
+//   2. unwrapSuite(data) — peels an OpenSearch wrapper down to the suite JSON.
+//   3. parseReport(data) — turns the raw suite JSON into a flat, render-ready
 //                          object `r` (scores, host/HW info, telemetry series).
-//   3. renderHTML(r)     — builds the report HTML string + chart specs.
-//   4. drawCharts(specs) — renders the telemetry line charts with Chart.js.
-//   5. UI wiring         — drag & drop, sample loading, standalone export.
+//   4. renderHTML(r)     — builds the single-report HTML string + chart specs.
+//   5. renderComparison  — one view for two reports: deltas and overlaid series.
+//   6. drawCharts(specs) — renders the telemetry line charts with Chart.js.
+//   7. UI wiring         — drag & drop, sample loading, standalone export.
 //
 // Relevant shape of the suite JSON:
 //   {
@@ -192,6 +246,62 @@ function get(obj, path, def) {
 function esc(s) {
   return String(s ?? "—").replace(/[&<>"']/g,
     c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// Signed formatting for comparison deltas. Missing values stay an em dash.
+function fmtSigned(x, d) {
+  if (x === null || x === undefined || Number.isNaN(x)) return "—";
+  const body = fmt(Math.abs(x), d);
+  if (x > 0) return "+" + body;
+  if (x < 0) return "-" + body;
+  return body;
+}
+
+function deltaNum(a, b) {
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+  return b - a;
+}
+function deltaPct(a, b) {
+  if (!Number.isFinite(a) || !Number.isFinite(b) || a === 0) return null;
+  return ((b - a) / Math.abs(a)) * 100;
+}
+function deltaLine(a, b) {
+  const d = deltaNum(a, b);
+  if (d === null) return "—";
+  const p = deltaPct(a, b);
+  return p === null ? fmtSigned(d) : `${fmtSigned(d)} (${fmtSigned(p, 1)}%)`;
+}
+
+// A success checkmark only for a completed run. Failed OpenSearch documents
+// (status "failed", score -1) stay readable without looking successful.
+function statusText(status) {
+  const s = String(status || "—");
+  return /^(ok|success|succeeded|passed)$/i.test(s) ? `✓ ${s}` : s;
+}
+
+function reportHasContent(r) {
+  return Number.isFinite(r.score) || (r.hostname && r.hostname !== "—") || !!r.profileKey;
+}
+
+// Peel OpenSearch wrappers down to the suite document parseReport expects.
+// A bare suite JSON is returned unchanged. A search response uses the first hit.
+function unwrapSuite(data) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("JSON must be an object");
+  }
+  const hits = data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : null;
+  if (hits && hits.length) return unwrapSuite(hits[0]);
+  const message = data._source && data._source.message;
+  if (message && typeof message === "object" && !Array.isArray(message) &&
+      (message.host || message.profiles || message.suite)) {
+    return message;
+  }
+  const source = data._source;
+  if (source && typeof source === "object" && !Array.isArray(source) &&
+      (source.host || source.profiles)) {
+    return source;
+  }
+  return data;
 }
 
 // -------------------------------------------------------------
@@ -541,7 +651,7 @@ function parseReport(data) {
     tsStart: data._timestamp || "",
     tsEnd: data._timestamp_end || "",
     hostname: host.hostname || "—",
-    ip: host.ip || "—",
+    ip: (Array.isArray(host.ip) ? host.ip.filter(Boolean).join(", ") : host.ip) || "—",
     site: get(host, ["tags", "site"], "—"),
     osLabel: `${os_.id || "?"} ${get(os_, ["version", "major"], "?")}.${get(os_, ["version", "minor"], "?")}`,
     kernel: `${kern.version || "?"}.${kern.major || "?"}.${kern.minor || "?"}-${kern.ABI || "?"}`,
@@ -712,7 +822,7 @@ function renderHTML(r) {
     <div><strong>CPU:</strong> ${esc(r.cpuModel)} · ${r.cpuTotal} CPUs
          (${r.cpuSockets}S × ${r.cpuCores}C × ${r.cpuThreadsPerCore}T)</div>
     <div><strong>GPU:</strong> ${esc(r.gpu)}</div>
-    <div><strong>Status:</strong> ✓ ${esc(r.status)}</div>
+    <div><strong>Status:</strong> ${esc(statusText(r.status))}</div>
   </div>
 </div>`;
 
@@ -846,6 +956,191 @@ function renderHTML(r) {
   return { html: hero + hostCard + telemetry + bench + meta, specs };
 }
 
+// -------------------------------------------------------------
+// Comparison — one view for two already-parsed reports.
+// Delta is always B − A. Telemetry x-axis is percent of each run.
+// -------------------------------------------------------------
+
+function runLabel(r, filename) {
+  const host = r.hostname && r.hostname !== "—" ? r.hostname : (filename || "run");
+  const date = (r.tsStart || "").slice(0, 10);
+  return date ? `${host} · ${date}` : host;
+}
+
+function toPercentPoints(values) {
+  const n = values.length;
+  return values.map((y, i) => ({ x: n <= 1 ? 0 : (i / (n - 1)) * 100, y }));
+}
+
+function meanCaption(s) {
+  if (!s || !s.values || !s.values.length) return "—";
+  const m = mean(s.values);
+  return m === null ? "—" : fmt(m);
+}
+
+function renderComparison(entryA, entryB) {
+  const a = entryA.r;
+  const b = entryB.r;
+  let labelA = runLabel(a, entryA.filename);
+  let labelB = runLabel(b, entryB.filename);
+  if (labelA === labelB) {
+    labelA += " (A)";
+    labelB += " (B)";
+  }
+  const scoreLabel = a.profileLabel && b.profileLabel && a.profileLabel !== b.profileLabel
+    ? `${a.profileLabel} / ${b.profileLabel}`
+    : (a.profileLabel || b.profileLabel || "Benchmark");
+  const unit = a.scoreUnit || b.scoreUnit || "";
+
+  function cmpMetric(label, va, vb) {
+    const d = deltaNum(va, vb);
+    const cls = d === null || d === 0 ? "" : (d > 0 ? "up" : "down");
+    return `
+      <div class="hero-metric">
+        <div class="score-label">${esc(label)}</div>
+        <div class="cmp-line"><span class="cmp-tag">A</span>${esc(fmt(va))}</div>
+        <div class="cmp-line"><span class="cmp-tag">B</span>${esc(fmt(vb))}</div>
+        <div class="hero-sub ${cls}">Δ ${esc(deltaLine(va, vb))}</div>
+      </div>`;
+  }
+
+  function runCard(tag, label, r, filename) {
+    const mem = Number.isFinite(r.memTotalMb) && r.memTotalMb > 0
+      ? `${(r.memTotalMb / 1024).toFixed(1)} GiB` : "—";
+    return `
+      <div class="card">
+        <h2>${esc(tag)} · ${esc(label)}</h2>
+        ${filename ? `<div class="sub" style="margin:-8px 0 10px">${esc(filename)}</div>` : ""}
+        <dl class="kv">
+          <dt>Host</dt><dd>${esc(r.hostname)} @ ${esc(r.site)}</dd>
+          <dt>CPU</dt><dd>${esc(r.cpuModel)}</dd>
+          <dt>Cores</dt><dd>${esc(r.ncores)}</dd>
+          <dt>Memory</dt><dd>${mem}</dd>
+          <dt>GPU</dt><dd>${esc(r.gpu)}</dd>
+          <dt>Status</dt><dd>${esc(statusText(r.status))}</dd>
+          <dt>Run window</dt><dd>${esc(r.tsStart)} → ${esc(r.tsEnd)}</dd>
+        </dl>
+      </div>`;
+  }
+
+  const hero = `
+<header>
+  <h1>Comparison · ${esc(labelA)} vs ${esc(labelB)}
+    <span class="badge">Benchmark type: ${esc(scoreLabel)}</span>
+  </h1>
+  <div class="sub">A is ${esc(labelA)} · B is ${esc(labelB)} · delta is B − A</div>
+</header>
+<div class="hero">
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
+    ${cmpMetric(`${scoreLabel} · total${unit ? " (" + unit + ")" : ""}`, a.score, b.score)}
+    ${cmpMetric("Score / core", a.scorePerCore, b.scorePerCore)}
+    ${cmpMetric("Score / W", a.scorePerWatt, b.scorePerWatt)}
+  </div>
+</div>`;
+
+  const runs = `
+<section>
+  <h2>Runs</h2>
+  <div class="grid grid-2">
+    ${runCard("A", labelA, a, entryA.filename)}
+    ${runCard("B", labelB, b, entryB.filename)}
+  </div>
+</section>`;
+
+  const mapA = new Map((a.benchmarks || []).map(item => [item.name, item]));
+  const mapB = new Map((b.benchmarks || []).map(item => [item.name, item]));
+  const names = [];
+  for (const name of [...mapA.keys(), ...mapB.keys()]) {
+    if (!names.includes(name)) names.push(name);
+  }
+  const scoreCell = item => (item && Number.isFinite(item.score)) ? item.score.toFixed(4) : "—";
+  const bench = names.length ? `
+<section>
+  <h2>${esc(scoreLabel)} workload results</h2>
+  <div class="sub" style="margin-bottom:14px">${names.length} benchmarks · delta is B − A</div>
+  <div class="card" style="padding:0">
+  <table>
+    <thead><tr>
+      <th>Benchmark</th><th>Kind</th>
+      <th class="num">Score A</th><th class="num">Score B</th>
+      <th class="num">Δ</th><th class="num">Δ %</th>
+    </tr></thead>
+    <tbody>
+      ${names.map(name => {
+        const ba = mapA.get(name);
+        const bb = mapB.get(name);
+        const sa = ba && Number.isFinite(ba.score) ? ba.score : NaN;
+        const sb = bb && Number.isFinite(bb.score) ? bb.score : NaN;
+        const d = deltaNum(sa, sb);
+        const p = deltaPct(sa, sb);
+        const cls = d === null || d === 0 ? "" : (d > 0 ? "up" : "down");
+        const kind = (ba && ba.kind) || (bb && bb.kind) || "—";
+        return `
+        <tr>
+          <td><strong>${esc(name)}</strong></td>
+          <td><code>${esc(kind)}</code></td>
+          <td class="num">${scoreCell(ba)}</td>
+          <td class="num">${scoreCell(bb)}</td>
+          <td class="num ${cls}">${d === null ? "—" : esc(fmtSigned(d, 4))}</td>
+          <td class="num ${cls}">${p === null ? "—" : esc(fmtSigned(p, 1) + "%")}</td>
+        </tr>`;
+      }).join("")}
+    </tbody>
+  </table>
+  </div>
+</section>` : `
+<section>
+  <h2>${esc(scoreLabel)} workload results</h2>
+  <div class="card"><em>No per-workload breakdown found in either report.</em></div>
+</section>`;
+
+  const COLOR_A = "rgb(3, 102, 214)";
+  const COLOR_B = "rgb(203, 36, 49)";
+  const keys = [];
+  for (const key of [...(a.metricKeys || []), ...(b.metricKeys || [])]) {
+    if (!keys.includes(key)) keys.push(key);
+  }
+  const specs = keys.map(key => {
+    const sA = a.series && a.series[key];
+    const sB = b.series && b.series[key];
+    const meta = (a.metricMeta && a.metricMeta[key]) || (b.metricMeta && b.metricMeta[key]) || {};
+    const unitText = meta.unit || (sA && sA.unit) || (sB && sB.unit) || "";
+    const series = [];
+    if (sA && sA.values && sA.values.length) {
+      series.push({ label: labelA, color: COLOR_A, points: toPercentPoints(sA.values) });
+    }
+    if (sB && sB.values && sB.values.length) {
+      series.push({ label: labelB, color: COLOR_B, points: toPercentPoints(sB.values) });
+    }
+    return {
+      id: chartIdFor(key),
+      mode: "compare",
+      title: meta.title || key,
+      unit: unitText,
+      series,
+      summary: `A mean ${meanCaption(sA)} · B mean ${meanCaption(sB)}`,
+    };
+  }).filter(spec => spec.series.length);
+
+  const telemetry = `
+<section>
+  <h2>System telemetry</h2>
+  ${specs.length === 0
+    ? `<div class="card"><em>No plugin time-series available in either report.</em></div>`
+    : `<div class="sub" style="margin-bottom:14px">${specs.length} metrics · time scaled to each run's own duration</div>
+       <div class="grid grid-2">
+         ${specs.map(c => `
+           <div class="card">
+             <h3>${esc(c.title)} (${esc(c.unit)})</h3>
+             <div class="sub" style="margin-bottom:6px">${esc(c.summary)}</div>
+             <div class="chart-wrap"><canvas id="${c.id}"></canvas></div>
+           </div>`).join("")}
+       </div>`}
+</section>`;
+
+  return { html: hero + runs + bench + telemetry, specs };
+}
+
 // Render the telemetry charts into the canvases created by renderHTML.
 // Defined as a standalone, dependency-free function on purpose: the "Download
 // as standalone HTML" button serializes it with `.toString()` and re-runs it
@@ -901,6 +1196,34 @@ function drawCharts(specs) {
   specs.forEach(cfg => {
     const el = document.getElementById(cfg.id);
     if (!el) return;
+    if (cfg.mode === "compare") {
+      const datasets = (cfg.series || []).map(s => ({
+        label: s.label,
+        data: s.points,
+        borderColor: s.color,
+        backgroundColor: s.color.replace("rgb", "rgba").replace(")", ",0.12)"),
+        borderWidth: 1.6, pointRadius: 0, tension: 0.15, fill: false,
+      }));
+      new Chart(el, {
+        type: "line",
+        data: { datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          parsing: { xAxisKey: "x", yAxisKey: "y" },
+          interaction: { mode: "nearest", intersect: false },
+          scales: {
+            x: { type: "linear", min: 0, max: 100,
+                 title: { display: true, text: "% of run" },
+                 ticks: { maxTicksLimit: 6 } },
+            y: { beginAtZero: true, title: { display: true, text: cfg.unit || "" } },
+          },
+          plugins: {
+            legend: { position: "top", labels: { boxWidth: 14, font: { size: 11 } } },
+          },
+        },
+      });
+      return;
+    }
     const datasets = [{
       label: cfg.unit,
       data: cfg.values,
@@ -940,8 +1263,8 @@ function drawCharts(specs) {
 // -------------------------------------------------------------
 // UI wiring — drag & drop, error display, and report lifecycle.
 // -------------------------------------------------------------
-const dz = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
+const fileInputB = document.getElementById("fileInputB");
 const landing = document.getElementById("landing");
 const landingFooter = document.getElementById("landingFooter");
 const report = document.getElementById("report");
@@ -950,6 +1273,9 @@ const errorBox = document.getElementById("error");
 // Holds the last successfully rendered report so the Download button can
 // re-serialize it into a standalone HTML file.
 let lastReport = null;
+// slotA is the primary run. slotB is optional and switches on comparison.
+let slotA = null;
+let slotB = null;
 
 function showError(msg) {
   errorBox.textContent = msg;
@@ -957,68 +1283,199 @@ function showError(msg) {
 }
 function clearError() { errorBox.classList.add("hidden"); }
 
-// Read a dropped/selected File as text and hand the parsed JSON to the renderer.
-function handleFile(file) {
-  clearError();
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      renderFromData(data);
-    } catch (err) {
-      showError(`Could not parse JSON: ${err.message}`);
-    }
-  };
-  reader.onerror = () => showError("Could not read the file.");
-  reader.readAsText(file);
+function fail(err) {
+  const msg = (err && err.message) ? err.message : String(err);
+  if (/^(Could not|No benchmark|JSON must)/.test(msg)) showError(msg);
+  else showError(`Failed to render: ${msg}`);
 }
 
-// Parse + render a report object: swaps the landing page for the report view,
-// draws the charts, and surfaces any failure as an inline error message.
-function renderFromData(data) {
-  try {
-    const r = parseReport(data);
-    if (!Number.isFinite(r.score)) {
-      throw new Error("No benchmark score found in profiles.* — is this the right JSON?");
-    }
-    const { html, specs } = renderHTML(r);
-    reportBody.innerHTML = html;
-    drawCharts(specs);
-    landing.classList.add("hidden");
-    landingFooter.classList.add("hidden");
-    report.classList.remove("hidden");
-    lastReport = { r, html, specs };
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  } catch (err) {
-    showError(`Failed to render: ${err.message}`);
+function destroyCharts() {
+  if (!window.Chart || !Chart.instances) return;
+  Object.values(Chart.instances).forEach(c => { try { c.destroy(); } catch (_) {} });
+}
+
+function showSlotNames() {
+  const a = document.getElementById("slotAName");
+  const b = document.getElementById("slotBName");
+  if (a) a.textContent = slotA ? `Loaded: ${slotA.filename}` : "";
+  if (b) {
+    b.textContent = !slotB ? ""
+      : slotA ? `Loaded: ${slotB.filename}`
+      : `Loaded: ${slotB.filename} — drop the first JSON to compare`;
   }
 }
 
-// Drop zone: click to open the file picker, plus drag-over highlighting.
-dz.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", e => {
-  if (e.target.files[0]) handleFile(e.target.files[0]);
-});
-["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => {
-  e.preventDefault(); e.stopPropagation(); dz.classList.add("hover");
-}));
-["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => {
-  e.preventDefault(); e.stopPropagation(); dz.classList.remove("hover");
-}));
-dz.addEventListener("drop", e => {
-  const f = e.dataTransfer.files && e.dataTransfer.files[0];
-  if (f) handleFile(f);
-});
+function readJson(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try { resolve(JSON.parse(reader.result)); }
+      catch (err) { reject(new Error(`Could not parse JSON: ${err.message}`)); }
+    };
+    reader.onerror = () => reject(new Error("Could not read the file."));
+    reader.readAsText(file);
+  });
+}
+
+function entryFrom(data, filename) {
+  const suite = unwrapSuite(data);
+  return { data: suite, r: parseReport(suite), filename: filename || "" };
+}
+
+const NO_SCORE = "No benchmark score found in profiles.* — is this the right JSON?";
+
+function renderSlots() {
+  if (!slotA) {
+    showSlotNames();
+    return;
+  }
+  const view = slotB ? renderComparison(slotA, slotB) : renderHTML(slotA.r);
+  destroyCharts();
+  reportBody.innerHTML = view.html;
+  drawCharts(view.specs);
+  landing.classList.add("hidden");
+  landingFooter.classList.add("hidden");
+  report.classList.remove("hidden");
+  const btn = document.getElementById("btnCompare");
+  if (btn) btn.textContent = slotB ? "Replace comparison JSON" : "Compare with another JSON";
+  lastReport = slotB
+    ? {
+        r: {
+          hostname: `${slotA.r.hostname}_vs_${slotB.r.hostname}`,
+          tsStart: slotA.r.tsStart || "",
+        },
+        html: view.html,
+        specs: view.specs,
+      }
+    : { r: slotA.r, html: view.html, specs: view.specs };
+  showSlotNames();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function applyEntry(slot, entry) {
+  if (slot === "a") {
+    if (!slotB && !Number.isFinite(entry.r.score)) throw new Error(NO_SCORE);
+    if (slotB && !reportHasContent(entry.r) && !reportHasContent(slotB.r)) throw new Error(NO_SCORE);
+    slotA = entry;
+  } else {
+    if (slotA && !reportHasContent(slotA.r) && !reportHasContent(entry.r)) throw new Error(NO_SCORE);
+    slotB = entry;
+  }
+  renderSlots();
+}
+
+async function loadSlot(slot, file) {
+  clearError();
+  try {
+    applyEntry(slot, entryFrom(await readJson(file), file.name));
+  } catch (err) {
+    fail(err);
+  }
+}
+
+function loadPasted(slot, textarea, filename) {
+  clearError();
+  try {
+    const trimmed = (textarea.value || "").trim();
+    if (!trimmed) throw new Error("Could not parse JSON: the box is empty.");
+    let data;
+    try { data = JSON.parse(trimmed); }
+    catch (err) { throw new Error(`Could not parse JSON: ${err.message}`); }
+    applyEntry(slot, entryFrom(data, filename));
+    textarea.value = "";
+  } catch (err) {
+    fail(err);
+  }
+}
+
+async function loadPair(fileA, fileB) {
+  clearError();
+  try {
+    const [dataA, dataB] = await Promise.all([readJson(fileA), readJson(fileB)]);
+    const entryA = entryFrom(dataA, fileA.name);
+    const entryB = entryFrom(dataB, fileB.name);
+    if (!reportHasContent(entryA.r) && !reportHasContent(entryB.r)) throw new Error(NO_SCORE);
+    slotA = entryA;
+    slotB = entryB;
+    renderSlots();
+  } catch (err) {
+    fail(err);
+  }
+}
+
+function bindDropzone(el, input, slot) {
+  input.addEventListener("click", e => e.stopPropagation());
+  el.addEventListener("click", e => {
+    if (e.target.closest("a")) return;
+    input.click();
+  });
+  input.addEventListener("change", e => {
+    const files = [...(e.target.files || [])];
+    e.target.value = "";
+    if (files.length >= 2) loadPair(files[0], files[1]);
+    else if (files[0]) loadSlot(slot, files[0]);
+  });
+  ["dragenter", "dragover"].forEach(ev => el.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); el.classList.add("hover");
+  }));
+  ["dragleave", "drop"].forEach(ev => el.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); el.classList.remove("hover");
+  }));
+  el.addEventListener("drop", e => {
+    const files = [...(e.dataTransfer.files || [])];
+    if (files.length >= 2) loadPair(files[0], files[1]);
+    else if (files[0]) loadSlot(slot, files[0]);
+  });
+}
+
+bindDropzone(document.getElementById("dropzone"), fileInput, "a");
+bindDropzone(document.getElementById("dropzoneB"), fileInputB, "b");
 
 // "Load another file": reset back to the landing/drop-zone state.
 document.getElementById("btnNew").addEventListener("click", () => {
+  destroyCharts();
+  slotA = null;
+  slotB = null;
+  lastReport = null;
   report.classList.add("hidden");
   landing.classList.remove("hidden");
   landingFooter.classList.remove("hidden");
   reportBody.innerHTML = "";
   fileInput.value = "";
+  fileInputB.value = "";
+  document.getElementById("fileInputCompare").value = "";
+  document.getElementById("pasteInput").value = "";
+  document.getElementById("pasteReportInput").value = "";
+  document.getElementById("pasteReport").classList.add("hidden");
+  const btn = document.getElementById("btnCompare");
+  if (btn) btn.textContent = "Compare with another JSON";
+  showSlotNames();
   clearError();
+});
+
+document.getElementById("btnCompare").addEventListener("click", () => {
+  document.getElementById("fileInputCompare").click();
+});
+document.getElementById("fileInputCompare").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (f) loadSlot("b", f);
+});
+
+document.getElementById("btnPasteA").addEventListener("click", () => {
+  loadPasted("a", document.getElementById("pasteInput"), "pasted.json");
+});
+document.getElementById("btnPasteB").addEventListener("click", () => {
+  loadPasted("b", document.getElementById("pasteInput"), "pasted comparison");
+});
+document.getElementById("btnPasteToggle").addEventListener("click", () => {
+  document.getElementById("pasteReport").classList.toggle("hidden");
+});
+document.getElementById("btnPasteReportA").addEventListener("click", () => {
+  loadPasted("a", document.getElementById("pasteReportInput"), "pasted.json");
+});
+document.getElementById("btnPasteReportB").addEventListener("click", () => {
+  loadPasted("b", document.getElementById("pasteReportInput"), "pasted comparison");
 });
 
 // "Download as standalone HTML": bundle the current report markup, the page
@@ -1061,7 +1518,12 @@ function loadSample() {
   clearError();
   fetch("/assets/hepscore-report/sample.json")
     .then(r => r.ok ? r.json() : Promise.reject(new Error("sample not available")))
-    .then(renderFromData)
+    .then(data => {
+      const entry = entryFrom(data, "sample.json");
+      if (!slotB && !Number.isFinite(entry.r.score)) throw new Error(NO_SCORE);
+      slotA = entry;
+      renderSlots();
+    })
     .catch(err => showError(`Could not load example: ${err.message}`));
 }
 
