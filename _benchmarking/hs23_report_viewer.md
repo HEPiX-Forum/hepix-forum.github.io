@@ -3,10 +3,11 @@ title: HS23 Report Viewer
 layout: page
 menu: HS23 Report Viewer
 description: |
-  Drop a HEPscore23 result JSON onto this page and get an interactive report
-  with the score, score per core, score per watt, plugin time series and
-  per-workload breakdown. Everything is rendered in your browser; nothing is
-  uploaded.
+  Drop or paste one or two HEPscore23 result JSON files onto this page. A single file
+  renders an interactive report with the score, score per core, score per watt,
+  plugin time series and per-workload breakdown. A second file compares the two
+  runs. Suite output and OpenSearch hit documents are both accepted. Everything
+  is rendered in your browser; nothing is uploaded.
 ---
 
 # {{ page.title }}
@@ -44,7 +45,8 @@ description: |
 </iframe>
 
 <p class="sub" style="margin-top: 14px; color: #586069; font-size: 13px;">
-  This viewer runs entirely client-side. Use the example JSON to preview the
-  report layout, or load your own <code>hepscore_result.json</code> after the
-  benchmark finishes.
+  This viewer runs entirely client-side. It accepts a suite
+  <code>hepscore_result.json</code> or an OpenSearch hit
+  (<code>_source.message</code>). Use the example JSON to preview the report
+  layout, paste a JSON document, or add a second file to compare two runs.
 </p>
