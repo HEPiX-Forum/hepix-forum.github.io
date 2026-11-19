@@ -96,6 +96,51 @@
     border-radius: 6px; padding: 10px 12px; background: #fff; color: var(--fg); }
   footer { text-align: center; color: var(--muted); font-size: 12px;
            margin-top: 24px; }
+
+  /* Raw JSON explorer */
+  .json-explorer { margin-top: 6px; }
+  .json-explorer + .json-explorer { margin-top: 16px; }
+  .je-toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;
+                align-items: center; }
+  .je-search { flex: 1 1 220px; min-width: 180px; border: 1px solid var(--border);
+               border-radius: 6px; padding: 7px 10px; font-size: 13px;
+               background: #fff; color: var(--fg); }
+  .je-btn { background: #fff; border: 1px solid var(--border); padding: 6px 12px;
+            border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 500;
+            color: var(--fg); }
+  .je-btn:hover { background: #f0f7ff; border-color: var(--accent); color: var(--accent); }
+  .je-tree { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+             font-size: 12.5px; line-height: 1.65; max-height: 560px; overflow: auto;
+             border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px;
+             background: #fbfcfd; }
+  .je-node { margin-left: 14px; }
+  .je-tree > .je-node { margin-left: 0; }
+  .je-row { display: block; white-space: pre-wrap; word-break: break-word; }
+  details.je-branch > summary { cursor: pointer; list-style: none; outline: none; }
+  details.je-branch > summary::-webkit-details-marker { display: none; }
+  details.je-branch > summary::before { content: "▸"; display: inline-block;
+       width: 1em; color: var(--muted); }
+  details.je-branch[open] > summary::before { content: "▾"; }
+  .je-key { color: #0b4aa2; }
+  .je-type { color: var(--muted); }
+  .je-str { color: #22863a; }
+  .je-num { color: #005cc5; }
+  .je-bool { color: #b08800; }
+  .je-null { color: var(--muted); font-style: italic; }
+  .je-preview { color: var(--muted); }
+  .je-copy { margin-left: 8px; font-size: 10px; color: var(--muted); cursor: pointer;
+             border: 1px solid var(--border); border-radius: 4px; padding: 0 5px;
+             background: #fff; visibility: hidden; }
+  .je-row:hover > .je-copy, summary:hover .je-copy { visibility: visible; }
+  .je-chunk { color: var(--muted); cursor: pointer; }
+  .je-hit { background: #fff5b1; border-radius: 3px; }
+  .je-results { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+  .je-result { display: block; padding: 2px 0; cursor: pointer;
+               font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+               font-size: 12px; color: var(--fg); }
+  .je-result:hover { color: var(--accent); }
+  .je-result .je-path { color: #0b4aa2; }
+  .je-empty { color: var(--muted); font-size: 12px; }
 </style>
 </head>
 <body>
@@ -435,7 +480,7 @@ function selectProfile(profiles) {
   if (profiles && profiles.hepscore) {
     return { key: "hepscore", label: "HEPscore23", obj: profiles.hepscore,
              score: get(profiles, ["hepscore", "score"], NaN),
-             unit: "HS06", status: get(profiles, ["hepscore", "status"], "—") };
+             unit: "", status: get(profiles, ["hepscore", "status"], "—") };
   }
   const keys = profiles ? Object.keys(profiles) : [];
   if (!keys.length) return { key: "", label: "Benchmark", obj: {}, score: NaN, unit: "", status: "—" };
@@ -596,6 +641,15 @@ function parseReport(data) {
       }
       if (bmScore === null) continue;
 
+      // Reference throughput for this workload (the "<kind>_ref" entry in
+      // wl-scores) and the relative score = throughput / reference.
+      let ref = null;
+      const refRaw = myScores[`${kind}_ref`];
+      if (refRaw !== undefined && refRaw !== null && !Number.isNaN(Number(refRaw))) {
+        ref = Number(refRaw);
+      }
+      const relative = (ref && ref > 0 && Number.isFinite(bmScore)) ? bmScore / ref : null;
+
       // Average duration across all "runN" entries that report one.
       const durations = [];
       for (const k of Object.keys(bm)) {
@@ -636,7 +690,7 @@ function parseReport(data) {
       } catch (_) { /* best-effort, ignore */ }
 
       benchmarks.push({
-        name, kind, score: bmScore,
+        name, kind, score: bmScore, ref, relative,
         runs: durations.length,
         avgDuration: durations.length ? mean(durations) : NaN,
         description: get(bm, ["app", "description"], ""),
@@ -677,6 +731,7 @@ function parseReport(data) {
     suiteVersion: String(get(data, ["suite", "version"], "—")),
     profileKey,
     profileLabel,
+    benchmarkName: String(get(profileObj, ["settings", "name"], "") || profileLabel),
     scoreUnit,
     hepscoreVersion: String(get(profileObj, ["app_info", "hepscore_ver"], "—")),
     runMode: String(get(data, ["suite", "flags", "run_mode"], "—")),
@@ -803,7 +858,7 @@ function renderHTML(r) {
 <div class="hero">
   <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
     <div class="hero-metric">
-      <div class="score-label">${esc(scoreLabel)} · total</div>
+      <div class="score-label">Final score</div>
       <div class="score">${fmt(r.score)}${scoreUnit}</div>
       <div class="hero-sub">${heroMethod} ${heroScaling}</div>
     </div>
@@ -888,15 +943,17 @@ function renderHTML(r) {
   const bench = r.benchmarks.length
     ? `
 <section>
-  <h2>${esc(scoreLabel)} workload results</h2>
+  <h2>${esc(r.benchmarkName)} workload results</h2>
   <div class="sub" style="margin-bottom:14px">
-    ${r.benchmarks.length} benchmarks · ${r.repetitions} repetitions each
+    ${r.benchmarks.length} benchmarks · ${r.repetitions} repetitions each ·
+    relative score = throughput / reference
   </div>
   <div class="card" style="padding:0">
   <table>
     <thead><tr>
       <th>Benchmark</th><th>Kind</th>
-      <th class="num">Score</th><th class="num">Runs</th>
+      <th class="num">Throughput</th>
+      <th class="num">Relative score</th><th class="num">Runs</th>
       <th class="num">Duration (avg)</th>
     </tr></thead>
     <tbody>
@@ -906,6 +963,7 @@ function renderHTML(r) {
               <div class="sub" style="font-size:11px">${esc(b.description)}</div></td>
           <td><code>${esc(b.kind)}</code></td>
           <td class="num">${b.score.toFixed(4)}</td>
+          <td class="num">${b.relative !== null ? b.relative.toFixed(4) : "—"}</td>
           <td class="num">${b.runs}</td>
           <td class="num">${fmt(b.avgDuration, 0)} s</td>
         </tr>`).join("")}
@@ -915,7 +973,7 @@ function renderHTML(r) {
 </section>`
     : `
 <section>
-  <h2>${esc(scoreLabel)} results</h2>
+  <h2>${esc(r.benchmarkName)} results</h2>
   <div class="card"><em>No per-workload breakdown found in this report.</em></div>
 </section>`;
 
@@ -953,7 +1011,19 @@ function renderHTML(r) {
   </div>
 </section>`;
 
-  return { html: hero + hostCard + telemetry + bench + meta, specs };
+  // Raw JSON explorer: a collapsed-by-default searchable tree of the full
+  // suite document. The mount div is populated by initJsonExplorer().
+  const rawJson = `
+<section>
+  <h2>Raw JSON</h2>
+  <details class="card">
+    <summary style="cursor:pointer; font-weight:600">Explore the full benchmark JSON</summary>
+    <div class="sub" style="margin:8px 0 10px">Search any key or value to find details not shown above. Everything stays in your browser.</div>
+    <div class="json-explorer" id="jsonExplorer"></div>
+  </details>
+</section>`;
+
+  return { html: hero + hostCard + telemetry + bench + meta + rawJson, specs };
 }
 
 // -------------------------------------------------------------
@@ -1032,7 +1102,7 @@ function renderComparison(entryA, entryB) {
 </header>
 <div class="hero">
   <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
-    ${cmpMetric(`${scoreLabel} · total${unit ? " (" + unit + ")" : ""}`, a.score, b.score)}
+    ${cmpMetric(`Final score${unit ? " (" + unit + ")" : ""}`, a.score, b.score)}
     ${cmpMetric("Score / core", a.scorePerCore, b.scorePerCore)}
     ${cmpMetric("Score / W", a.scorePerWatt, b.scorePerWatt)}
   </div>
@@ -1054,15 +1124,18 @@ function renderComparison(entryA, entryB) {
     if (!names.includes(name)) names.push(name);
   }
   const scoreCell = item => (item && Number.isFinite(item.score)) ? item.score.toFixed(4) : "—";
+  const relCell = item => (item && item.relative !== null && Number.isFinite(item.relative)) ? item.relative.toFixed(4) : "—";
+  const benchName = a.benchmarkName || b.benchmarkName || scoreLabel;
   const bench = names.length ? `
 <section>
-  <h2>${esc(scoreLabel)} workload results</h2>
-  <div class="sub" style="margin-bottom:14px">${names.length} benchmarks · delta is B − A</div>
+  <h2>${esc(benchName)} workload results</h2>
+  <div class="sub" style="margin-bottom:14px">${names.length} benchmarks · delta is B − A · relative score = throughput / reference</div>
   <div class="card" style="padding:0">
   <table>
     <thead><tr>
       <th>Benchmark</th><th>Kind</th>
-      <th class="num">Score A</th><th class="num">Score B</th>
+      <th class="num">Throughput A</th><th class="num">Throughput B</th>
+      <th class="num">Relative A</th><th class="num">Relative B</th>
       <th class="num">Δ</th><th class="num">Δ %</th>
     </tr></thead>
     <tbody>
@@ -1081,6 +1154,8 @@ function renderComparison(entryA, entryB) {
           <td><code>${esc(kind)}</code></td>
           <td class="num">${scoreCell(ba)}</td>
           <td class="num">${scoreCell(bb)}</td>
+          <td class="num">${relCell(ba)}</td>
+          <td class="num">${relCell(bb)}</td>
           <td class="num ${cls}">${d === null ? "—" : esc(fmtSigned(d, 4))}</td>
           <td class="num ${cls}">${p === null ? "—" : esc(fmtSigned(p, 1) + "%")}</td>
         </tr>`;
@@ -1090,7 +1165,7 @@ function renderComparison(entryA, entryB) {
   </div>
 </section>` : `
 <section>
-  <h2>${esc(scoreLabel)} workload results</h2>
+  <h2>${esc(benchName)} workload results</h2>
   <div class="card"><em>No per-workload breakdown found in either report.</em></div>
 </section>`;
 
@@ -1138,7 +1213,21 @@ function renderComparison(entryA, entryB) {
        </div>`}
 </section>`;
 
-  return { html: hero + runs + bench + telemetry, specs };
+  // Raw JSON explorers: one searchable tree per run (A and B).
+  const rawJson = `
+<section>
+  <h2>Raw JSON</h2>
+  <details class="card">
+    <summary style="cursor:pointer; font-weight:600">Explore the full benchmark JSON</summary>
+    <div class="sub" style="margin:8px 0 10px">Search any key or value in either run. Everything stays in your browser.</div>
+    <h3>A · ${esc(labelA)}</h3>
+    <div class="json-explorer" id="jsonExplorerA"></div>
+    <h3>B · ${esc(labelB)}</h3>
+    <div class="json-explorer" id="jsonExplorerB"></div>
+  </details>
+</section>`;
+
+  return { html: hero + runs + bench + telemetry + rawJson, specs };
 }
 
 // Render the telemetry charts into the canvases created by renderHTML.
@@ -1260,6 +1349,288 @@ function drawCharts(specs) {
   });
 }
 
+// Build an interactive, searchable tree view of a raw JSON document inside
+// `rootEl`. Like drawCharts, this is intentionally self-contained (it does not
+// reference any outer-scope variable) so the "Download as standalone HTML"
+// button can serialize it with `.toString()` and re-run it in the export.
+function initJsonExplorer(rootEl, data) {
+  if (!rootEl) return;
+  rootEl.innerHTML = "";
+  const CHUNK = 100; // large arrays are shown in slices of this many items
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g,
+      c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function typeOf(v) {
+    if (v === null) return "null";
+    if (Array.isArray(v)) return "array";
+    return typeof v;
+  }
+  function previewVal(v) {
+    const t = typeOf(v);
+    if (t === "string") {
+      const s = v.length > 80 ? v.slice(0, 77) + "…" : v;
+      return '<span class="je-str">"' + escHtml(s) + '"</span>';
+    }
+    if (t === "number") return '<span class="je-num">' + escHtml(v) + "</span>";
+    if (t === "boolean") return '<span class="je-bool">' + v + "</span>";
+    if (t === "null") return '<span class="je-null">null</span>';
+    return "";
+  }
+  function summaryPreview(v) {
+    const t = typeOf(v);
+    if (t === "array") return '<span class="je-type">[' + v.length + "]</span>";
+    const keys = Object.keys(v);
+    const list = keys.slice(0, 6).join(", ") + (keys.length > 6 ? ", …" : "");
+    return '<span class="je-type">{' + keys.length + "}</span> " +
+           '<span class="je-preview">' + escHtml(list) + "</span>";
+  }
+  function summaryText(v) {
+    const t = typeOf(v);
+    return t === "array" ? "[" + v.length + "]" : "{" + Object.keys(v).length + "}";
+  }
+  function valueText(v) {
+    const t = typeOf(v);
+    if (t === "string") return '"' + v + '"';
+    if (t === "null") return "null";
+    return String(v);
+  }
+  function pathToStr(path) {
+    let out = "";
+    for (const k of path) {
+      if (typeof k === "number") out += "[" + k + "]";
+      else if (/^[A-Za-z_$][\w$]*$/.test(k)) out += (out ? "." : "") + k;
+      else out += '["' + String(k).replace(/"/g, '\\"') + '"]';
+    }
+    return out || "(root)";
+  }
+
+  function makeCopyBtn(path) {
+    const b = document.createElement("span");
+    b.className = "je-copy";
+    b.textContent = "copy path";
+    b.title = "Copy this path to the clipboard";
+    b.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const str = pathToStr(path);
+      try { navigator.clipboard.writeText(str); } catch (_) { /* ignore */ }
+      b.textContent = "copied";
+      setTimeout(() => { b.textContent = "copy path"; }, 1000);
+    });
+    return b;
+  }
+
+  function keyLabelHTML(keyLabel) {
+    return keyLabel === null ? "" : '<span class="je-key">' + escHtml(keyLabel) + "</span>: ";
+  }
+
+  function makeLeaf(keyLabel, v, path) {
+    const row = document.createElement("div");
+    row.className = "je-node";
+    const inner = document.createElement("div");
+    inner.className = "je-row";
+    inner.innerHTML = keyLabelHTML(keyLabel) + previewVal(v);
+    inner.appendChild(makeCopyBtn(path));
+    row.appendChild(inner);
+    row.dataset.path = JSON.stringify(path);
+    return row;
+  }
+
+  function makeBranch(keyLabel, v, path) {
+    const det = document.createElement("details");
+    det.className = "je-branch je-node";
+    det.dataset.path = JSON.stringify(path);
+    const sum = document.createElement("summary");
+    sum.className = "je-row";
+    sum.innerHTML = keyLabelHTML(keyLabel) + summaryPreview(v);
+    sum.appendChild(makeCopyBtn(path));
+    det.appendChild(sum);
+    let built = false;
+    det._build = () => { if (!built) { built = true; buildChildren(det, v, path); } };
+    det.addEventListener("toggle", () => { if (det.open) det._build(); });
+    return det;
+  }
+
+  function makeChunk(v, start, end, path) {
+    const det = document.createElement("details");
+    det.className = "je-branch je-chunk-wrap je-node";
+    const sum = document.createElement("summary");
+    sum.className = "je-row";
+    sum.innerHTML = '<span class="je-chunk">[' + start + " … " + (end - 1) + "]</span>";
+    det.appendChild(sum);
+    let built = false;
+    det._build = () => {
+      if (built) return;
+      built = true;
+      for (let i = start; i < end; i++) det.appendChild(nodeFor(i, v[i], path.concat(i)));
+    };
+    det.addEventListener("toggle", () => { if (det.open) det._build(); });
+    return det;
+  }
+
+  function buildChildren(container, v, path) {
+    const t = typeOf(v);
+    if (t === "object") {
+      for (const k of Object.keys(v)) container.appendChild(nodeFor(k, v[k], path.concat(k)));
+    } else if (t === "array") {
+      if (v.length <= CHUNK) {
+        for (let i = 0; i < v.length; i++) container.appendChild(nodeFor(i, v[i], path.concat(i)));
+      } else {
+        for (let start = 0; start < v.length; start += CHUNK) {
+          container.appendChild(makeChunk(v, start, Math.min(start + CHUNK, v.length), path));
+        }
+      }
+    }
+  }
+
+  function nodeFor(keyLabel, v, path) {
+    const t = typeOf(v);
+    return (t === "object" || t === "array")
+      ? makeBranch(keyLabel, v, path)
+      : makeLeaf(keyLabel, v, path);
+  }
+
+  // Locate the direct child node for `wantJson`, descending into (and opening)
+  // array chunk wrappers as needed. Returns the matching element or null.
+  function locateChild(container, wantJson) {
+    for (const kid of container.children) {
+      if (kid.dataset && kid.dataset.path === wantJson) return kid;
+    }
+    for (const kid of container.children) {
+      if (kid.tagName === "DETAILS" && kid.classList.contains("je-chunk-wrap")) {
+        kid.open = true;
+        if (kid._build) kid._build();
+        for (const g of kid.children) {
+          if (g.dataset && g.dataset.path === wantJson) return g;
+        }
+      }
+    }
+    return null;
+  }
+
+  // Open every ancestor branch down to `path` (building lazily as we go) and
+  // return the final node element, or null if the path can't be resolved.
+  function expandToPath(path) {
+    let container = tree;
+    let node = null;
+    for (let depth = 0; depth < path.length; depth++) {
+      node = locateChild(container, JSON.stringify(path.slice(0, depth + 1)));
+      if (!node) return null;
+      if (node.tagName === "DETAILS") {
+        node.open = true;
+        if (node._build) node._build();
+      }
+      container = node;
+    }
+    return node;
+  }
+
+  function revealPath(path) {
+    const node = expandToPath(path);
+    if (!node) return;
+    tree.querySelectorAll(".je-hit").forEach(e => e.classList.remove("je-hit"));
+    const target = node.tagName === "DETAILS"
+      ? node.querySelector(":scope > summary")
+      : (node.querySelector(":scope > .je-row") || node);
+    (target || node).classList.add("je-hit");
+    node.scrollIntoView({ block: "center" });
+  }
+
+  function runSearch(q) {
+    results.innerHTML = "";
+    const query = String(q || "").trim().toLowerCase();
+    if (!query) return;
+    const MAX = 200;
+    const matches = [];
+    (function walk(v, path) {
+      if (matches.length >= MAX) return;
+      const t = typeOf(v);
+      const lastKey = path.length ? String(path[path.length - 1]) : "";
+      if (lastKey.toLowerCase().includes(query)) {
+        matches.push({ path, v });
+      } else if (t !== "object" && t !== "array" &&
+                 String(v).toLowerCase().includes(query)) {
+        matches.push({ path, v });
+      }
+      if (matches.length >= MAX) return;
+      if (t === "object") for (const k of Object.keys(v)) walk(v[k], path.concat(k));
+      else if (t === "array") for (let i = 0; i < v.length; i++) walk(v[i], path.concat(i));
+    })(data, []);
+
+    if (!matches.length) {
+      results.innerHTML = '<div class="je-empty">No matches.</div>';
+      return;
+    }
+    const head = document.createElement("div");
+    head.className = "je-empty";
+    head.textContent = matches.length >= MAX
+      ? "Showing first " + MAX + " matches"
+      : matches.length + " match" + (matches.length > 1 ? "es" : "");
+    results.appendChild(head);
+    for (const m of matches) {
+      const t = typeOf(m.v);
+      const valStr = (t === "object" || t === "array") ? summaryText(m.v) : valueText(m.v);
+      const row = document.createElement("div");
+      row.className = "je-result";
+      row.innerHTML = '<span class="je-path">' + escHtml(pathToStr(m.path)) +
+                      "</span> = " + escHtml(valStr);
+      row.addEventListener("click", () => revealPath(m.path));
+      results.appendChild(row);
+    }
+  }
+
+  // Toolbar: search box + expand/collapse controls.
+  const toolbar = document.createElement("div");
+  toolbar.className = "je-toolbar";
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "je-search";
+  search.placeholder = "Search keys and values…";
+  const expandBtn = document.createElement("button");
+  expandBtn.type = "button";
+  expandBtn.className = "je-btn";
+  expandBtn.textContent = "Expand top level";
+  const collapseBtn = document.createElement("button");
+  collapseBtn.type = "button";
+  collapseBtn.className = "je-btn";
+  collapseBtn.textContent = "Collapse all";
+  toolbar.appendChild(search);
+  toolbar.appendChild(expandBtn);
+  toolbar.appendChild(collapseBtn);
+
+  const tree = document.createElement("div");
+  tree.className = "je-tree";
+  const results = document.createElement("div");
+  results.className = "je-results";
+
+  rootEl.appendChild(toolbar);
+  rootEl.appendChild(tree);
+  rootEl.appendChild(results);
+
+  // Root level is rendered eagerly; nested branches build on first open.
+  buildChildren(tree, data, []);
+
+  expandBtn.addEventListener("click", () => {
+    for (const kid of tree.children) {
+      if (kid.tagName === "DETAILS") {
+        kid.open = true;
+        if (kid._build) kid._build();
+      }
+    }
+  });
+  collapseBtn.addEventListener("click", () => {
+    tree.querySelectorAll("details.je-branch").forEach(d => { d.open = false; });
+  });
+
+  let searchTimer = null;
+  search.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => runSearch(search.value), 200);
+  });
+}
+
 // -------------------------------------------------------------
 // UI wiring — drag & drop, error display, and report lifecycle.
 // -------------------------------------------------------------
@@ -1333,6 +1704,12 @@ function renderSlots() {
   destroyCharts();
   reportBody.innerHTML = view.html;
   drawCharts(view.specs);
+  if (slotB) {
+    initJsonExplorer(document.getElementById("jsonExplorerA"), slotA.data);
+    initJsonExplorer(document.getElementById("jsonExplorerB"), slotB.data);
+  } else {
+    initJsonExplorer(document.getElementById("jsonExplorer"), slotA.data);
+  }
   landing.classList.add("hidden");
   landingFooter.classList.add("hidden");
   report.classList.remove("hidden");
@@ -1346,8 +1723,10 @@ function renderSlots() {
         },
         html: view.html,
         specs: view.specs,
+        dataA: slotA.data,
+        dataB: slotB.data,
       }
-    : { r: slotA.r, html: view.html, specs: view.specs };
+    : { r: slotA.r, html: view.html, specs: view.specs, data: slotA.data };
   showSlotNames();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1501,7 +1880,17 @@ document.getElementById("btnDownload").addEventListener("click", async () => {
   const css = document.querySelector("style").textContent;
   const specsJSON = JSON.stringify(lastReport.specs);
   const chartInit = `(${drawCharts.toString()})(${specsJSON});`;
-  const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HEPscore report · ${esc(lastReport.r.hostname)}</title>${chartJS}<style>${css}</style></head><body><div class="container">${lastReport.html}</div><script>${chartInit}<\/script></body></html>`;
+  // Embed the raw JSON and wire up the explorer(s) in the export too. Escaping
+  // "<" prevents the serialized data from closing the inline <script> early.
+  const safeJson = obj => JSON.stringify(obj).replace(/</g, "\\u003c");
+  let explorerInit = "";
+  if (lastReport.dataA !== undefined && lastReport.dataB !== undefined) {
+    explorerInit = `(${initJsonExplorer.toString()})(document.getElementById("jsonExplorerA"), ${safeJson(lastReport.dataA)});`
+      + `(${initJsonExplorer.toString()})(document.getElementById("jsonExplorerB"), ${safeJson(lastReport.dataB)});`;
+  } else if (lastReport.data !== undefined) {
+    explorerInit = `(${initJsonExplorer.toString()})(document.getElementById("jsonExplorer"), ${safeJson(lastReport.data)});`;
+  }
+  const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>HEPscore report · ${esc(lastReport.r.hostname)}</title>${chartJS}<style>${css}</style></head><body><div class="container">${lastReport.html}</div><script>${chartInit}${explorerInit}<\/script></body></html>`;
   const blob = new Blob([full], { type: "text/html" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
