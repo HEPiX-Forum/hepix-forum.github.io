@@ -68,13 +68,26 @@
   @media (max-width: 800px) {
     .drop-row { grid-template-columns: 1fr; }
   }
-  .hero .cmp-line { font-size: 22px; font-weight: 700; line-height: 1.25; }
-  .hero .cmp-tag { display: inline-block; min-width: 1.4em; font-size: 12px;
-                   font-weight: 600; opacity: 0.75; margin-right: 6px; }
-  .hero .up { color: #b7f0c2; }
-  .hero .down { color: #ffc9c9; }
+  .hero .cmp-line { font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; }
+  .hero .cmp-tag { display: inline-block; min-width: 1.1em; font-size: 12px;
+                   font-weight: 600; opacity: 0.65; margin-right: 8px;
+                   letter-spacing: 0; vertical-align: 5px; }
+  .hero-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: start; }
+  @media (max-width: 800px) { .hero-scores { grid-template-columns: 1fr; } }
+  .hero .cmp-delta { margin-top: 10px; padding-top: 8px;
+                     border-top: 1px solid rgba(255,255,255,0.28);
+                     color: #fff; font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .hero .cmp-delta.up { color: #d8ffe6; }
+  .hero .cmp-delta.down { color: #ffe1e1; }
   td.up { color: #22863a; font-weight: 600; }
   td.down { color: #cb2431; font-weight: 600; }
+  tr.diff td, td.diff { background: #fff6d8; }
+  tr.diff td:first-child { box-shadow: inset 3px 0 0 #d4a017; font-weight: 700; }
+  .diffs-banner { background: #fff6d8; border: 1px solid #e6c200; border-radius: 8px;
+                  padding: 10px 14px; margin-bottom: 12px; font-size: 14px; }
+  .table-scroll { overflow-x: auto; }
+  .dropzone .dz-paste { margin-top: 14px; text-align: left; min-height: 88px; cursor: text; }
+  .dz-btn.dz-secondary { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
   .dz-btn { display: inline-block; background: var(--accent); color: #fff;
             padding: 8px 18px; border-radius: 6px; font-weight: 600;
             margin-top: 8px; font-size: 13px; }
@@ -141,6 +154,18 @@
   .je-result:hover { color: var(--accent); }
   .je-result .je-path { color: #0b4aa2; }
   .je-empty { color: var(--muted); font-size: 12px; }
+  .je-cmp { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px; }
+  .je-cmp th, .je-cmp td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border);
+                          vertical-align: top; }
+  .je-cmp th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
+               color: var(--muted); background: #f6f8fa; }
+  .je-cmp td.je-path, .je-cmp td.je-val { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                                          word-break: break-word; }
+  .je-cmp td.je-path { color: #0b4aa2; width: 36%; }
+  .je-cmp tr.je-diff td.je-val { background: #f4f7fb; font-weight: 600; }
+  .je-cmp tbody tr { cursor: pointer; }
+  .je-cmp tbody tr:hover td { background: #f0f7ff; }
+  .je-sides { margin-top: 16px; }
 </style>
 </head>
 <body>
@@ -162,6 +187,9 @@
       <input id="fileInput" type="file" accept=".json,application/json" multiple hidden>
       <span class="dz-btn">Choose file…</span>
       <p class="muted" id="slotAName"></p>
+      <textarea id="pasteInput" class="json-paste dz-paste" spellcheck="false"
+        placeholder="Or paste the first JSON here…"></textarea>
+      <button type="button" id="btnPasteA" class="dz-btn dz-secondary">Load pasted JSON</button>
       <p class="muted" style="margin-top:14px">
         No file? <a href="#" id="sampleLink">Load the example run</a>.
       </p>
@@ -169,20 +197,13 @@
     <div id="dropzoneB" class="dropzone">
       <p style="font-size:32px; margin-bottom:4px">⚖️</p>
       <p><strong>Add a second JSON to compare</strong></p>
-      <p class="muted">optional · same formats as the first file</p>
+      <p class="muted">optional · drop a file or paste JSON below</p>
       <input id="fileInputB" type="file" accept=".json,application/json" multiple hidden>
       <span class="dz-btn">Choose file…</span>
       <p class="muted" id="slotBName"></p>
-    </div>
-  </div>
-  <div class="card paste-card">
-    <h2>Or paste JSON</h2>
-    <p class="sub" style="margin:0 0 8px">Suite output or an OpenSearch hit. Nothing is uploaded.</p>
-    <textarea id="pasteInput" class="json-paste" spellcheck="false"
-      placeholder="Paste a benchmark JSON here…"></textarea>
-    <div class="toolbar" style="margin:10px 0 0">
-      <button type="button" id="btnPasteA">Load as first run</button>
-      <button type="button" id="btnPasteB">Load as comparison</button>
+      <textarea id="pasteInputB" class="json-paste dz-paste" spellcheck="false"
+        placeholder="Or paste the second JSON here…"></textarea>
+      <button type="button" id="btnPasteB" class="dz-btn dz-secondary">Load pasted JSON</button>
     </div>
   </div>
 </div>
@@ -196,12 +217,14 @@
     <input id="fileInputCompare" type="file" accept=".json,application/json" hidden>
   </div>
   <div id="pasteReport" class="card hidden" style="margin-bottom:16px">
-    <h2>Paste JSON</h2>
+    <h2>Paste a JSON to compare</h2>
+    <p class="sub" style="margin:0 0 8px">Paste the second run, or replace the first. Nothing is uploaded.</p>
     <textarea id="pasteReportInput" class="json-paste" spellcheck="false"
       placeholder="Paste a benchmark JSON here…"></textarea>
     <div class="toolbar" style="margin:10px 0 0">
-      <button type="button" id="btnPasteReportA">Replace first run</button>
       <button type="button" id="btnPasteReportB">Use as comparison</button>
+      <button type="button" id="btnPasteReportA">Replace first run</button>
+      <button type="button" id="btnCompareFile">Choose a file…</button>
     </div>
   </div>
   <div id="reportBody"></div>
@@ -238,7 +261,7 @@
 //     "host": { "HW": {...}, "SW": {...}, ... },  // static machine inventory
 //     "suite": { "version", "flags": {...} },
 //     "profiles": {                               // one benchmark "profile"
-//       "<benchmark>": { "value"|"score", "unit", "benchmarks": {...} }
+//       "<benchmark>": { "value"|"score", "unit", "wl-scores": {...}, "benchmarks": {...} }
 //     },
 //     "plugins": {                                // dynamic time-series data
 //       "CommandExecutor": {
@@ -268,12 +291,42 @@ function mean(arr) {
 }
 function median(arr) { return percentile(arr, 0.5); }
 
-// Human-friendly number formatting: "—" for missing values, thousands
-// separators for large numbers, otherwise `d` decimals (default 2).
+// Human-friendly number formatting. Missing values are an em dash.
+// At most two fraction digits; a smaller `d` is kept (counts stay whole).
 function fmt(x, d) {
-  if (x === null || x === undefined || Number.isNaN(x)) return "—";
-  if (Math.abs(x) >= 1000) return x.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return x.toFixed(d !== undefined ? d : 2);
+  if (x === null || x === undefined || Number.isNaN(Number(x))) return "—";
+  let digits = 2;
+  if (d !== undefined && Number.isFinite(Number(d))) digits = Math.max(0, Math.min(2, Number(d)));
+  return Number(x).toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: 0,
+  });
+}
+
+function smtLabel(smt) {
+  const s = String(smt ?? "—");
+  if (["1", "true", "True", "yes"].includes(s)) return "enabled";
+  if (["0", "false", "False", "no"].includes(s)) return "disabled";
+  return s || "—";
+}
+
+function memLabel(mb) {
+  if (!Number.isFinite(mb) || mb <= 0) return "—";
+  return `${fmt(mb / 1024)} GiB`;
+}
+
+function freqRangeLabel(r) {
+  const min = Number(r.cpuMinMhz), max = Number(r.cpuMaxMhz);
+  if (Number.isFinite(min) && min > 0 && Number.isFinite(max) && max > 0) {
+    return `${fmt(min)}–${fmt(max)} MHz`;
+  }
+  if (Number.isFinite(max) && max > 0) return `${fmt(max)} MHz max`;
+  return "—";
+}
+
+function nominalFreqLabel(r) {
+  const nom = Number(r.cpuMhz);
+  return Number.isFinite(nom) && nom > 0 ? `${fmt(nom)} MHz` : "—";
 }
 
 // Safe nested lookup: get(obj, ["a","b"], def) returns obj.a.b or `def`
@@ -509,6 +562,29 @@ function keysMatch(a, b) {
   return String(a || "").toLowerCase() === String(b || "").toLowerCase();
 }
 
+// First non-reference number in a wl-scores map, plus its "<kind>_ref" value.
+// Returns null when the map has no usable throughput.
+function pickWorkloadScore(myScores) {
+  if (!myScores || typeof myScores !== "object" || Array.isArray(myScores)) return null;
+  let score = null, kind = "";
+  for (const [k, v] of Object.entries(myScores)) {
+    if (String(k).endsWith("_ref")) continue;
+    const n = Number(v);
+    if (!Number.isFinite(n)) continue;
+    score = n;
+    kind = k;
+    break;
+  }
+  if (score === null) return null;
+  let ref = null;
+  const refRaw = myScores[`${kind}_ref`];
+  if (refRaw !== undefined && refRaw !== null && Number.isFinite(Number(refRaw))) {
+    ref = Number(refRaw);
+  }
+  const relative = (ref && ref > 0) ? score / ref : null;
+  return { kind, score, ref, relative };
+}
+
 // Find the metric container(s) inside a single plugin and which phase each
 // came from. Returns [{ plugin, phase, data }, ...]. Two plugin layouts:
 //   - Phased (like CommandExecutor): metrics live under phase keys; we prefer
@@ -616,39 +692,24 @@ function parseReport(data) {
   const q85Power = power ? percentile(power.values, 0.85) : null;
   const scorePerWatt = (Number.isFinite(score) && q85Power && q85Power > 0) ? score / q85Power : null;
 
-  // Per-workload breakdown (HEPscore reports list sub-benchmarks; flat
-  // benchmarks like DB12 have none, leaving this array empty).
+  // Per-workload breakdown. Full suite JSON lists each workload under
+  // `benchmarks` (with per-run durations). Summary documents, such as an
+  // OpenSearch procurement hit, omit that tree and keep only `wl-scores`.
+  // Flat benchmarks like DB12 have neither, leaving this array empty.
   const benchmarks = [];
   const bms = get(profileObj, ["benchmarks"], {}) || {};
   const wlScores = get(profileObj, ["wl-scores"], {}) || {};
   const workloadStarts = []; // { name, ts } in ISO
-  if (bms && typeof bms === "object") {
+  if (bms && typeof bms === "object" && !Array.isArray(bms)) {
     for (const [name, bm] of Object.entries(bms)) {
       if (!bm || typeof bm !== "object") continue;
       // The workload score may live in the top-level wl-scores map or nested
-      // in the first run's report; "*_ref" entries are reference values, skip.
-      let bmScore = null, kind = "";
+      // in the first run's report; "*_ref" entries are reference values.
       const myScores = wlScores[name] || {};
-      for (const [k, v] of Object.entries(myScores)) {
-        if (k.endsWith("_ref")) continue;
-        bmScore = Number(v); kind = k; break;
-      }
-      if (bmScore === null) {
-        const wls = get(bm, ["run0", "report", "wl-scores"], {}) || {};
-        for (const [k, v] of Object.entries(wls)) {
-          bmScore = Number(v); kind = k; break;
-        }
-      }
-      if (bmScore === null) continue;
-
-      // Reference throughput for this workload (the "<kind>_ref" entry in
-      // wl-scores) and the relative score = throughput / reference.
-      let ref = null;
-      const refRaw = myScores[`${kind}_ref`];
-      if (refRaw !== undefined && refRaw !== null && !Number.isNaN(Number(refRaw))) {
-        ref = Number(refRaw);
-      }
-      const relative = (ref && ref > 0 && Number.isFinite(bmScore)) ? bmScore / ref : null;
+      const picked = pickWorkloadScore(myScores)
+        || pickWorkloadScore(get(bm, ["run0", "report", "wl-scores"], {}) || {});
+      if (!picked) continue;
+      const { kind, score: bmScore, ref, relative } = picked;
 
       // Average duration across all "runN" entries that report one.
       const durations = [];
@@ -691,9 +752,31 @@ function parseReport(data) {
 
       benchmarks.push({
         name, kind, score: bmScore, ref, relative,
+        version: String(bm.version || get(bm, ["app", "version"], "") || ""),
         runs: durations.length,
         avgDuration: durations.length ? mean(durations) : NaN,
         description: get(bm, ["app", "description"], ""),
+      });
+    }
+  }
+
+  // Workloads present only in wl-scores (no per-run `benchmarks` entry).
+  const named = new Set(benchmarks.map(b => b.name));
+  if (wlScores && typeof wlScores === "object" && !Array.isArray(wlScores)) {
+    for (const [name, myScores] of Object.entries(wlScores)) {
+      if (named.has(name)) continue;
+      const picked = pickWorkloadScore(myScores);
+      if (!picked) continue;
+      benchmarks.push({
+        name,
+        kind: picked.kind,
+        score: picked.score,
+        ref: picked.ref,
+        relative: picked.relative,
+        version: "",
+        runs: null,
+        avgDuration: NaN,
+        description: "",
       });
     }
   }
@@ -721,8 +804,11 @@ function parseReport(data) {
     cpuTotal: Number(cpu.CPU_num || 0),
     cpuMinMhz: Number(cpu.CPU_Min_Speed_MHz || 0),
     cpuMaxMhz: Number(cpu.CPU_Max_Speed_MHz || 0),
+    cpuMhz: Number(cpu.CPU_MHz),
     cpuL2: cpu.L2_cache || "—",
     cpuL3: cpu.L3_cache || "—",
+    powerPolicy: cpu.Power_Policy || "—",
+    powerDriver: cpu.Power_Driver || "—",
     smt: String(cpu.SMT_Enabled ?? "—"),
     memTotalMb: Math.floor(Number(mem.Mem_Total || 0) / 1024),
     memAvailMb: Math.floor(Number(mem.Mem_Available || 0) / 1024),
@@ -856,7 +942,7 @@ function renderHTML(r) {
   <div class="sub">Run ID <code>${esc(r.runId)}</code> · ${esc(r.tsStart)} → ${esc(r.tsEnd)}</div>
 </header>
 <div class="hero">
-  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
+  <div class="hero-scores">
     <div class="hero-metric">
       <div class="score-label">Final score</div>
       <div class="score">${fmt(r.score)}${scoreUnit}</div>
@@ -907,14 +993,15 @@ function renderHTML(r) {
         <dd>${r.cpuSockets} socket · ${r.cpuCores} cores ·
             ${r.cpuThreadsPerCore} thread/core · ${r.cpuTotal} CPUs</dd>
         <dt>Clock</dt>
-        <dd>${fmt(r.cpuMinMhz, 0)} – ${fmt(r.cpuMaxMhz, 0)} MHz</dd>
+        <dd>${esc(freqRangeLabel(r))}${nominalFreqLabel(r) !== "—" ? ` · nominal ${esc(nominalFreqLabel(r))}` : ""}</dd>
+        <dt>Governor</dt><dd>${esc(r.powerPolicy)}</dd>
+        <dt>Power driver</dt><dd>${esc(r.powerDriver)}</dd>
         <dt>L2 / L3</dt><dd>${esc(r.cpuL2)} / ${esc(r.cpuL3)}</dd>
-        <dt>SMT</dt>
-        <dd>${["1","true","True","yes"].includes(r.smt) ? "enabled" : "disabled"}</dd>
+        <dt>SMT</dt><dd>${esc(smtLabel(r.smt))}</dd>
         <dt>Memory</dt>
-        <dd>${(r.memTotalMb/1024).toFixed(1)} GiB total,
-            ${(r.memAvailMb/1024).toFixed(1)} GiB avail.</dd>
-        <dt>Swap</dt><dd>${(r.swapTotalMb/1024).toFixed(1)} GiB</dd>
+        <dd>${esc(memLabel(r.memTotalMb))} total,
+            ${esc(memLabel(r.memAvailMb))} avail.</dd>
+        <dt>Swap</dt><dd>${esc(memLabel(r.swapTotalMb))}</dd>
         <dt>GPU</dt><dd>${esc(r.gpu)}</dd>
       </dl>
     </div>
@@ -948,10 +1035,10 @@ function renderHTML(r) {
     ${r.benchmarks.length} benchmarks · ${r.repetitions} repetitions each ·
     relative score = throughput / reference
   </div>
-  <div class="card" style="padding:0">
+  <div class="card table-scroll" style="padding:0">
   <table>
     <thead><tr>
-      <th>Benchmark</th><th>Kind</th>
+      <th>Benchmark</th><th>Kind</th><th>Version</th>
       <th class="num">Throughput</th>
       <th class="num">Relative score</th><th class="num">Runs</th>
       <th class="num">Duration (avg)</th>
@@ -962,10 +1049,11 @@ function renderHTML(r) {
           <td><strong>${esc(b.name)}</strong>
               <div class="sub" style="font-size:11px">${esc(b.description)}</div></td>
           <td><code>${esc(b.kind)}</code></td>
-          <td class="num">${b.score.toFixed(4)}</td>
-          <td class="num">${b.relative !== null ? b.relative.toFixed(4) : "—"}</td>
-          <td class="num">${b.runs}</td>
-          <td class="num">${fmt(b.avgDuration, 0)} s</td>
+          <td>${esc(b.version || "—")}</td>
+          <td class="num">${fmt(b.score)}</td>
+          <td class="num">${b.relative !== null ? fmt(b.relative) : "—"}</td>
+          <td class="num">${b.runs === null || b.runs === undefined ? "—" : b.runs}</td>
+          <td class="num">${fmt(b.avgDuration)} s</td>
         </tr>`).join("")}
     </tbody>
   </table>
@@ -1064,19 +1152,23 @@ function renderComparison(entryA, entryB) {
 
   function cmpMetric(label, va, vb) {
     const d = deltaNum(va, vb);
+    const p = deltaPct(va, vb);
     const cls = d === null || d === 0 ? "" : (d > 0 ? "up" : "down");
+    const deltaText = d === null ? "" : (p === null ? `Δ ${fmtSigned(d)}` : `Δ ${fmtSigned(d)} (${fmtSigned(p)}%)`);
+    const deltaHtml = d === null
+      ? `<div class="hero-sub">Δ not available</div>`
+      : `<div class="cmp-delta ${cls}">${esc(deltaText)}</div>`;
     return `
       <div class="hero-metric">
         <div class="score-label">${esc(label)}</div>
         <div class="cmp-line"><span class="cmp-tag">A</span>${esc(fmt(va))}</div>
         <div class="cmp-line"><span class="cmp-tag">B</span>${esc(fmt(vb))}</div>
-        <div class="hero-sub ${cls}">Δ ${esc(deltaLine(va, vb))}</div>
+        ${deltaHtml}
       </div>`;
   }
 
   function runCard(tag, label, r, filename) {
-    const mem = Number.isFinite(r.memTotalMb) && r.memTotalMb > 0
-      ? `${(r.memTotalMb / 1024).toFixed(1)} GiB` : "—";
+    const mem = memLabel(r.memTotalMb);
     return `
       <div class="card">
         <h2>${esc(tag)} · ${esc(label)}</h2>
@@ -1085,7 +1177,11 @@ function renderComparison(entryA, entryB) {
           <dt>Host</dt><dd>${esc(r.hostname)} @ ${esc(r.site)}</dd>
           <dt>CPU</dt><dd>${esc(r.cpuModel)}</dd>
           <dt>Cores</dt><dd>${esc(r.ncores)}</dd>
+          <dt>Sockets</dt><dd>${esc(r.cpuSockets)}</dd>
+          <dt>Governor</dt><dd>${esc(r.powerPolicy)}</dd>
           <dt>Memory</dt><dd>${mem}</dd>
+          <dt>Python</dt><dd>${esc(r.python)}</dd>
+          <dt>Singularity</dt><dd>${esc(r.singularity)}</dd>
           <dt>GPU</dt><dd>${esc(r.gpu)}</dd>
           <dt>Status</dt><dd>${esc(statusText(r.status))}</dd>
           <dt>Run window</dt><dd>${esc(r.tsStart)} → ${esc(r.tsEnd)}</dd>
@@ -1101,12 +1197,28 @@ function renderComparison(entryA, entryB) {
   <div class="sub">A is ${esc(labelA)} · B is ${esc(labelB)} · delta is B − A</div>
 </header>
 <div class="hero">
-  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; align-items:start">
+  <div class="hero-scores">
     ${cmpMetric(`Final score${unit ? " (" + unit + ")" : ""}`, a.score, b.score)}
     ${cmpMetric("Score / core", a.scorePerCore, b.scorePerCore)}
     ${cmpMetric("Score / W", a.scorePerWatt, b.scorePerWatt)}
   </div>
 </div>`;
+
+  const setupRows = [
+    ["CPU", a.cpuModel, b.cpuModel],
+    ["Governor", a.powerPolicy, b.powerPolicy],
+    ["Power driver", a.powerDriver, b.powerDriver],
+    ["Cores used", String(a.ncores), String(b.ncores)],
+    ["Sockets", String(a.cpuSockets), String(b.cpuSockets)],
+    ["SMT", smtLabel(a.smt), smtLabel(b.smt)],
+    ["CPU frequency", freqRangeLabel(a), freqRangeLabel(b)],
+    ["Nominal frequency", nominalFreqLabel(a), nominalFreqLabel(b)],
+    ["L2 cache", a.cpuL2, b.cpuL2],
+    ["L3 cache", a.cpuL3, b.cpuL3],
+    ["Memory", memLabel(a.memTotalMb), memLabel(b.memTotalMb)],
+    ["Python", a.python, b.python],
+    ["Singularity", a.singularity, b.singularity],
+  ];
 
   const runs = `
 <section>
@@ -1123,17 +1235,45 @@ function renderComparison(entryA, entryB) {
   for (const name of [...mapA.keys(), ...mapB.keys()]) {
     if (!names.includes(name)) names.push(name);
   }
-  const scoreCell = item => (item && Number.isFinite(item.score)) ? item.score.toFixed(4) : "—";
-  const relCell = item => (item && item.relative !== null && Number.isFinite(item.relative)) ? item.relative.toFixed(4) : "—";
+  const scoreCell = item => (item && Number.isFinite(item.score)) ? fmt(item.score) : "—";
+  const relCell = item => (item && item.relative !== null && Number.isFinite(item.relative)) ? fmt(item.relative) : "—";
+  const versionDiffNames = names.filter(name => {
+    const va = ((mapA.get(name) || {}).version) || "";
+    const vb = ((mapB.get(name) || {}).version) || "";
+    return va && vb && va !== vb;
+  });
+  const setupDiffs = setupRows.filter(([, va, vb]) => String(va) !== String(vb));
+  const diffLabels = setupDiffs.map(([label]) => label);
+  if (versionDiffNames.length) diffLabels.push("workload versions");
+  const setupBanner = diffLabels.length
+    ? `<div class="diffs-banner"><strong>${diffLabels.length} difference${diffLabels.length === 1 ? "" : "s"} to check:</strong> ${diffLabels.map(esc).join(", ")}. Highlighted rows are not the same in A and B.</div>`
+    : `<div class="sub" style="margin-bottom:12px">Governor, cores, memory, caches, frequency, SMT, Python, and Singularity match.</div>`;
+  const setup = `
+<section>
+  <h2>Setup comparison</h2>
+  ${setupBanner}
+  <div class="card table-scroll" style="padding:0">
+  <table>
+    <thead><tr><th>Field</th><th>A</th><th>B</th></tr></thead>
+    <tbody>
+      ${setupRows.map(([label, va, vb]) => {
+        const differ = String(va) !== String(vb);
+        return `<tr class="${differ ? "diff" : ""}"><td>${esc(label)}</td><td>${esc(va)}</td><td>${esc(vb)}</td></tr>`;
+      }).join("")}
+    </tbody>
+  </table>
+  </div>
+</section>`;
   const benchName = a.benchmarkName || b.benchmarkName || scoreLabel;
   const bench = names.length ? `
 <section>
   <h2>${esc(benchName)} workload results</h2>
-  <div class="sub" style="margin-bottom:14px">${names.length} benchmarks · delta is B − A · relative score = throughput / reference</div>
-  <div class="card" style="padding:0">
+  <div class="sub" style="margin-bottom:14px">${names.length} benchmarks · delta is B − A · relative score = throughput / reference · a blank version means that run did not report one</div>
+  <div class="card table-scroll" style="padding:0">
   <table>
     <thead><tr>
       <th>Benchmark</th><th>Kind</th>
+      <th>Version A</th><th>Version B</th>
       <th class="num">Throughput A</th><th class="num">Throughput B</th>
       <th class="num">Relative A</th><th class="num">Relative B</th>
       <th class="num">Δ</th><th class="num">Δ %</th>
@@ -1148,16 +1288,21 @@ function renderComparison(entryA, entryB) {
         const p = deltaPct(sa, sb);
         const cls = d === null || d === 0 ? "" : (d > 0 ? "up" : "down");
         const kind = (ba && ba.kind) || (bb && bb.kind) || "—";
+        const va = (ba && ba.version) || "";
+        const vb = (bb && bb.version) || "";
+        const vCls = va && vb && va !== vb ? "diff" : "";
         return `
         <tr>
           <td><strong>${esc(name)}</strong></td>
           <td><code>${esc(kind)}</code></td>
+          <td class="${vCls}">${esc(va || "—")}</td>
+          <td class="${vCls}">${esc(vb || "—")}</td>
           <td class="num">${scoreCell(ba)}</td>
           <td class="num">${scoreCell(bb)}</td>
           <td class="num">${relCell(ba)}</td>
           <td class="num">${relCell(bb)}</td>
-          <td class="num ${cls}">${d === null ? "—" : esc(fmtSigned(d, 4))}</td>
-          <td class="num ${cls}">${p === null ? "—" : esc(fmtSigned(p, 1) + "%")}</td>
+          <td class="num ${cls}">${d === null ? "—" : esc(fmtSigned(d))}</td>
+          <td class="num ${cls}">${p === null ? "—" : esc(fmtSigned(p) + "%")}</td>
         </tr>`;
       }).join("")}
     </tbody>
@@ -1219,15 +1364,12 @@ function renderComparison(entryA, entryB) {
   <h2>Raw JSON</h2>
   <details class="card">
     <summary style="cursor:pointer; font-weight:600">Explore the full benchmark JSON</summary>
-    <div class="sub" style="margin:8px 0 10px">Search any key or value in either run. Everything stays in your browser.</div>
-    <h3>A · ${esc(labelA)}</h3>
-    <div class="json-explorer" id="jsonExplorerA"></div>
-    <h3>B · ${esc(labelB)}</h3>
-    <div class="json-explorer" id="jsonExplorerB"></div>
+    <div class="sub" style="margin:8px 0 10px">Search a key, a value, or a dotted path such as HW.CPU. The same field is shown from both runs.</div>
+    <div class="json-explorer" id="jsonExplorerCompare"></div>
   </details>
 </section>`;
 
-  return { html: hero + runs + bench + telemetry + rawJson, specs };
+  return { html: hero + setup + runs + bench + telemetry + rawJson, specs };
 }
 
 // Render the telemetry charts into the canvases created by renderHTML.
@@ -1282,6 +1424,17 @@ function drawCharts(specs) {
 
   // One Chart.js line chart per spec: the metric series plus any aggregate
   // reference lines (mean/Q85) as flat dashed datasets.
+  function formatTick(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return String(v ?? "");
+    return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+  function tooltipLabel(ctx) {
+    const y = ctx.parsed ? ctx.parsed.y : ctx.raw;
+    const name = ctx.dataset && ctx.dataset.label ? ctx.dataset.label + ": " : "";
+    return name + formatTick(y);
+  }
+
   specs.forEach(cfg => {
     const el = document.getElementById(cfg.id);
     if (!el) return;
@@ -1304,10 +1457,12 @@ function drawCharts(specs) {
             x: { type: "linear", min: 0, max: 100,
                  title: { display: true, text: "% of run" },
                  ticks: { maxTicksLimit: 6 } },
-            y: { beginAtZero: true, title: { display: true, text: cfg.unit || "" } },
+            y: { beginAtZero: true, title: { display: true, text: cfg.unit || "" },
+                 ticks: { callback: formatTick } },
           },
           plugins: {
             legend: { position: "top", labels: { boxWidth: 14, font: { size: 11 } } },
+            tooltip: { callbacks: { label: tooltipLabel } },
           },
         },
       });
@@ -1336,11 +1491,13 @@ function drawCharts(specs) {
         interaction: { mode: "index", intersect: false },
         scales: {
           x: { ticks: { maxTicksLimit: 8 } },
-          y: { beginAtZero: true, title: { display: true, text: cfg.unit } },
+          y: { beginAtZero: true, title: { display: true, text: cfg.unit },
+               ticks: { callback: formatTick } },
         },
         plugins: {
           legend: { position: "top",
                     labels: { boxWidth: 14, font: { size: 11 } } },
+          tooltip: { callbacks: { label: tooltipLabel } },
           workloadMarkers: { marks: cfg.markerIdx || [] },
         },
       },
@@ -1353,8 +1510,9 @@ function drawCharts(specs) {
 // `rootEl`. Like drawCharts, this is intentionally self-contained (it does not
 // reference any outer-scope variable) so the "Download as standalone HTML"
 // button can serialize it with `.toString()` and re-run it in the export.
-function initJsonExplorer(rootEl, data) {
+function initJsonExplorer(rootEl, data, opts) {
   if (!rootEl) return;
+  opts = opts || {};
   rootEl.innerHTML = "";
   const CHUNK = 100; // large arrays are shown in slices of this many items
 
@@ -1527,7 +1685,7 @@ function initJsonExplorer(rootEl, data) {
     return node;
   }
 
-  function revealPath(path) {
+  function revealPath(path, quiet) {
     const node = expandToPath(path);
     if (!node) return;
     tree.querySelectorAll(".je-hit").forEach(e => e.classList.remove("je-hit"));
@@ -1535,26 +1693,49 @@ function initJsonExplorer(rootEl, data) {
       ? node.querySelector(":scope > summary")
       : (node.querySelector(":scope > .je-row") || node);
     (target || node).classList.add("je-hit");
-    node.scrollIntoView({ block: "center" });
+    if (!quiet) node.scrollIntoView({ block: "center" });
+  }
+
+  // "HW.CPU" matches a path ending in those segments. "values[0]" is the same as "values.0".
+  function normQuery(q) {
+    return String(q || "").trim().toLowerCase()
+      .replace(/\[(\d+)\]/g, ".$1")
+      .replace(/\.+/g, ".")
+      .replace(/^\./, "")
+      .replace(/\.$/, "");
+  }
+  // "HW.CPU.CPU" matches every path whose tail starts that way, so CPU_Model,
+  // CPU_num, and the rest all show up. Each segment is a prefix of the key.
+  function pathMatches(path, v, query) {
+    const q = normQuery(query);
+    if (!q || !path.length) return false;
+    if (q.includes(".")) {
+      const qsegs = q.split(".").filter(Boolean);
+      const segs = path.map(k => String(k).toLowerCase());
+      if (!qsegs.length || segs.length < qsegs.length) return false;
+      const start = segs.length - qsegs.length;
+      for (let i = 0; i < qsegs.length; i++) {
+        if (!segs[start + i].startsWith(qsegs[i])) return false;
+      }
+      return true;
+    }
+    const lastKey = String(path[path.length - 1]).toLowerCase();
+    if (lastKey.includes(q)) return true;
+    const t = typeOf(v);
+    return t !== "object" && t !== "array" && String(v).toLowerCase().includes(q);
   }
 
   function runSearch(q) {
     results.innerHTML = "";
-    const query = String(q || "").trim().toLowerCase();
+    const query = normQuery(q);
     if (!query) return;
     const MAX = 200;
     const matches = [];
     (function walk(v, path) {
       if (matches.length >= MAX) return;
-      const t = typeOf(v);
-      const lastKey = path.length ? String(path[path.length - 1]) : "";
-      if (lastKey.toLowerCase().includes(query)) {
-        matches.push({ path, v });
-      } else if (t !== "object" && t !== "array" &&
-                 String(v).toLowerCase().includes(query)) {
-        matches.push({ path, v });
-      }
+      if (pathMatches(path, v, query)) matches.push({ path, v });
       if (matches.length >= MAX) return;
+      const t = typeOf(v);
       if (t === "object") for (const k of Object.keys(v)) walk(v[k], path.concat(k));
       else if (t === "array") for (let i = 0; i < v.length; i++) walk(v[i], path.concat(i));
     })(data, []);
@@ -1563,13 +1744,14 @@ function initJsonExplorer(rootEl, data) {
       results.innerHTML = '<div class="je-empty">No matches.</div>';
       return;
     }
+    const shown = matches.slice(0, MAX);
     const head = document.createElement("div");
     head.className = "je-empty";
-    head.textContent = matches.length >= MAX
-      ? "Showing first " + MAX + " matches"
-      : matches.length + " match" + (matches.length > 1 ? "es" : "");
+    head.textContent = (shown.length > 1
+      ? shown.length + " matches · click one to open it in the JSON"
+      : "1 match");
     results.appendChild(head);
-    for (const m of matches) {
+    for (const m of shown) {
       const t = typeOf(m.v);
       const valStr = (t === "object" || t === "array") ? summaryText(m.v) : valueText(m.v);
       const row = document.createElement("div");
@@ -1579,6 +1761,8 @@ function initJsonExplorer(rootEl, data) {
       row.addEventListener("click", () => revealPath(m.path));
       results.appendChild(row);
     }
+    // Open the tree only when the search identifies a single node.
+    if (shown.length === 1) revealPath(shown[0].path);
   }
 
   // Toolbar: search box + expand/collapse controls.
@@ -1587,7 +1771,7 @@ function initJsonExplorer(rootEl, data) {
   const search = document.createElement("input");
   search.type = "search";
   search.className = "je-search";
-  search.placeholder = "Search keys and values…";
+  search.placeholder = "Search keys, values, or a path like HW.CPU";
   const expandBtn = document.createElement("button");
   expandBtn.type = "button";
   expandBtn.className = "je-btn";
@@ -1596,7 +1780,7 @@ function initJsonExplorer(rootEl, data) {
   collapseBtn.type = "button";
   collapseBtn.className = "je-btn";
   collapseBtn.textContent = "Collapse all";
-  toolbar.appendChild(search);
+  if (!opts.hideSearch) toolbar.appendChild(search);
   toolbar.appendChild(expandBtn);
   toolbar.appendChild(collapseBtn);
 
@@ -1606,8 +1790,8 @@ function initJsonExplorer(rootEl, data) {
   results.className = "je-results";
 
   rootEl.appendChild(toolbar);
-  rootEl.appendChild(tree);
   rootEl.appendChild(results);
+  rootEl.appendChild(tree);
 
   // Root level is rendered eagerly; nested branches build on first open.
   buildChildren(tree, data, []);
@@ -1624,10 +1808,194 @@ function initJsonExplorer(rootEl, data) {
     tree.querySelectorAll("details.je-branch").forEach(d => { d.open = false; });
   });
 
-  let searchTimer = null;
+  if (!opts.hideSearch) {
+    let searchTimer = null;
+    search.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => runSearch(search.value), 200);
+    });
+  }
+  return { reveal: revealPath };
+}
+
+// One search across two suite documents. A dotted path such as HW.CPU
+// resolves in both trees, and each matching field is shown side by side.
+function initCompareJsonExplorer(rootEl, dataA, dataB, labelA, labelB) {
+  if (!rootEl) return;
+  rootEl.innerHTML = "";
+  const nameA = labelA || "A";
+  const nameB = labelB || "B";
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g,
+      c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function kind(v) {
+    if (v === null) return "null";
+    if (Array.isArray(v)) return "array";
+    return typeof v;
+  }
+  function pathLabel(path) {
+    let out = "";
+    for (const k of path) {
+      if (typeof k === "number") out += "[" + k + "]";
+      else out += (out ? "." : "") + k;
+    }
+    return out || "(root)";
+  }
+  function normQuery(q) {
+    return String(q || "").trim().toLowerCase()
+      .replace(/\[(\d+)\]/g, ".$1")
+      .replace(/\.+/g, ".")
+      .replace(/^\./, "")
+      .replace(/\.$/, "");
+  }
+  function pathMatches(path, v, query) {
+    const q = normQuery(query);
+    if (!q) return false;
+    if (q.includes(".")) {
+      const qsegs = q.split(".").filter(Boolean);
+      const segs = path.map(k => String(k).toLowerCase());
+      if (!qsegs.length || segs.length < qsegs.length) return false;
+      const start = segs.length - qsegs.length;
+      for (let i = 0; i < qsegs.length; i++) {
+        if (!segs[start + i].startsWith(qsegs[i])) return false;
+      }
+      return true;
+    }
+    const lastKey = path.length ? String(path[path.length - 1]).toLowerCase() : "";
+    if (lastKey.includes(q)) return true;
+    const t = kind(v);
+    return t !== "object" && t !== "array" && String(v).toLowerCase().includes(q);
+  }
+  function lookup(data, path) {
+    let cur = data;
+    for (const p of path) {
+      if (cur == null || typeof cur !== "object" || !(p in cur)) return undefined;
+      cur = cur[p];
+    }
+    return cur;
+  }
+  function collect(data, query) {
+    const out = [];
+    (function walk(v, path) {
+      if (out.length >= 80) return;
+      if (path.length && pathMatches(path, v, query)) out.push(path);
+      if (out.length >= 80) return;
+      const t = kind(v);
+      if (t === "object") for (const k of Object.keys(v)) walk(v[k], path.concat(k));
+      else if (t === "array") for (let i = 0; i < v.length; i++) walk(v[i], path.concat(i));
+    })(data, []);
+    return out;
+  }
+  function preview(v) {
+    if (v === undefined) return "—";
+    const t = kind(v);
+    if (t === "string") return v.length > 80 ? v.slice(0, 77) + "…" : v;
+    if (t === "array") return "[" + v.length + "]";
+    if (t === "object") {
+      const keys = Object.keys(v);
+      return "{" + keys.length + "} " + keys.slice(0, 4).join(", ") + (keys.length > 4 ? ", …" : "");
+    }
+    if (v === null) return "null";
+    return String(v);
+  }
+  function same(a, b) {
+    if (a === undefined && b === undefined) return true;
+    if (a === undefined || b === undefined) return false;
+    const ta = kind(a), tb = kind(b);
+    if (ta !== tb) return false;
+    if (ta === "object" || ta === "array") {
+      try { return JSON.stringify(a) === JSON.stringify(b); }
+      catch (_) { return false; }
+    }
+    return a === b;
+  }
+
+  const toolbar = document.createElement("div");
+  toolbar.className = "je-toolbar";
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "je-search";
+  search.placeholder = "Search both runs, e.g. HW.CPU";
+  toolbar.appendChild(search);
+  const results = document.createElement("div");
+  results.className = "je-results";
+  const sides = document.createElement("div");
+  sides.className = "grid grid-2 je-sides";
+  const colA = document.createElement("div");
+  const colB = document.createElement("div");
+  colA.innerHTML = '<h3>A · ' + escHtml(nameA) + "</h3>";
+  colB.innerHTML = '<h3>B · ' + escHtml(nameB) + "</h3>";
+  const treeA = document.createElement("div");
+  const treeB = document.createElement("div");
+  colA.appendChild(treeA);
+  colB.appendChild(treeB);
+  sides.appendChild(colA);
+  sides.appendChild(colB);
+  rootEl.appendChild(toolbar);
+  rootEl.appendChild(results);
+  rootEl.appendChild(sides);
+
+  const expA = initJsonExplorer(treeA, dataA, { hideSearch: true });
+  const expB = initJsonExplorer(treeB, dataB, { hideSearch: true });
+
+  function show(q) {
+    results.innerHTML = "";
+    const query = normQuery(q);
+    if (!query) return;
+    const seen = new Set();
+    const paths = [];
+    for (const path of collect(dataA, query).concat(collect(dataB, query))) {
+      const id = JSON.stringify(path);
+      if (seen.has(id)) continue;
+      seen.add(id);
+      paths.push(path);
+    }
+    const rows = paths.map(path => ({
+      path,
+      a: lookup(dataA, path),
+      b: lookup(dataB, path),
+    }));
+    if (!rows.length) {
+      results.innerHTML = '<div class="je-empty">No matches.</div>';
+      return;
+    }
+    const table = document.createElement("table");
+    table.className = "je-cmp";
+    const shown = rows.slice(0, 80);
+    table.innerHTML = "<thead><tr><th>Field</th><th>A</th><th>B</th></tr></thead>";
+    const body = document.createElement("tbody");
+    for (const row of shown) {
+      const tr = document.createElement("tr");
+      if (!same(row.a, row.b)) tr.className = "je-diff";
+      tr.innerHTML = '<td class="je-path">' + escHtml(pathLabel(row.path)) + "</td>" +
+        '<td class="je-val">' + escHtml(preview(row.a)) + "</td>" +
+        '<td class="je-val">' + escHtml(preview(row.b)) + "</td>";
+      tr.addEventListener("click", () => {
+        if (expA && expA.reveal) expA.reveal(row.path);
+        if (expB && expB.reveal) expB.reveal(row.path);
+      });
+      body.appendChild(tr);
+    }
+    table.appendChild(body);
+    const head = document.createElement("div");
+    head.className = "je-empty";
+    head.textContent = rows.length > shown.length
+      ? "Showing first " + shown.length + " fields"
+      : shown.length + " field" + (shown.length > 1 ? "s" : "") + " · differing values are emphasized";
+    results.appendChild(head);
+    results.appendChild(table);
+    if (shown.length === 1) {
+      if (expA && expA.reveal) expA.reveal(shown[0].path);
+      if (expB && expB.reveal) expB.reveal(shown[0].path);
+    }
+  }
+
+  let timer = null;
   search.addEventListener("input", () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => runSearch(search.value), 200);
+    clearTimeout(timer);
+    timer = setTimeout(() => show(search.value), 200);
   });
 }
 
@@ -1705,8 +2073,12 @@ function renderSlots() {
   reportBody.innerHTML = view.html;
   drawCharts(view.specs);
   if (slotB) {
-    initJsonExplorer(document.getElementById("jsonExplorerA"), slotA.data);
-    initJsonExplorer(document.getElementById("jsonExplorerB"), slotB.data);
+    initCompareJsonExplorer(
+      document.getElementById("jsonExplorerCompare"),
+      slotA.data, slotB.data,
+      runLabel(slotA.r, slotA.filename),
+      runLabel(slotB.r, slotB.filename)
+    );
   } else {
     initJsonExplorer(document.getElementById("jsonExplorer"), slotA.data);
   }
@@ -1725,6 +2097,8 @@ function renderSlots() {
         specs: view.specs,
         dataA: slotA.data,
         dataB: slotB.data,
+        labelA: runLabel(slotA.r, slotA.filename),
+        labelB: runLabel(slotB.r, slotB.filename),
       }
     : { r: slotA.r, html: view.html, specs: view.specs, data: slotA.data };
   showSlotNames();
@@ -1785,7 +2159,7 @@ async function loadPair(fileA, fileB) {
 function bindDropzone(el, input, slot) {
   input.addEventListener("click", e => e.stopPropagation());
   el.addEventListener("click", e => {
-    if (e.target.closest("a")) return;
+    if (e.target.closest("a, textarea, button, input")) return;
     input.click();
   });
   input.addEventListener("change", e => {
@@ -1824,6 +2198,7 @@ document.getElementById("btnNew").addEventListener("click", () => {
   fileInputB.value = "";
   document.getElementById("fileInputCompare").value = "";
   document.getElementById("pasteInput").value = "";
+  document.getElementById("pasteInputB").value = "";
   document.getElementById("pasteReportInput").value = "";
   document.getElementById("pasteReport").classList.add("hidden");
   const btn = document.getElementById("btnCompare");
@@ -1833,6 +2208,13 @@ document.getElementById("btnNew").addEventListener("click", () => {
 });
 
 document.getElementById("btnCompare").addEventListener("click", () => {
+  const panel = document.getElementById("pasteReport");
+  panel.classList.remove("hidden");
+  const box = document.getElementById("pasteReportInput");
+  box.focus();
+  panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+document.getElementById("btnCompareFile").addEventListener("click", () => {
   document.getElementById("fileInputCompare").click();
 });
 document.getElementById("fileInputCompare").addEventListener("change", e => {
@@ -1841,11 +2223,13 @@ document.getElementById("fileInputCompare").addEventListener("change", e => {
   if (f) loadSlot("b", f);
 });
 
-document.getElementById("btnPasteA").addEventListener("click", () => {
+document.getElementById("btnPasteA").addEventListener("click", e => {
+  e.stopPropagation();
   loadPasted("a", document.getElementById("pasteInput"), "pasted.json");
 });
-document.getElementById("btnPasteB").addEventListener("click", () => {
-  loadPasted("b", document.getElementById("pasteInput"), "pasted comparison");
+document.getElementById("btnPasteB").addEventListener("click", e => {
+  e.stopPropagation();
+  loadPasted("b", document.getElementById("pasteInputB"), "pasted comparison");
 });
 document.getElementById("btnPasteToggle").addEventListener("click", () => {
   document.getElementById("pasteReport").classList.toggle("hidden");
@@ -1885,8 +2269,10 @@ document.getElementById("btnDownload").addEventListener("click", async () => {
   const safeJson = obj => JSON.stringify(obj).replace(/</g, "\\u003c");
   let explorerInit = "";
   if (lastReport.dataA !== undefined && lastReport.dataB !== undefined) {
-    explorerInit = `(${initJsonExplorer.toString()})(document.getElementById("jsonExplorerA"), ${safeJson(lastReport.dataA)});`
-      + `(${initJsonExplorer.toString()})(document.getElementById("jsonExplorerB"), ${safeJson(lastReport.dataB)});`;
+    const labelA = JSON.stringify(lastReport.labelA || "A").replace(/</g, "\\u003c");
+    const labelB = JSON.stringify(lastReport.labelB || "B").replace(/</g, "\\u003c");
+    explorerInit = `${initJsonExplorer.toString()}\n${initCompareJsonExplorer.toString()}\n`
+      + `initCompareJsonExplorer(document.getElementById("jsonExplorerCompare"), ${safeJson(lastReport.dataA)}, ${safeJson(lastReport.dataB)}, ${labelA}, ${labelB});`;
   } else if (lastReport.data !== undefined) {
     explorerInit = `(${initJsonExplorer.toString()})(document.getElementById("jsonExplorer"), ${safeJson(lastReport.data)});`;
   }
